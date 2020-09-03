@@ -1,7 +1,6 @@
 package commands;
 
 import bot.NASABot;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.text.ParseException;

@@ -1,10 +1,9 @@
 package commands;
 
 import bot.NASABot;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
-public class ImageSearch  extends Command {
+public class ImageSearch  extends NASACommand {
 
     public ImageSearch() {
         this.name = "image";
@@ -15,7 +14,7 @@ public class ImageSearch  extends Command {
     @Override
     protected void execute(CommandEvent commandEvent) {
         if (commandEvent.getArgs().isEmpty()) {
-            commandEvent.replyError("No search term provided, please check your formatting: \n```");
+            commandEvent.replyError(String.format("No search term provided, please check your formatting: %s", this.getArgumentsString()));
         } else {
             commandEvent.reply(NASABot.apiClient.getNASAImage(commandEvent.getArgs()));
         }

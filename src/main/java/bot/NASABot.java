@@ -2,6 +2,8 @@ package bot;
 
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import commands.ImageSearch;
+import commands.Info;
 import commands.POTD;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
@@ -17,7 +19,6 @@ public class NASABot {
     public static JDA jda;
     public static String prefix = "NASA_";
     public static APIClient apiClient = new APIClient();
-
     public static void main(String[] args) throws LoginException {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
         String token = null;
@@ -33,11 +34,11 @@ public class NASABot {
         }
 
         CommandClientBuilder builder = new CommandClientBuilder();
-        builder.setPrefix("NASA_");
-        builder.addCommands(new POTD());
+        builder.setPrefix(prefix);
+        builder.addCommands(new POTD(), new ImageSearch(), new Info());
         builder.setOwnerId(ownerId);
         CommandClient commandClient = builder.build();
 
-        jda = new JDABuilder(AccountType.BOT).setToken(token).setActivity(Activity.watching("the sky.")).addEventListeners(commandClient).build();
+        jda = new JDABuilder(AccountType.BOT).setToken(token).addEventListeners(commandClient).setActivity(Activity.watching("the sky.")).build();
     }
 }
