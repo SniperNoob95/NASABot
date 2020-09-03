@@ -5,6 +5,8 @@ This project is a work in progress, and will be updated iteratively as features 
 
 See [the project board](https://github.com/SniperNoob95/NASABot/projects/1) for insight into upcoming additions/changes.
 
+Join the [Discord server](https://discord.gg/b4wS5q4) if interested.
+
 **Contact Sniper Noob#5606 (181588597558738954) on Discord if needed.**
 
 ## Command Usage
