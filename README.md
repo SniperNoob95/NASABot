@@ -9,6 +9,8 @@ Join the [Discord server](https://discord.gg/b4wS5q4) if interested.
 
 **Contact Sniper Noob#5606 (181588597558738954) on Discord if needed.**
 
+Credits to https://github.com/JDA-Applications/JDA-Utilities for providing the extremely helpful JDA-Utilities library.
+
 ## Command Usage
 #### POTD
     NASA_POTD [date (YYYY-MM-DD)]
@@ -21,3 +23,7 @@ Returns an image from the NASA image database that matches the given search term
 #### Info
     NASA_info
 Returns information about the bot.
+
+#### Help
+    NASA_help
+Sends the caller a PM with help for using the bot.
