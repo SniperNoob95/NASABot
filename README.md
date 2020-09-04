@@ -1,7 +1,7 @@
 # NASABot
 A Discord bot that implements the NASA API to provide cool, interesting, and informative artifacts.
 
-[Discord Invite Link](https://discord.com/api/oauth2/authorize?client_id=748775876077813881&permissions=67226688&scope=bot)
+####[Discord Invite Link](https://discord.com/api/oauth2/authorize?client_id=748775876077813881&permissions=67226688&scope=bot)
 
 This project is a work in progress, and will be updated iteratively as features are added.
 
