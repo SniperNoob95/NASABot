@@ -21,3 +21,7 @@ Returns an image from the NASA image database that matches the given search term
 #### Info
     NASA_info
 Returns information about the bot.
+
+#### Help
+    NASA_help
+Sends the caller a PM with help for using the bot.
