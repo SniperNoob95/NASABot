@@ -2,3 +2,4 @@ src/main/resources/
 *.iml
 .idea/
 /target
+*.sh
