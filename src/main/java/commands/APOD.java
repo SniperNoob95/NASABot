@@ -18,6 +18,8 @@ public class APOD extends NASACommand {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
+        this.insertCommand(commandEvent);
+
         if (commandEvent.getArgs().isEmpty()) {
             commandEvent.reply(NASABot.apiClient.getPictureOfTheDay(simpleDateFormat.format(System.currentTimeMillis() - 86400000)));
         } else {

@@ -16,6 +16,8 @@ public class Info extends NASACommand {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
+        this.insertCommand(commandEvent);
+
         List<Guild> guildList = NASABot.jda.getGuilds();
         int numServers = guildList.size();
         int numPlayers  = 0;

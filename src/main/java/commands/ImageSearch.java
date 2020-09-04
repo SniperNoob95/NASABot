@@ -13,6 +13,8 @@ public class ImageSearch  extends NASACommand {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
+        this.insertCommand(commandEvent);
+
         if (commandEvent.getArgs().isEmpty()) {
             commandEvent.replyError(String.format("No search term provided, please check your formatting: %s", this.getArgumentsString()));
         } else {
