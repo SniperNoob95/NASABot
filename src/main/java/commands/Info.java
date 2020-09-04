@@ -29,6 +29,7 @@ public class Info extends NASACommand {
         embedBuilder.addField("GitHub", "https://github.com/SniperNoob95", false);
         embedBuilder.addField("Servers Present", String.format("%s",numServers), false);
         embedBuilder.addField("Players Served", String.format("%s", numPlayers), false);
+        embedBuilder.addField("NASABot Discord Server", "https://discord.gg/b4wS5q4", false);
         embedBuilder.setFooter("Created by Sniper Noob", "https://i.imgur.com/ilKsNnn.png");
 
         commandEvent.reply(embedBuilder.build());

@@ -4,11 +4,10 @@ import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import commands.ImageSearch;
 import commands.Info;
-import commands.POTD;
+import commands.APOD;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
 import utils.APIClient;
 
 import javax.security.auth.login.LoginException;
@@ -19,7 +18,7 @@ public class NASABot {
     public static JDA jda;
     public static String prefix = "NASA_";
     public static APIClient apiClient = new APIClient();
-    public static void main(String[] args) throws LoginException {
+    public static void main(String[] args) throws LoginException, InterruptedException {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
         String token = null;
         String ownerId = null;
@@ -35,10 +34,10 @@ public class NASABot {
 
         CommandClientBuilder builder = new CommandClientBuilder();
         builder.setPrefix(prefix);
-        builder.addCommands(new POTD(), new ImageSearch(), new Info());
+        builder.addCommands(new APOD(), new ImageSearch(), new Info());
         builder.setOwnerId(ownerId);
         CommandClient commandClient = builder.build();
 
-        jda = new JDABuilder(AccountType.BOT).setToken(token).addEventListeners(commandClient).setActivity(Activity.watching("the sky.")).build();
+        jda = new JDABuilder(AccountType.BOT).setToken(token).addEventListeners(commandClient).build().awaitReady();
     }
 }
