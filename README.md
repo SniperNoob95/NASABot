@@ -14,7 +14,7 @@ Join the [Discord server](https://discord.gg/b4wS5q4) if interested.
 Credits to https://github.com/JDA-Applications/JDA-Utilities for providing the extremely helpful JDA-Utilities library.
 
 ## Command Usage
-#### POTD
+#### AOTD
     NASA_POTD [date (YYYY-MM-DD)]
 Returns the Astronomy Picture of the Day for the previous day, or the given date if provided.
 
