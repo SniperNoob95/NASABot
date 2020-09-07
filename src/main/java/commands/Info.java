@@ -28,7 +28,7 @@ public class Info extends NASACommand {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setTitle("NASABot");
         embedBuilder.setDescription("Information about the bot.");
-        embedBuilder.addField("GitHub", "https://github.com/SniperNoob95", false);
+        embedBuilder.addField("GitHub", "https://github.com/SniperNoob95/NASABot", false);
         embedBuilder.addField("Servers Present", String.format("%s",numServers), false);
         embedBuilder.addField("Players Served", String.format("%s", numPlayers), false);
         embedBuilder.addField("NASABot Discord Server", "https://discord.gg/b4wS5q4", false);
