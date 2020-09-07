@@ -11,7 +11,7 @@ public class Info extends NASACommand {
 
     public Info() {
         this.name = "info";
-        this.help = "Displays information about the bot.";
+        this.help = "Displays information, GitHub, and invite link for the bot.";
     }
 
     @Override
