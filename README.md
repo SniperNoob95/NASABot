@@ -16,10 +16,12 @@ Credits to https://github.com/JDA-Applications/JDA-Utilities for providing the e
 ## Command Usage
 #### APOD
     NASA_POTD [date (YYYY-MM-DD)]
+    Ex: NASA_POTD 2020-09-05
 Returns the Astronomy Picture of the Day for the previous day, or the given date if provided.
 
 #### Image
     NASA_image <search term>
+    Ex: NASA_image black hole
 Returns an image from the NASA image database that matches the given search term.
 
 #### Info
