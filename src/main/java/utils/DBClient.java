@@ -9,8 +9,6 @@ import okhttp3.Response;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.ResourceBundle;
 
 public class DBClient {
@@ -44,8 +42,9 @@ public class DBClient {
     public void insertCommand(CommandEvent commandEvent, String command) {
         JSONObject payload = new JSONObject();
         payload.put("date", System.currentTimeMillis() / 1000);
-        payload.put("username", commandEvent.getMember().getEffectiveName());
+        payload.put("username", commandEvent.getMember().getUser().getName());
         payload.put("userid", commandEvent.getMember().getIdLong());
+        payload.put("serverid", commandEvent.getGuild().getIdLong());
         payload.put("command", command);
         payload.put("args", commandEvent.getArgs());
 
