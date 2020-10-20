@@ -18,7 +18,7 @@ public class NASABot {
 
     public static JDA jda;
     public static String prefix = "NASA_";
-    public static APIClient apiClient = new APIClient();
+    public static APIClient apiClient;
     public static DBClient dbClient;
     public static void main(String[] args) throws LoginException, InterruptedException {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
@@ -42,5 +42,6 @@ public class NASABot {
 
         jda = new JDABuilder(AccountType.BOT).setToken(token).addEventListeners(commandClient).build().awaitReady();
         dbClient = new DBClient();
+        apiClient = new APIClient();
     }
 }

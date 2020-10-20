@@ -27,6 +27,8 @@ public class DBClient {
                 System.out.println("Healthcheck failed.");
                 System.exit(0);
             }
+
+            healthCheck.close();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Cannot contact API.");
@@ -45,6 +47,7 @@ public class DBClient {
         payload.put("username", commandEvent.getMember().getUser().getName());
         payload.put("userid", commandEvent.getMember().getIdLong());
         payload.put("serverid", commandEvent.getGuild().getIdLong());
+        payload.put("servername", commandEvent.getGuild().getName());
         payload.put("command", command);
         payload.put("args", commandEvent.getArgs());
 
@@ -56,6 +59,8 @@ public class DBClient {
             if (response.code() != 201) {
                 System.out.println(String.format("Failed to insert command: %s", payload));
             }
+
+            response.close();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(String.format("Failed to insert command: %s", payload));
