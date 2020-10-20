@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -38,7 +39,10 @@ public class APIClient {
             HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(baseUrl + "/planetary/apod")).newBuilder();
             builder.addQueryParameter("api_key", apiKey).addQueryParameter("date", date);
             Request request = new Request.Builder().url(builder.build().toString()).build();
-            return formatPictureOfTheDay(Objects.requireNonNull(httpClient.newCall(request).execute().body()).string());
+            Response response = httpClient.newCall(request).execute();
+            MessageEmbed embed = formatPictureOfTheDay(Objects.requireNonNull(response.body()).string());
+            response.close();
+            return embed;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,7 +78,10 @@ public class APIClient {
             HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(imageUrl + "/search")).newBuilder();
             builder.addQueryParameter("media_type", "image").addQueryParameter("q", searchTerm);
             Request request = new Request.Builder().url(builder.build().toString()).build();
-            return formatNASAImage(Objects.requireNonNull(httpClient.newCall(request).execute().body()).string());
+            Response response = httpClient.newCall(request).execute();
+            MessageEmbed embed = formatNASAImage(Objects.requireNonNull(response.body()).string());
+            response.close();
+            return embed;
         } catch (Exception e) {
             e.printStackTrace();
         }
