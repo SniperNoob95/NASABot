@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import utils.APIClient;
 import utils.DBClient;
+import utils.TopGGClient;
 
 import javax.security.auth.login.LoginException;
 import java.util.ResourceBundle;
@@ -20,6 +21,7 @@ public class NASABot {
     public static String prefix = "NASA_";
     public static APIClient apiClient;
     public static DBClient dbClient;
+    public static TopGGClient topGGClient;
     public static void main(String[] args) throws LoginException, InterruptedException {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
         String token = null;
@@ -43,5 +45,6 @@ public class NASABot {
         jda = new JDABuilder(AccountType.BOT).setToken(token).addEventListeners(commandClient).build().awaitReady();
         dbClient = new DBClient();
         apiClient = new APIClient();
+        topGGClient = new TopGGClient();
     }
 }
