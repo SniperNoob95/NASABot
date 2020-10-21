@@ -1,5 +1,7 @@
 # NASABot
-A Discord bot that implements the NASA API to provide cool, interesting, and informative artifacts.
+A Discord bot that implements the NASA API to provide cool, interesting, and informative artifacts.\
+[![Discord Bots](https://top.gg/api/widget/status/748775876077813881.svg)](https://top.gg/bot/748775876077813881)
+[![Discord Bots](https://top.gg/api/widget/servers/748775876077813881.svg)](https://top.gg/bot/748775876077813881)
 
 #### [Discord Invite Link](https://discord.com/api/oauth2/authorize?client_id=748775876077813881&permissions=67226688&scope=bot)
 
