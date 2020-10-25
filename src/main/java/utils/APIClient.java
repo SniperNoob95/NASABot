@@ -58,9 +58,9 @@ public class APIClient {
             EmbedBuilder embedBuilder = new EmbedBuilder();
             embedBuilder
                     .setTitle(jsonObject.getString("title"))
-                    .setDescription(String.format("%S", jsonObject.getString("explanation")))
+                    .setDescription(String.format("%s", outputDateFormat.format(inputDateFormat.parse(jsonObject.getString("date")))))
                     .setColor(Color.GREEN)
-                    .addField("Date", String.format("%S", outputDateFormat.format(inputDateFormat.parse(jsonObject.getString("date")))), false);
+                    .addField("Description", String.format("%s", jsonObject.getString("explanation")), false);
             if (jsonObject.getString("url").contains("youtube.com")) {
                 embedBuilder.addField("Video Link", jsonObject.getString("url"), false);
             } else {
