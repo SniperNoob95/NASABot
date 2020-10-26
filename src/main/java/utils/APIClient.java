@@ -60,7 +60,7 @@ public class APIClient {
                     .setTitle(jsonObject.getString("title"))
                     .setDescription(String.format("%s", outputDateFormat.format(inputDateFormat.parse(jsonObject.getString("date")))))
                     .setColor(Color.GREEN)
-                    .addField("Description", jsonObject.getString("description").length() > 1024 ? String.format("%s", jsonObject.getString("explanation")).substring(0, 1020) + "..." : String.format("%s", jsonObject.getString("explanation")), false);
+                    .addField("Description", jsonObject.getString("explanation").length() > 1024 ? String.format("%s", jsonObject.getString("explanation")).substring(0, 1020) + "..." : String.format("%s", jsonObject.getString("explanation")), false);
             if (jsonObject.getString("url").contains("youtube.com")) {
                 embedBuilder.addField("Video Link", jsonObject.getString("url"), false);
             } else {
