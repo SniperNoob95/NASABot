@@ -8,6 +8,8 @@ import commands.APOD;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import utils.APIClient;
 import utils.DBClient;
 import utils.TopGGClient;
@@ -42,7 +44,7 @@ public class NASABot {
         builder.setOwnerId(ownerId);
         CommandClient commandClient = builder.build();
 
-        jda = JDABuilder.createDefault(token).addEventListeners(commandClient).build().awaitReady();
+        jda = JDABuilder.createDefault(token).enableIntents(GatewayIntent.GUILD_MEMBERS).addEventListeners(commandClient).build().awaitReady();
         //jda = new JDABuilder(AccountType.BOT).setToken(token).addEventListeners(commandClient).build().awaitReady();
         dbClient = new DBClient();
         apiClient = new APIClient();

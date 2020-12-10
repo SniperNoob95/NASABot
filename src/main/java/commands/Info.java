@@ -22,7 +22,7 @@ public class Info extends NASACommand {
         int numServers = guildList.size();
         int numPlayers  = 0;
         for (Guild guild : guildList) {
-            numPlayers += guild.getMembers().size();
+            numPlayers += guild.getMemberCount();
         }
 
         EmbedBuilder embedBuilder = new EmbedBuilder();
