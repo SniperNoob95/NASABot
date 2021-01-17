@@ -58,7 +58,7 @@ public class DBClient {
         payload.put("serverid", commandEvent.getGuild().getIdLong());
         payload.put("servername", commandEvent.getGuild().getName());
         payload.put("command", command);
-        payload.put("args", commandEvent.getArgs());
+        payload.put("args", commandEvent.getArgs() == null ? "" : commandEvent.getArgs());
 
         try {
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), payload.toString());
