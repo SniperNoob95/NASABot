@@ -93,6 +93,8 @@ public class DBClient {
         payload.put("serverId", serverId);
         payload.put("channelId", channelId);
 
+        System.out.println(payload.toString(4));
+
         try {
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), payload.toString());
             Request request = new Request.Builder().url(url + "/postChannels").post(requestBody).build();
@@ -148,7 +150,6 @@ public class DBClient {
      * @return ID of postChannel, or 0 if none.
      */
     public long getPostChannel(long serverId) {
-        System.out.println(serverId);
         try {
             HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url + "/postChannels")).newBuilder();
             builder.addQueryParameter("serverId", String.valueOf(serverId));
