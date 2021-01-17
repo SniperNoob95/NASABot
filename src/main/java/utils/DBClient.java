@@ -166,7 +166,7 @@ public class DBClient {
             if (jsonArray.length() == 0) {
                 return null;
             } else {
-                return jsonArray.getJSONObject(0).getString("channelId");
+                return jsonArray.getJSONObject(0).getString("channel_id");
             }
 
         } catch (Exception e) {
