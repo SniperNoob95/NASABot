@@ -51,14 +51,18 @@ public class DBClient {
      * @param command The command issued.
      */
     public void insertCommand(CommandEvent commandEvent, String command) {
-        JSONObject payload = new JSONObject();
-        payload.put("date", System.currentTimeMillis() / 1000);
-        payload.put("username", commandEvent.getMember().getUser().getName());
-        payload.put("userid", commandEvent.getMember().getIdLong());
-        payload.put("serverid", commandEvent.getGuild().getIdLong());
-        payload.put("servername", commandEvent.getGuild().getName());
-        payload.put("command", command);
-        payload.put("args", commandEvent.getArgs() == null ? "" : commandEvent.getArgs());
+        try {
+            JSONObject payload = new JSONObject();
+            payload.put("date", System.currentTimeMillis() / 1000);
+            payload.put("username", commandEvent.getMember().getUser().getName());
+            payload.put("userid", commandEvent.getMember().getIdLong());
+            payload.put("serverid", commandEvent.getGuild().getIdLong());
+            payload.put("servername", commandEvent.getGuild().getName());
+            payload.put("command", command);
+            payload.put("args", commandEvent.getArgs() == null ? "" : commandEvent.getArgs());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         try {
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), payload.toString());
