@@ -100,6 +100,7 @@ public class DBClient {
 
             if (response.code() != 201) {
                 System.out.println(String.format("Failed to insert postChannel: %s", payload));
+                response.close();
                 return false;
             }
 
@@ -125,8 +126,9 @@ public class DBClient {
             Request request = new Request.Builder().url(builder.build()).delete().build();
             Response response = httpClient.newCall(request).execute();
 
-            if (response.code() != 201) {
+            if (response.code() != 200) {
                 System.out.println(String.format("Failed to delete postChannel: %s", serverId));
+                response.close();
                 return false;
             }
 
@@ -152,8 +154,9 @@ public class DBClient {
             Request request = new Request.Builder().url(builder.build()).get().build();
             Response response = httpClient.newCall(request).execute();
 
-            if (response.code() != 201) {
+            if (response.code() != 200) {
                 System.out.println(String.format("Failed to get postChannel: %s", serverId));
+                response.close();
                 return 0;
             }
 
