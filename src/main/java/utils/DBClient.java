@@ -51,8 +51,8 @@ public class DBClient {
      * @param command The command issued.
      */
     public void insertCommand(CommandEvent commandEvent, String command) {
+        JSONObject payload = new JSONObject();
         try {
-            JSONObject payload = new JSONObject();
             payload.put("date", System.currentTimeMillis() / 1000);
             payload.put("username", commandEvent.getMember().getUser().getName());
             payload.put("userid", commandEvent.getMember().getIdLong());
