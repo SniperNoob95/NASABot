@@ -87,7 +87,7 @@ public class DBClient {
      * @param channelId ID of the channel.
      * @return True if successful, else false.
      */
-    public boolean addPostChannel(long serverId, long channelId) {
+    public boolean addPostChannel(String serverId, String channelId) {
         JSONObject payload = new JSONObject();
         payload.put("dateAdded", System.currentTimeMillis() / 1000);
         payload.put("serverId", serverId);
@@ -119,10 +119,10 @@ public class DBClient {
      * @param serverId ID of the server.
      * @return True if successful, else false.
      */
-    public boolean deletePostChannel(long serverId) {
+    public boolean deletePostChannel(String serverId) {
         try {
             HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url + "/postChannels")).newBuilder();
-            builder.addQueryParameter("serverId", String.valueOf(serverId));
+            builder.addQueryParameter("serverId", serverId);
             Request request = new Request.Builder().url(builder.build()).delete().build();
             Response response = httpClient.newCall(request).execute();
 
@@ -147,10 +147,10 @@ public class DBClient {
      * @param serverId ID of the server.
      * @return ID of postChannel, or 0 if none.
      */
-    public long getPostChannel(long serverId) {
+    public long getPostChannel(String serverId) {
         try {
             HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url + "/postChannels")).newBuilder();
-            builder.addQueryParameter("serverId", String.valueOf(serverId));
+            builder.addQueryParameter("serverId", serverId);
             Request request = new Request.Builder().url(builder.build()).get().build();
             Response response = httpClient.newCall(request).execute();
 

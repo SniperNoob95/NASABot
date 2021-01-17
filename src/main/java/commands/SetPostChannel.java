@@ -23,9 +23,9 @@ public class SetPostChannel extends NASACommand {
             return;
         }
 
-        if (NASABot.dbClient.getPostChannel(commandEvent.getGuild().getIdLong()) != 0) {
+        if (NASABot.dbClient.getPostChannel(commandEvent.getGuild().getId()) != 0) {
             try {
-                TextChannel textChannel = commandEvent.getGuild().getTextChannelById(NASABot.dbClient.getPostChannel(commandEvent.getGuild().getIdLong()));
+                TextChannel textChannel = commandEvent.getGuild().getTextChannelById(NASABot.dbClient.getPostChannel(commandEvent.getGuild().getId()));
                 commandEvent.replyError(String.format("This server is already using %s as the Post Channel. Please clear " +
                         "it before setting a new one with the following command:\n```NASA_removePostChannel```", Objects.requireNonNull(textChannel).getAsMention()));
             } catch (Exception e) {
@@ -37,7 +37,7 @@ public class SetPostChannel extends NASACommand {
 
         if (commandEvent.getMessage().getMentionedChannels().size() > 0) {
             TextChannel textChannel = commandEvent.getMessage().getMentionedChannels().get(0);
-            if(NASABot.dbClient.addPostChannel(commandEvent.getGuild().getIdLong(), textChannel.getIdLong())) {
+            if(NASABot.dbClient.addPostChannel(commandEvent.getGuild().getId(), textChannel.getId())) {
                 commandEvent.reply(String.format("%s has been set as the Post Channel for this server.", textChannel.getAsMention()));
             }
         } else {
