@@ -11,6 +11,7 @@ public class APOD extends NASACommand {
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public APOD() {
+        super();
         this.name = "APOD";
         this.help = "Displays the Picture of the Day from yesterday, or the specified date.";
         this.arguments = "[date (yyyy-mm-dd)]";

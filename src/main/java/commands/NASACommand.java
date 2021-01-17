@@ -25,6 +25,8 @@ public abstract class NASACommand extends Command {
     }
 
     public void insertCommand(CommandEvent commandEvent) {
-        NASABot.dbClient.insertCommand(commandEvent, this.getName());
+        System.out.println(this.getName());
+        System.out.println(this.name);
+        NASABot.dbClient.insertCommand(commandEvent, this.name);
     }
 }
