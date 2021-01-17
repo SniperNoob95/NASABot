@@ -14,7 +14,14 @@ public abstract class NASACommand extends Command {
     }
 
     public String getArgumentsString() {
-        return String.format("\n```NASA_%s %s```", this.name, this.arguments);
+        String arguments;
+        try {
+            arguments =  String.format("\n```NASA_%s %s```", this.name, this.arguments);
+        } catch (NullPointerException e) {
+            arguments = String.format("\n```NASA_%s %s```", this.name, "");
+        }
+
+        return arguments;
     }
 
     public void insertCommand(CommandEvent commandEvent) {
