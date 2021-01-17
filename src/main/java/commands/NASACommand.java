@@ -16,17 +16,15 @@ public abstract class NASACommand extends Command {
     public String getArgumentsString() {
         String arguments;
         try {
-            arguments =  String.format("\n```NASA_%s %s```", this.name, this.arguments);
+            arguments =  String.format("\n```NASA_%s %s```", this.getName(), this.getArguments());
         } catch (NullPointerException e) {
-            arguments = String.format("\n```NASA_%s %s```", this.name, "");
+            arguments = String.format("\n```NASA_%s %s```", this.getName(), "");
         }
 
         return arguments;
     }
 
     public void insertCommand(CommandEvent commandEvent) {
-        System.out.println(this.getName());
-        System.out.println(this.name);
-        NASABot.dbClient.insertCommand(commandEvent, this.name);
+        NASABot.dbClient.insertCommand(commandEvent, this.getName());
     }
 }

@@ -153,13 +153,14 @@ public class DBClient {
             Response response = httpClient.newCall(request).execute();
 
             if (response.code() != 201) {
-                System.out.println(String.format("Failed to delete postChannel: %s", serverId));
+                System.out.println(String.format("Failed to get postChannel: %s", serverId));
                 return 0;
             }
 
             JSONArray jsonArray = new JSONArray(Objects.requireNonNull(response.body()).string());
             response.close();
 
+            System.out.println(jsonArray.toString(4));
             if (jsonArray.length() == 0) {
                 return 0;
             } else {
