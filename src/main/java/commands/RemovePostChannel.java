@@ -19,7 +19,7 @@ public class RemovePostChannel extends NASACommand {
             return;
         }
 
-        if (NASABot.dbClient.deletePostChannel(commandEvent.getGuild().getIdLong())) {
+        if (NASABot.dbClient.deletePostChannel(commandEvent.getGuild().getId())) {
             commandEvent.reply("Post Channels for this server have been removed.");
         } else {
             commandEvent.replyError("There was a problem removing the server's Post Channel.");

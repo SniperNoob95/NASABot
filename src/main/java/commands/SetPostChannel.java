@@ -23,7 +23,7 @@ public class SetPostChannel extends NASACommand {
             return;
         }
 
-        if (NASABot.dbClient.getPostChannel(commandEvent.getGuild().getId()) != 0) {
+        if (NASABot.dbClient.getPostChannel(commandEvent.getGuild().getId()) != null) {
             try {
                 TextChannel textChannel = commandEvent.getGuild().getTextChannelById(NASABot.dbClient.getPostChannel(commandEvent.getGuild().getId()));
                 commandEvent.replyError(String.format("This server is already using %s as the Post Channel. Please clear " +

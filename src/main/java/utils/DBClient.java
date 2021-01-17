@@ -147,7 +147,7 @@ public class DBClient {
      * @param serverId ID of the server.
      * @return ID of postChannel, or 0 if none.
      */
-    public long getPostChannel(String serverId) {
+    public String getPostChannel(String serverId) {
         try {
             HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url + "/postChannels")).newBuilder();
             builder.addQueryParameter("serverId", serverId);
@@ -157,22 +157,22 @@ public class DBClient {
             if (response.code() != 200) {
                 System.out.println(String.format("Failed to get postChannel: %s", serverId));
                 response.close();
-                return 0;
+                return null;
             }
 
             JSONArray jsonArray = new JSONArray(Objects.requireNonNull(response.body()).string());
             response.close();
 
             if (jsonArray.length() == 0) {
-                return 0;
+                return null;
             } else {
-                return jsonArray.getJSONObject(0).getLong("channelId");
+                return jsonArray.getJSONObject(0).getString("channelId");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(String.format("Failed to insert command: %s", serverId));
-            return 0;
+            return null;
         }
     }
 }
