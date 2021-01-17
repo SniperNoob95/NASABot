@@ -93,8 +93,6 @@ public class DBClient {
         payload.put("serverId", serverId);
         payload.put("channelId", channelId);
 
-        System.out.println(payload.toString(4));
-
         try {
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), payload.toString());
             Request request = new Request.Builder().url(url + "/postChannels").post(requestBody).build();
@@ -165,7 +163,6 @@ public class DBClient {
             JSONArray jsonArray = new JSONArray(Objects.requireNonNull(response.body()).string());
             response.close();
 
-            System.out.println(jsonArray.toString(4));
             if (jsonArray.length() == 0) {
                 return 0;
             } else {
