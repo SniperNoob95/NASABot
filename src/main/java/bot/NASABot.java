@@ -2,9 +2,12 @@ package bot;
 
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import commands.GetPostChannel;
 import commands.ImageSearch;
 import commands.Info;
 import commands.APOD;
+import commands.RemovePostChannel;
+import commands.SetPostChannel;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -40,12 +43,11 @@ public class NASABot {
 
         CommandClientBuilder builder = new CommandClientBuilder();
         builder.setPrefix(prefix);
-        builder.addCommands(new APOD(), new ImageSearch(), new Info());
+        builder.addCommands(new APOD(), new ImageSearch(), new Info(), new SetPostChannel(), new GetPostChannel(), new RemovePostChannel());
         builder.setOwnerId(ownerId);
         CommandClient commandClient = builder.build();
 
         jda = JDABuilder.createDefault(token).enableIntents(GatewayIntent.GUILD_MEMBERS).addEventListeners(commandClient).build().awaitReady();
-        //jda = new JDABuilder(AccountType.BOT).setToken(token).addEventListeners(commandClient).build().awaitReady();
         dbClient = new DBClient();
         apiClient = new APIClient();
         topGGClient = new TopGGClient();
