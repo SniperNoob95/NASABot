@@ -55,8 +55,8 @@ public class DBClient {
         try {
             payload.put("date", System.currentTimeMillis() / 1000);
             payload.put("username", commandEvent.getMember().getUser().getName());
-            payload.put("userid", commandEvent.getMember().getIdLong());
-            payload.put("serverid", commandEvent.getGuild().getIdLong());
+            payload.put("userid", commandEvent.getMember().getId());
+            payload.put("serverid", commandEvent.getGuild().getId());
             payload.put("servername", commandEvent.getGuild().getName());
             payload.put("command", command);
             payload.put("args", commandEvent.getArgs() == null ? "" : commandEvent.getArgs());

@@ -28,9 +28,11 @@ public class SetPostChannel extends NASACommand {
                 TextChannel textChannel = commandEvent.getGuild().getTextChannelById(NASABot.dbClient.getPostChannel(commandEvent.getGuild().getId()));
                 commandEvent.replyError(String.format("This server is already using %s as the Post Channel. Please clear " +
                         "it before setting a new one with the following command:\n```NASA_removePostChannel```", Objects.requireNonNull(textChannel).getAsMention()));
+                return;
             } catch (Exception e) {
                 commandEvent.replyError("There is already a Post Channel set for this server, but the bot does not have permission to view it. " +
                         "Please clear the current Post Channel before setting a new one with the following command:\n```NASA_removePostChannel```");
+                return;
             }
 
         }
