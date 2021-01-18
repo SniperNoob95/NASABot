@@ -14,8 +14,6 @@ Join the [Discord server](https://discord.gg/b4wS5q4) if interested.
 
 **Contact Sniper Noob#5606 (181588597558738954) on Discord if needed.**
 
-Credits to https://github.com/JDA-Applications/JDA-Utilities for providing the extremely helpful JDA-Utilities library.
-
 ## Command Usage
 #### setPostChannel
 	NASA_setPostChannel <#channel mention>
