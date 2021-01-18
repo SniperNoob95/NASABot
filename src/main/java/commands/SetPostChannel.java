@@ -18,7 +18,7 @@ public class SetPostChannel extends NASACommand {
     protected void execute(CommandEvent commandEvent) {
         this.insertCommand(commandEvent);
 
-        if (!commandEvent.getMember().hasPermission(Permission.ADMINISTRATOR) && !commandEvent.getMember().isOwner()) {
+        if (!commandEvent.getMember().hasPermission(Permission.ADMINISTRATOR) && !Objects.equals(commandEvent.getGuild().getOwner(), commandEvent.getMember())) {
             commandEvent.replyError("Only server administrators or the server owner may use this command.");
             return;
         }

@@ -4,6 +4,8 @@ import bot.NASABot;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.Permission;
 
+import java.util.Objects;
+
 public class RemovePostChannel extends NASACommand {
     public RemovePostChannel() {
         this.name = "removePostChannel";
@@ -14,7 +16,7 @@ public class RemovePostChannel extends NASACommand {
     protected void execute(CommandEvent commandEvent) {
         this.insertCommand(commandEvent);
 
-        if (!commandEvent.getMember().hasPermission(Permission.ADMINISTRATOR) && !commandEvent.getMember().isOwner()) {
+        if (!commandEvent.getMember().hasPermission(Permission.ADMINISTRATOR) && !Objects.equals(commandEvent.getGuild().getOwner(), commandEvent.getMember())) {
             commandEvent.replyError("Only server administrators or the server owner may use this command.");
             return;
         }
