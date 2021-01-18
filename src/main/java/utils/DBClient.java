@@ -99,7 +99,7 @@ public class DBClient {
             Response response = httpClient.newCall(request).execute();
 
             if (response.code() != 201) {
-                System.out.println(String.format("Failed to insert postChannel: %s", payload));
+                System.out.println(String.format("Failed to insert Post Channel: %s", payload));
                 response.close();
                 return false;
             }
@@ -108,7 +108,7 @@ public class DBClient {
             return true;
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println(String.format("Failed to insert command: %s", payload));
+            System.out.println(String.format("Failed to add Post Channel: %s", payload));
             return false;
         }
     }
@@ -127,7 +127,7 @@ public class DBClient {
             Response response = httpClient.newCall(request).execute();
 
             if (response.code() != 200) {
-                System.out.println(String.format("Failed to delete postChannel: %s", serverId));
+                System.out.println(String.format("Failed to delete Post Channel: %s", serverId));
                 response.close();
                 return false;
             }
@@ -136,7 +136,7 @@ public class DBClient {
             return true;
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println(String.format("Failed to insert command: %s", serverId));
+            System.out.println(String.format("Failed to delete Post Channel for server: %s", serverId));
             return false;
         }
     }
@@ -155,7 +155,7 @@ public class DBClient {
             Response response = httpClient.newCall(request).execute();
 
             if (response.code() != 200) {
-                System.out.println(String.format("Failed to get postChannel: %s", serverId));
+                System.out.println(String.format("Failed to get Post Channel: %s", serverId));
                 response.close();
                 return null;
             }
@@ -171,7 +171,35 @@ public class DBClient {
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println(String.format("Failed to insert command: %s", serverId));
+            System.out.println(String.format("Failed to get Post Channel for server: %s", serverId));
+            return null;
+        }
+    }
+
+    public JSONArray getAllPostChannels() {
+        try {
+            HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url + "/postChannels")).newBuilder();
+            Request request = new Request.Builder().url(builder.build()).get().build();
+            Response response = httpClient.newCall(request).execute();
+
+            if (response.code() != 200) {
+                System.out.println("Failed to get all Post Channels");
+                response.close();
+                return null;
+            }
+
+            JSONArray jsonArray = new JSONArray(Objects.requireNonNull(response.body()).string());
+            response.close();
+
+            if (jsonArray.length() == 0) {
+                return null;
+            } else {
+                return jsonArray;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Failed to get all Post Channels.");
             return null;
         }
     }
