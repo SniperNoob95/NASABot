@@ -17,7 +17,7 @@ Join the [Discord server](https://discord.gg/b4wS5q4) if interested.
 ## Command Usage
 #### setPostChannel
 	NASA_setPostChannel <#channel mention>
-    Ex: `NASA_setPostChannel #lounge
+    Ex: NASA_setPostChannel #lounge
 Sets the Post Channel for the server to receive automated APOD postings each day, as well as update announcements from the owner.
 #### removePostChannel
 	NASA_removePostChannel
