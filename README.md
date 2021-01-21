@@ -24,6 +24,7 @@ Sets the Post Channel for the server to receive automated APOD postings each day
 Removes the Post Channel set for the server.
 #### getPostChannel
 	NASA_getPostChannel
+Returns the Post Channel set for the server.
 #### APOD
     NASA_POTD [date (YYYY-MM-DD)]
     Ex: NASA_POTD 2020-09-05
