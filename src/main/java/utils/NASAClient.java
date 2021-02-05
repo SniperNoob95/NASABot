@@ -15,15 +15,15 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.ResourceBundle;
 
-public class APIClient {
+public class NASAClient {
 
     private final String baseUrl = "https://api.nasa.gov";
     private final String imageUrl = "https://images-api.nasa.gov";
     private final OkHttpClient httpClient = new OkHttpClient().newBuilder().build();
-    SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMM dd, yyyy");
+    private final SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMM dd, yyyy");
     private String apiKey;
 
-    public APIClient() {
+    public NASAClient() {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
 
         try {

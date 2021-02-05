@@ -10,13 +10,13 @@ import java.text.SimpleDateFormat;
 import java.util.Objects;
 import java.util.TimerTask;
 
-public class APODSchedulePost extends TimerTask {
+public class APODSchedulePostTask extends TimerTask {
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
     public void run() {
-        MessageEmbed embed = NASABot.apiClient.getPictureOfTheDay(simpleDateFormat.format(System.currentTimeMillis() - 86400000));
+        MessageEmbed embed = NASABot.NASAClient.getPictureOfTheDay(simpleDateFormat.format(System.currentTimeMillis() - 86400000));
         JSONArray postChannels = NASABot.dbClient.getAllPostChannels();
 
         for (int i = 0; i < postChannels.length(); i++) {

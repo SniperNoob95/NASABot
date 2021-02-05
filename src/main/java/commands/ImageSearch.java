@@ -18,7 +18,7 @@ public class ImageSearch  extends NASACommand {
         if (commandEvent.getArgs().isEmpty()) {
             commandEvent.replyError(String.format("No search term provided, please check your formatting: %s", this.getArgumentsString()));
         } else {
-            commandEvent.reply(NASABot.apiClient.getNASAImage(commandEvent.getArgs()));
+            commandEvent.reply(NASABot.NASAClient.getNASAImage(commandEvent.getArgs()));
         }
     }
 }

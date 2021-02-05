@@ -22,11 +22,11 @@ public class APOD extends NASACommand {
         this.insertCommand(commandEvent);
 
         if (commandEvent.getArgs().isEmpty()) {
-            commandEvent.reply(NASABot.apiClient.getPictureOfTheDay(simpleDateFormat.format(System.currentTimeMillis() - 86400000)));
+            commandEvent.reply(NASABot.NASAClient.getPictureOfTheDay(simpleDateFormat.format(System.currentTimeMillis() - 86400000)));
         } else {
             try {
                 if (simpleDateFormat.parse(commandEvent.getArgs()) != null) {
-                    commandEvent.reply(NASABot.apiClient.getPictureOfTheDay(commandEvent.getArgs()));
+                    commandEvent.reply(NASABot.NASAClient.getPictureOfTheDay(commandEvent.getArgs()));
                 } else {
                     commandEvent.reply(String.format("Unable to get APOD, please check your formatting: %s", this.getArgumentsString()));
                 }
