@@ -8,7 +8,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONObject;
 
-import java.awt.*;
+import java.awt.Color;;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
@@ -18,7 +18,7 @@ public class ISSClient {
 
     private final String url = "http://api.open-notify.org/iss-now.json";
     private final OkHttpClient httpClient = new OkHttpClient().newBuilder().build();
-    private final SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMM dd, yyyy - HH:mm:ss");
+    private final SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMM dd, yyyy - HH:mm:ss z");
 
     public MessageEmbed getISSLocation() {
         try {
@@ -40,6 +40,7 @@ public class ISSClient {
 
         try {
             JSONObject jsonObject = new JSONObject(issLocationResponse);
+
             EmbedBuilder embedBuilder = new EmbedBuilder();
             embedBuilder
                     .setTitle("ISS Current Location")
@@ -47,12 +48,17 @@ public class ISSClient {
                     .setColor(Color.BLUE)
                     .addField("Latitude", jsonObject.getJSONObject("iss_position").getString("latitude"), false)
                     .addField("Longitude", jsonObject.getJSONObject("iss_position").getString("longitude"), false)
-                    .setImage();
+                    .setThumbnail("https://www.nationalgeographic.com/content/dam/science/2020/10/28/ISS/international_space_station_in_2018.adapt.1900.1.jpg")
+                    .setImage(getGoogleMapsLink(Double.parseDouble(jsonObject.getJSONObject("iss_position").getString("latitude")), Double.parseDouble(jsonObject.getJSONObject("iss_position").getString("longitude"))));
 
             return embedBuilder.build();
         } catch (Exception e) {
             e.printStackTrace();
             return new EmbedBuilder().setTitle("ISS Current Location").addField("ERROR", "Unable to obtain Picture of the Day.", false).setColor(Color.RED).build();
         }
+    }
+
+    public String getGoogleMapsLink(Double latitude, Double longitude) {
+        return String.format("https://maps.google.com/?q=%s,%s&ll=%s,%s&z=3", latitude, longitude, latitude, longitude);
     }
 }
