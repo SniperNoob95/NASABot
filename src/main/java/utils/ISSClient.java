@@ -46,7 +46,7 @@ public class ISSClient {
                     .setTitle("ISS Current Location")
                     .setDescription(String.format("%s", outputDateFormat.format(new Date(jsonObject.getLong("timestamp") * 1000))))
                     .setColor(Color.BLUE)
-                    .addField("Latitude", jsonObject.getJSONObject("iss_position").getString("latitude"), false)
+                    .addField("Latitude", jsonObject.getJSONObject("iss_position").getString("latitude"), true)
                     .addField("Longitude", jsonObject.getJSONObject("iss_position").getString("longitude"), true)
                     .addField("\u200B", "\u200B", true)
                     .addField("\u200B", "\u200B", true)
