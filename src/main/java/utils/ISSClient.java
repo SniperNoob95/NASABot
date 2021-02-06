@@ -48,9 +48,8 @@ public class ISSClient {
                     .setColor(Color.BLUE)
                     .addField("Latitude", jsonObject.getJSONObject("iss_position").getString("latitude"), false)
                     .addField("Longitude", jsonObject.getJSONObject("iss_position").getString("longitude"), false)
-                    .setThumbnail("https://www.nationalgeographic.com/content/dam/science/2020/10/28/ISS/international_space_station_in_2018.adapt.1900.1.jpg")
-                    .setImage(getGoogleMapsLink(Double.parseDouble(jsonObject.getJSONObject("iss_position").getString("latitude")), Double.parseDouble(jsonObject.getJSONObject("iss_position").getString("longitude"))));
-
+                    .addField("Google Maps Location", getGoogleMapsLink(Double.parseDouble(jsonObject.getJSONObject("iss_position").getString("latitude")), Double.parseDouble(jsonObject.getJSONObject("iss_position").getString("longitude"))), false)
+                    .setThumbnail("https://www.nationalgeographic.com/content/dam/science/2020/10/28/ISS/international_space_station_in_2018.adapt.1900.1.jpg");
             return embedBuilder.build();
         } catch (Exception e) {
             e.printStackTrace();
