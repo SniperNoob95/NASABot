@@ -12,6 +12,7 @@ public class SetPostChannel extends NASACommand {
     public SetPostChannel() {
         this.name = "setPostChannel";
         this.help = "Sets the Post Channel for the server.";
+        this.arguments = "<#channelMention>";
     }
 
     @Override

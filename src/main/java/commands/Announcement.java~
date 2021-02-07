@@ -6,7 +6,7 @@ public class Announcement extends NASACommand {
 
     public Announcement() {
         super();
-        this.name = "announcement";
+        this.name = "Announcement";
         this.help = "Allows the bot owner to make announcements.";
         this.ownerCommand = true;
     }

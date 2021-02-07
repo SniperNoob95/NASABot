@@ -30,7 +30,6 @@ public class APODSchedulePostTask extends TimerTask {
         try {
             guild = NASABot.jda.getGuildById(serverId);
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println(String.format("Guild %s no longer visible to bot, deleting Post Channels", serverId));
             NASABot.dbClient.deletePostChannel(serverId);
             return;
@@ -39,7 +38,6 @@ public class APODSchedulePostTask extends TimerTask {
         try {
             textChannel = Objects.requireNonNull(guild).getTextChannelById(channelId);
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println(String.format("Text channel %s in guild %s no longer visible to bot, skipping APOD post.", channelId, serverId));
             return;
         }
@@ -47,7 +45,6 @@ public class APODSchedulePostTask extends TimerTask {
         try {
             Objects.requireNonNull(textChannel).sendMessage(embed).queue();
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println(String.format("Unable to send APOD to text channel %s in guild %s.", channelId, serverId));
         }
     }
