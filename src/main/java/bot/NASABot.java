@@ -26,6 +26,7 @@ public class NASABot {
     public static DBClient dbClient;
     public static TopGGClient topGGClient;
     public static ISSClient issClient;
+    public static GeoNamesClient geoNamesClient;
     private static TimerTask APODSchedulePostTask;
 
     public static void main(String[] args) throws LoginException, InterruptedException {
@@ -53,6 +54,7 @@ public class NASABot {
         NASAClient = new NASAClient();
         topGGClient = new TopGGClient();
         issClient = new ISSClient();
+        geoNamesClient = new GeoNamesClient();
 
         scheduleAPODPostTask();
     }

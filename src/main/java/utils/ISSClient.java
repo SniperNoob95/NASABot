@@ -1,5 +1,6 @@
 package utils;
 
+import bot.NASABot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import okhttp3.HttpUrl;
@@ -49,6 +50,7 @@ public class ISSClient {
                     .addField("Latitude", jsonObject.getJSONObject("iss_position").getString("latitude"), true)
                     .addField("Longitude", jsonObject.getJSONObject("iss_position").getString("longitude"), true)
                     .addField("Google Maps Location", getGoogleMapsLink(Double.parseDouble(jsonObject.getJSONObject("iss_position").getString("latitude")), Double.parseDouble(jsonObject.getJSONObject("iss_position").getString("longitude"))), false)
+                    .addField("Currently Over Country", NASABot.geoNamesClient.getCountryFromLatitudeLongitude(jsonObject.getJSONObject("iss_position").getString("latitude"), jsonObject.getJSONObject("iss_position").getString("longitude")), false)
                     .setThumbnail("https://www.nationalgeographic.com/content/dam/science/2020/10/28/ISS/international_space_station_in_2018.adapt.1900.1.jpg");
             return embedBuilder.build();
         } catch (Exception e) {
