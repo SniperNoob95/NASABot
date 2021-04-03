@@ -49,7 +49,7 @@ public class NASABot {
         builder.setOwnerId(ownerId);
         CommandClient commandClient = builder.build();
 
-        jda = JDABuilder.createDefault(token).enableIntents(GatewayIntent.GUILD_MEMBERS).addEventListeners(commandClient).build().awaitReady();
+        jda = JDABuilder.createDefault(token).addEventListeners(commandClient).build().awaitReady();
         dbClient = new DBClient();
         NASAClient = new NASAClient();
         topGGClient = new TopGGClient();
