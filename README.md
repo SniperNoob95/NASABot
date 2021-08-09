@@ -26,8 +26,8 @@ Removes the Post Channel set for the server.
 	NASA_getPostChannel
 Returns the Post Channel set for the server.
 #### APOD
-    NASA_POTD [date (YYYY-MM-DD)]
-    Ex: NASA_POTD 2020-09-05
+    NASA_APOD [date (YYYY-MM-DD)]
+    Ex: NASA_APOD 2020-09-05
 Returns the Astronomy Picture of the Day for the previous day, or the given date if provided.
 
 #### ISS
