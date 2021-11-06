@@ -41,9 +41,9 @@ public class SetPostChannel extends NASACommand {
         if (commandEvent.getMessage().getMentionedChannels().size() > 0) {
             TextChannel textChannel = commandEvent.getMessage().getMentionedChannels().get(0);
             if (NASABot.dbClient.createPostChannel(commandEvent.getGuild().getId(), textChannel.getId())) {
-                String postChannelId = NASABot.dbClient.getPostChannelForServer(commandEvent.getGuild().getId());
-                if (postChannelId != null) {
-                    if (NASABot.dbClient.createPostChannelConfiguration(Integer.parseInt(postChannelId))) {
+                int postChannelId = NASABot.dbClient.getPostChannelId(commandEvent.getGuild().getId());
+                if (postChannelId != -1) {
+                    if (NASABot.dbClient.createPostChannelConfiguration(postChannelId)) {
                         commandEvent.reply(String.format("%s has been set as the Post Channel for this server.", textChannel.getAsMention()));
                     } else {
                         commandEvent.reply("Unable to set Post Channel Configuration. Please contact the bot owner or join the NASABot Discord channel to report this error.");

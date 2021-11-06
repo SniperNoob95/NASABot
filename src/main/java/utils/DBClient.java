@@ -65,8 +65,6 @@ public class DBClient {
                 return null;
             }
 
-            System.out.println(response.body().string());
-
             JSONArray jsonArray = new JSONArray(Objects.requireNonNull(response.body()).string());
             response.close();
 
@@ -214,6 +212,22 @@ public class DBClient {
     }
 
     /**
+     * Gets postChannels for the given serverId.
+     *
+     * @param serverId ID of the server.
+     * @return ID of postChannel, or 0 if none.
+     */
+    public int getPostChannelId(String serverId) {
+        try {
+            return Objects.requireNonNull(issueGetRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))))).getJSONObject(0).getInt("id");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(String.format("Failed to get Post Channel for server ID: %s", serverId));
+            return -1;
+        }
+    }
+
+    /**
      * Gets postChannels for the given timeOption.
      *
      * @param timeOption time option to query against.
@@ -236,9 +250,9 @@ public class DBClient {
         return issuePostRequest("/postChannelConfigurations", payload);
     }
 
-    public int getPostTimeForServer(String postChannelId) {
+    public int getPostTimeForServer(int postChannelId) {
         try {
-            return Objects.requireNonNull(issueGetRequest("/postChannelConfigurations", new HashMap<>(Map.ofEntries(entry("postChannelId", postChannelId))))).getJSONObject(0).getInt("time_option");
+            return Objects.requireNonNull(issueGetRequest("/postChannelConfigurations", new HashMap<>(Map.ofEntries(entry("postChannelId", String.valueOf(postChannelId)))))).getJSONObject(0).getInt("time_option");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(String.format("Failed to get Post Configuration for Post Channel id: %s.", postChannelId));

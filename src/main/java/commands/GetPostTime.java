@@ -14,7 +14,12 @@ public class GetPostTime extends NASACommand{
     protected void execute(CommandEvent commandEvent) {
         this.insertCommand(commandEvent);
 
-        String postChannelId = NASABot.dbClient.getPostChannelForServer(commandEvent.getGuild().getId());
+        int postChannelId = NASABot.dbClient.getPostChannelId(commandEvent.getGuild().getId());
+
+        if (postChannelId == -1) {
+            commandEvent.reply("This server does not have a Post Channel configured. To set a Post Channel, use the setPostChannel command.");
+            return;
+        }
 
         int postTime = NASABot.dbClient.getPostTimeForServer(postChannelId);
 

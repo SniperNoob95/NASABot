@@ -29,6 +29,7 @@ public class SetPostTime extends NASACommand{
             timeOption = Integer.parseInt(commandEvent.getArgs());
         } catch (NumberFormatException e) {
             commandEvent.reply(String.format("Invalid Post Time option, please check your formatting: %s", this.getArgumentsString()));
+            return;
         }
 
         StringBuilder timeOptions = new StringBuilder();
@@ -42,16 +43,17 @@ public class SetPostTime extends NASACommand{
 
         if (timeOption < minimumOption || timeOption > maximumOption) {
             commandEvent.reply(String.format("The Post Time options are \n```%s```\nFor more information, please visit the top.gg or GitHub pages, which can be found via the `NASA_info` command.", timeOptions));
+            return;
         }
 
-        String postChannelId = NASABot.dbClient.getPostChannelForServer(commandEvent.getGuild().getId());
+        int postChannelId = NASABot.dbClient.getPostChannelId(commandEvent.getGuild().getId());
 
-        if (postChannelId == null) {
+        if (postChannelId == -1) {
             commandEvent.reply("This server does not have a Post Channel configured. To set a Post Channel, use the setPostChannel command.");
         } else {
-            boolean result = NASABot.dbClient.updatePostChannelConfiguration(timeOption, Integer.parseInt(postChannelId));
+            boolean result = NASABot.dbClient.updatePostChannelConfiguration(timeOption, postChannelId);
             if (result) {
-                commandEvent.reply(String.format("Post Time set to %s:00 UTC.", NASABot.postTimes.get(Integer.parseInt(postChannelId))));
+                commandEvent.reply(String.format("Post Time set to %s:00 UTC.", NASABot.postTimes.get(timeOption)));
             } else {
                 commandEvent.reply("Unable to set Post Time. Please contact the bot owner or join the NASABot Discord channel to report this error.");
             }
