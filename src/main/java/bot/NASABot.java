@@ -77,7 +77,7 @@ public class NASABot {
         LocalDate today = LocalDate.now(ZoneId.of("UTC"));
         LocalDateTime todayMidnight = LocalDateTime.of(today, midnight);
         LocalDateTime tomorrowTime = todayMidnight.plusHours(hours);
-        if (tomorrowTime.isBefore(ChronoLocalDateTime.from(today))) {
+        if (tomorrowTime.isBefore(ChronoLocalDateTime.from(today.atTime(LocalTime.now())))) {
             return Date.from(tomorrowTime.atZone(ZoneId.of("UTC")).plusDays(1).toInstant());
         } else {
             return Date.from(tomorrowTime.atZone(ZoneId.of("UTC")).toInstant());
