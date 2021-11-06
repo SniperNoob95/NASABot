@@ -65,6 +65,8 @@ public class DBClient {
                 return null;
             }
 
+            System.out.println(response.body());
+
             JSONArray jsonArray = new JSONArray(Objects.requireNonNull(response.body()).string());
             response.close();
 
