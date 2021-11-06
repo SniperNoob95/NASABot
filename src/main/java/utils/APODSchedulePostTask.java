@@ -13,11 +13,16 @@ import java.util.TimerTask;
 public class APODSchedulePostTask extends TimerTask {
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private int timeOption;
+
+    public APODSchedulePostTask(int timeOption) {
+        this.timeOption = timeOption;
+    }
 
     @Override
     public void run() {
         MessageEmbed embed = NASABot.NASAClient.getPictureOfTheDay(simpleDateFormat.format(System.currentTimeMillis() - 86400000));
-        JSONArray postChannels = NASABot.dbClient.getAllPostChannels();
+        JSONArray postChannels = NASABot.dbClient.getPostChannelsForPostTimeOption(timeOption);
 
         for (int i = 0; i < postChannels.length(); i++) {
             sendAPODToChannel(postChannels.getJSONObject(i).getString("server_id"), postChannels.getJSONObject(i).getString("channel_id"), embed);
@@ -30,7 +35,7 @@ public class APODSchedulePostTask extends TimerTask {
         try {
             guild = NASABot.jda.getGuildById(serverId);
         } catch (Exception e) {
-            System.out.println(String.format("Guild %s no longer visible to bot, deleting Post Channels", serverId));
+            System.out.println(String.format("Guild %s no longer visible to bot, deleting Post Channel", serverId));
             NASABot.dbClient.deletePostChannel(serverId);
             return;
         }

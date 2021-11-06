@@ -11,8 +11,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
+
+import static java.util.Map.entry;
 
 public class DBClient {
 
@@ -44,13 +49,100 @@ public class DBClient {
         return httpClient.newCall(request).execute();
     }
 
+    private JSONArray issueGetRequest(String path, Map<String, String> queryParameters) {
+        try {
+            HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url + path)).newBuilder();
+            if (queryParameters != null) {
+                for (Map.Entry<String, String> entry : queryParameters.entrySet()) {
+                    builder.addQueryParameter(entry.getKey(), entry.getValue());
+                }
+            }
+            Request request = new Request.Builder().url(builder.build()).get().build();
+            Response response = httpClient.newCall(request).execute();
+
+            if (response.code() != 200) {
+                response.close();
+                return null;
+            }
+
+            JSONArray jsonArray = new JSONArray(Objects.requireNonNull(response.body()).string());
+            response.close();
+
+            if (jsonArray.length() == 0) {
+                return null;
+            } else {
+                return jsonArray;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public boolean issuePostRequest(String path, JSONObject payload) {
+        try {
+            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), payload.toString());
+            Request request = new Request.Builder().url(url + path).post(requestBody).build();
+            Response response = httpClient.newCall(request).execute();
+
+            if (response.code() != 201) {
+                response.close();
+                return false;
+            }
+
+            response.close();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean issuePutRequest(String path, JSONObject payload) {
+        try {
+            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), payload.toString());
+            Request request = new Request.Builder().url(url + path).put(requestBody).build();
+            Response response = httpClient.newCall(request).execute();
+
+            if (response.code() != 201) {
+                response.close();
+                return false;
+            }
+
+            response.close();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean issueDeleteRequest(String path, Map<String, String> queryParameters) {
+        try {
+            HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url + path)).newBuilder();
+            if (queryParameters != null) {
+                for (Map.Entry<String, String> entry : queryParameters.entrySet()) {
+                    builder.addQueryParameter(entry.getKey(), entry.getValue());
+                }
+            }
+            Request request = new Request.Builder().url(builder.build()).delete().build();
+            Response response = httpClient.newCall(request).execute();
+
+            response.close();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     /**
      * Inserts a command issued by a user.
      *
      * @param commandEvent Event in which the command occurred.
-     * @param command The command issued.
+     * @param command      The command issued.
      */
-    public void insertCommand(CommandEvent commandEvent, String command) {
+    public boolean insertCommand(CommandEvent commandEvent, String command) {
         JSONObject payload = new JSONObject();
         try {
             payload.put("date", System.currentTimeMillis() / 1000);
@@ -64,53 +156,23 @@ public class DBClient {
             e.printStackTrace();
         }
 
-        try {
-            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), payload.toString());
-            Request request = new Request.Builder().url(url + "/commands").post(requestBody).build();
-            Response response = httpClient.newCall(request).execute();
-
-            if (response.code() != 201) {
-                System.out.println(String.format("Failed to insert command: %s", payload));
-            }
-
-            response.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(String.format("Failed to insert command: %s", payload));
-        }
+        return issuePostRequest("/commands", payload);
     }
 
     /**
      * Creates a new postChannel for the given serverId and channelId.
      *
-     * @param serverId ID of the server.
+     * @param serverId  ID of the server.
      * @param channelId ID of the channel.
      * @return True if successful, else false.
      */
-    public boolean addPostChannel(String serverId, String channelId) {
+    public boolean createPostChannel(String serverId, String channelId) {
         JSONObject payload = new JSONObject();
         payload.put("dateAdded", System.currentTimeMillis() / 1000);
         payload.put("serverId", serverId);
         payload.put("channelId", channelId);
 
-        try {
-            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), payload.toString());
-            Request request = new Request.Builder().url(url + "/postChannels").post(requestBody).build();
-            Response response = httpClient.newCall(request).execute();
-
-            if (response.code() != 201) {
-                System.out.println(String.format("Failed to insert Post Channel: %s", payload));
-                response.close();
-                return false;
-            }
-
-            response.close();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(String.format("Failed to add Post Channel: %s", payload));
-            return false;
-        }
+        return issuePostRequest("/postChannels", payload);
     }
 
     /**
@@ -121,24 +183,16 @@ public class DBClient {
      */
     public boolean deletePostChannel(String serverId) {
         try {
-            HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url + "/postChannels")).newBuilder();
-            builder.addQueryParameter("serverId", serverId);
-            Request request = new Request.Builder().url(builder.build()).delete().build();
-            Response response = httpClient.newCall(request).execute();
-
-            if (response.code() != 200) {
-                System.out.println(String.format("Failed to delete Post Channel: %s", serverId));
-                response.close();
-                return false;
-            }
-
-            response.close();
-            return true;
+            return issueDeleteRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))));
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(String.format("Failed to delete Post Channel for server: %s", serverId));
             return false;
         }
+    }
+
+    public JSONArray getAllPostChannels() {
+        return issueGetRequest("/postChannels", null);
     }
 
     /**
@@ -147,60 +201,58 @@ public class DBClient {
      * @param serverId ID of the server.
      * @return ID of postChannel, or 0 if none.
      */
-    public String getPostChannel(String serverId) {
+    public String getPostChannelForServer(String serverId) {
         try {
-            HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url + "/postChannels")).newBuilder();
-            builder.addQueryParameter("serverId", serverId);
-            Request request = new Request.Builder().url(builder.build()).get().build();
-            Response response = httpClient.newCall(request).execute();
-
-            if (response.code() != 200) {
-                System.out.println(String.format("Failed to get Post Channel: %s", serverId));
-                response.close();
-                return null;
-            }
-
-            JSONArray jsonArray = new JSONArray(Objects.requireNonNull(response.body()).string());
-            response.close();
-
-            if (jsonArray.length() == 0) {
-                return null;
-            } else {
-                return jsonArray.getJSONObject(0).getString("channel_id");
-            }
-
+            return Objects.requireNonNull(issueGetRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))))).getJSONObject(0).getString("channel_id");
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println(String.format("Failed to get Post Channel for server: %s", serverId));
+            System.out.println(String.format("Failed to get Post Channel for server ID: %s", serverId));
             return null;
         }
     }
 
-    public JSONArray getAllPostChannels() {
+    /**
+     * Gets postChannels for the given timeOption.
+     *
+     * @param timeOption time option to query against.
+     * @return postChannels that match the query.
+     */
+    public JSONArray getPostChannelsForPostTimeOption(int timeOption) {
+        return issueGetRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("timeOption", String.valueOf(timeOption)))));
+    }
+
+    /**
+     * Creates a new postChannelConfiguration for the given postChannelId.
+     *
+     * @param postChannelId postChannelId to create the configuration for.
+     * @return True if successful, else false.
+     */
+    public boolean createPostChannelConfiguration(int postChannelId) {
+        JSONObject payload = new JSONObject();
+        payload.put("postChannelId", postChannelId);
+
+        return issuePostRequest("/postChannelConfigurations", payload);
+    }
+
+    public int getPostTimeForServer(String postChannelId) {
         try {
-            HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url + "/postChannels")).newBuilder();
-            Request request = new Request.Builder().url(builder.build()).get().build();
-            Response response = httpClient.newCall(request).execute();
-
-            if (response.code() != 200) {
-                System.out.println("Failed to get all Post Channels");
-                response.close();
-                return null;
-            }
-
-            JSONArray jsonArray = new JSONArray(Objects.requireNonNull(response.body()).string());
-            response.close();
-
-            if (jsonArray.length() == 0) {
-                return null;
-            } else {
-                return jsonArray;
-            }
-
+            return Objects.requireNonNull(issueGetRequest("/postChannelConfigurations", new HashMap<>(Map.ofEntries(entry("postChannelId", postChannelId))))).getJSONObject(0).getInt("time_option");
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Failed to get all Post Channels.");
-            return null;
+            System.out.println(String.format("Failed to get Post Configuration for Post Channel id: %s.", postChannelId));
+            return -1;
         }
+    }
+
+    public JSONArray getPostChannelConfigurations() {
+        return issueGetRequest("/postChannelConfigurations", null);
+    }
+
+    public boolean updatePostChannelConfiguration(int timeOption, int postChannelId) {
+        JSONObject payload = new JSONObject();
+        payload.put("timeOption", timeOption);
+        payload.put("postChannelId", postChannelId);
+
+        return issuePutRequest("/postChannelConfigurations", payload);
     }
 }

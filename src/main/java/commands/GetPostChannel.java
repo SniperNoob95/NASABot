@@ -23,11 +23,11 @@ public class GetPostChannel extends NASACommand {
             return;
         }
 
-        String channelId = NASABot.dbClient.getPostChannel(commandEvent.getGuild().getId());
+        String postChannelId = NASABot.dbClient.getPostChannelForServer(commandEvent.getGuild().getId());
 
-        if (channelId != null) {
+        if (postChannelId != null) {
             try {
-                TextChannel textChannel = commandEvent.getGuild().getTextChannelById(NASABot.dbClient.getPostChannel(commandEvent.getGuild().getId()));
+                TextChannel textChannel = commandEvent.getGuild().getTextChannelById(NASABot.dbClient.getPostChannelForServer(commandEvent.getGuild().getId()));
                 commandEvent.reply(String.format("This server is using %s as the Post Channel. You can remove it before setting a new one with the following command:" +
                         "\n```NASA_removePostChannel```", Objects.requireNonNull(textChannel).getAsMention()));
             } catch (Exception e) {

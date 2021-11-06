@@ -1,5 +1,5 @@
-# NASABot v3.2.0
-**Now featuring automated APOD posting!** A Discord bot that implements the NASA API to provide cool, interesting, and informative artifacts.\
+# NASABot v4.0.0
+**Now featuring configurable automated APOD posting times!** A Discord bot that implements the NASA API to provide cool, interesting, and informative artifacts.\
 [![Discord Bots](https://top.gg/api/widget/status/748775876077813881.svg)](https://top.gg/bot/748775876077813881)
 [![Discord Bots](https://top.gg/api/widget/servers/748775876077813881.svg)](https://top.gg/bot/748775876077813881)
 **Upvote us on [Top.gg](https://top.gg/bot/748775876077813881)!**
@@ -25,6 +25,18 @@ Removes the Post Channel set for the server.
 #### getPostChannel
 	NASA_getPostChannel
 Returns the Post Channel set for the server.
+#### setPostTime
+    NASA_setPostTime <option>
+    Ex: NASA_setPostTime <1>
+    Options are as follows:
+        0 (default): 16:00 UTC
+        1: 6:00 UTC
+        2: 11:00 UTC
+        3: 21:00 UTC
+Sets the Post Time for the server to receive automated APOD postings each day. By default, all servers use option 0 until overridden.
+#### getPostTime
+    NASA_getPostTime
+Returns the Post Time set for the server.
 #### APOD
     NASA_APOD [date (YYYY-MM-DD)]
     Ex: NASA_APOD 2020-09-05
@@ -34,15 +46,15 @@ Returns the Astronomy Picture of the Day for the previous day, or the given date
     NASA_ISS
 Displays the current location of the International Space Station.
 
-#### Image
+#### image
     NASA_image <search term>
     Ex: NASA_image black hole
 Returns an image from the NASA image database that matches the given search term.
 
-#### Info
+#### info
     NASA_info
 Returns information about the bot.
 
-#### Help
+#### ielp
     NASA_help
 Sends the caller a PM with help for using the bot.

@@ -24,15 +24,15 @@ public class SetPostChannel extends NASACommand {
             return;
         }
 
-        if (NASABot.dbClient.getPostChannel(commandEvent.getGuild().getId()) != null) {
+        if (NASABot.dbClient.getPostChannelForServer(commandEvent.getGuild().getId()) != null) {
             try {
-                TextChannel textChannel = commandEvent.getGuild().getTextChannelById(NASABot.dbClient.getPostChannel(commandEvent.getGuild().getId()));
+                TextChannel textChannel = commandEvent.getGuild().getTextChannelById(NASABot.dbClient.getPostChannelForServer(commandEvent.getGuild().getId()));
                 commandEvent.replyError(String.format("This server is already using %s as the Post Channel. Please clear " +
-                        "it before setting a new one with the following command:\n```NASA_removePostChannel```", Objects.requireNonNull(textChannel).getAsMention()));
+                        "it before setting a new one with the removePostChannel command.", Objects.requireNonNull(textChannel).getAsMention()));
                 return;
             } catch (Exception e) {
                 commandEvent.replyError("There is already a Post Channel set for this server, but the bot does not have permission to view it. " +
-                        "Please clear the current Post Channel before setting a new one with the following command:\n```NASA_removePostChannel```");
+                        "Please clear the current Post Channel before setting a new one with the removePostChannel command.");
                 return;
             }
 
@@ -40,13 +40,21 @@ public class SetPostChannel extends NASACommand {
 
         if (commandEvent.getMessage().getMentionedChannels().size() > 0) {
             TextChannel textChannel = commandEvent.getMessage().getMentionedChannels().get(0);
-            if(NASABot.dbClient.addPostChannel(commandEvent.getGuild().getId(), textChannel.getId())) {
-                commandEvent.reply(String.format("%s has been set as the Post Channel for this server.", textChannel.getAsMention()));
+            if (NASABot.dbClient.createPostChannel(commandEvent.getGuild().getId(), textChannel.getId())) {
+                String postChannelId = NASABot.dbClient.getPostChannelForServer(commandEvent.getGuild().getId());
+                if (postChannelId != null) {
+                    if (NASABot.dbClient.createPostChannelConfiguration(Integer.parseInt(postChannelId))) {
+                        commandEvent.reply(String.format("%s has been set as the Post Channel for this server.", textChannel.getAsMention()));
+                    } else {
+                        commandEvent.reply("Unable to set Post Channel Configuration. Please contact the bot owner or join the NASABot Discord channel to report this error.");
+                    }
+                } else {
+                    commandEvent.reply("Unable to get Post Channel ID. Please contact the bot owner or join the NASABot Discord channel to report this error.");
+                }
             }
         } else {
-            commandEvent.replyError("No channels were mentioned, or the bot does not have permission to view the " +
-                    "mentioned channel. Please check your permission settings or command formatting:" +
-                    "\n```NASA_setPostChannel <#channel>```");
+            commandEvent.replyError(String.format("No channels were mentioned, or the bot does not have permission to view the " +
+                    "mentioned channel. Please check your permission settings or command formatting: %s", this.getArgumentsString()));
         }
     }
 }

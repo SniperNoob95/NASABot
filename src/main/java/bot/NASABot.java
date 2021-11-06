@@ -5,7 +5,6 @@ import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import commands.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.requests.GatewayIntent;
 import utils.*;
 
 import javax.security.auth.login.LoginException;
@@ -13,10 +12,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.chrono.ChronoLocalDateTime;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static java.util.Map.entry;
 
 public class NASABot {
 
@@ -27,7 +31,7 @@ public class NASABot {
     public static TopGGClient topGGClient;
     public static ISSClient issClient;
     public static GeoNamesClient geoNamesClient;
-    private static TimerTask APODSchedulePostTask;
+    public static Map<Integer, Integer> postTimes;
 
     public static void main(String[] args) throws LoginException, InterruptedException {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
@@ -45,7 +49,7 @@ public class NASABot {
 
         CommandClientBuilder builder = new CommandClientBuilder();
         builder.setPrefix(prefix);
-        builder.addCommands(new APOD(), new ImageSearch(), new Info(), new SetPostChannel(), new GetPostChannel(), new RemovePostChannel(), new ISS(), new Announcement());
+        builder.addCommands(new APOD(), new ImageSearch(), new Info(), new SetPostChannel(), new GetPostChannel(), new RemovePostChannel(), new SetPostTime(), new GetPostTime(), new ISS(), new Announcement());
         builder.setOwnerId(ownerId);
         CommandClient commandClient = builder.build();
 
@@ -56,21 +60,33 @@ public class NASABot {
         issClient = new ISSClient();
         geoNamesClient = new GeoNamesClient();
 
-        scheduleAPODPostTask();
+        postTimes = new HashMap<>(Map.ofEntries(
+                entry(0, 16), // OPTION 0
+                entry(1, 6), // OPTION 1
+                entry(2, 11), // OPTION 2
+                entry(3, 21) // OPTION 3
+        ));
+
+        for (HashMap.Entry<Integer, Integer> entry : postTimes.entrySet()) {
+            scheduleAPODPostTask(entry.getKey());
+        }
     }
 
-    public static Date getAPODScheduleStartDate() {
+    public static Date getAPODScheduleStartDate(int hours) {
         LocalTime midnight = LocalTime.MIDNIGHT;
         LocalDate today = LocalDate.now(ZoneId.of("UTC"));
         LocalDateTime todayMidnight = LocalDateTime.of(today, midnight);
-        LocalDateTime tomorrowNoon = todayMidnight.plusHours(16);
-
-        return Date.from(tomorrowNoon.atZone(ZoneId.of("UTC")).toInstant());
+        LocalDateTime tomorrowTime = todayMidnight.plusHours(hours);
+        if (tomorrowTime.isBefore(ChronoLocalDateTime.from(today))) {
+            return Date.from(tomorrowTime.atZone(ZoneId.of("UTC")).plusDays(1).toInstant());
+        } else {
+            return Date.from(tomorrowTime.atZone(ZoneId.of("UTC")).toInstant());
+        }
     }
 
-    private static void scheduleAPODPostTask() {
-        APODSchedulePostTask = new APODSchedulePostTask();
+    private static void scheduleAPODPostTask(int timeOption) {
+        TimerTask APODSchedulePostTask = new APODSchedulePostTask(timeOption);
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(APODSchedulePostTask, getAPODScheduleStartDate(), 86400000);
+        timer.scheduleAtFixedRate(APODSchedulePostTask, getAPODScheduleStartDate(postTimes.get(timeOption)), 86400000);
     }
 }
