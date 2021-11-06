@@ -55,6 +55,6 @@ Returns an image from the NASA image database that matches the given search term
     NASA_info
 Returns information about the bot.
 
-#### ielp
+#### help
     NASA_help
 Sends the caller a PM with help for using the bot.
