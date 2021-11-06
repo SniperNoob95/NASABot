@@ -27,7 +27,7 @@ Removes the Post Channel set for the server.
 Returns the Post Channel set for the server.
 #### setPostTime
     NASA_setPostTime <option>
-    Ex: NASA_setPostTime <1>
+    Ex: NASA_setPostTime 1
     Options are as follows:
         0 (default): 16:00 UTC
         1: 6:00 UTC
