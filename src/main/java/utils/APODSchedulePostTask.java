@@ -1,8 +1,10 @@
 package utils;
 
 import bot.NASABot;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.json.JSONArray;
 
@@ -17,6 +19,8 @@ public class APODSchedulePostTask extends TimerTask {
 
     public APODSchedulePostTask(int timeOption) {
         this.timeOption = timeOption;
+
+        System.out.println(this.timeOption);
     }
 
     @Override
@@ -27,6 +31,9 @@ public class APODSchedulePostTask extends TimerTask {
         for (int i = 0; i < postChannels.length(); i++) {
             sendAPODToChannel(postChannels.getJSONObject(i).getString("server_id"), postChannels.getJSONObject(i).getString("channel_id"), embed);
         }
+
+        PrivateChannel privateChannel = NASABot.jda.openPrivateChannelById("181588597558738954").complete();
+        privateChannel.sendMessage("Starting APOD for time option " + timeOption + " for " + postChannels.length() + " servers.").queue();
     }
 
     private void sendAPODToChannel(String serverId, String channelId, MessageEmbed embed) {
@@ -48,7 +55,7 @@ public class APODSchedulePostTask extends TimerTask {
         }
 
         try {
-            Objects.requireNonNull(textChannel).sendMessage(embed).queue();
+            Objects.requireNonNull(textChannel).sendMessageEmbeds(embed).queue();
         } catch (Exception e) {
             System.out.println(String.format("Unable to send APOD to text channel %s in guild %s.", channelId, serverId));
         }
