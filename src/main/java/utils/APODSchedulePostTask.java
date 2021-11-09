@@ -19,8 +19,6 @@ public class APODSchedulePostTask extends TimerTask {
 
     public APODSchedulePostTask(int timeOption) {
         this.timeOption = timeOption;
-
-        System.out.println(this.timeOption);
     }
 
     @Override
