@@ -32,6 +32,7 @@ public class NASABot {
     public static ISSClient issClient;
     public static GeoNamesClient geoNamesClient;
     public static Map<Integer, Integer> postTimes;
+    public static boolean loggingEnabled = false;
 
     public static void main(String[] args) throws LoginException, InterruptedException {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
@@ -49,7 +50,7 @@ public class NASABot {
 
         CommandClientBuilder builder = new CommandClientBuilder();
         builder.setPrefix(prefix);
-        builder.addCommands(new APOD(), new ImageSearch(), new Info(), new SetPostChannel(), new GetPostChannel(), new RemovePostChannel(), new SetPostTime(), new GetPostTime(), new ISS(), new Announcement());
+        builder.addCommands(new APOD(), new ImageSearch(), new Info(), new SetPostChannel(), new GetPostChannel(), new RemovePostChannel(), new SetPostTime(), new GetPostTime(), new ISS(), new Announcement(), new ToggleLogging());
         builder.setOwnerId(ownerId);
         CommandClient commandClient = builder.build();
 
@@ -88,5 +89,13 @@ public class NASABot {
         TimerTask APODSchedulePostTask = new APODSchedulePostTask(timeOption);
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(APODSchedulePostTask, getAPODScheduleStartDate(postTimes.get(timeOption)), 86400000);
+    }
+
+    public static boolean isLoggingEnabled() {
+        return loggingEnabled;
+    }
+
+    public static void setLoggingEnabled(boolean value) {
+        loggingEnabled = value;
     }
 }

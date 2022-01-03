@@ -1,7 +1,6 @@
 package utils;
 
 import bot.NASABot;
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.PrivateChannel;
@@ -30,8 +29,10 @@ public class APODSchedulePostTask extends TimerTask {
             sendAPODToChannel(postChannels.getJSONObject(i).getString("server_id"), postChannels.getJSONObject(i).getString("channel_id"), embed);
         }
 
-        PrivateChannel privateChannel = NASABot.jda.openPrivateChannelById("181588597558738954").complete();
-        privateChannel.sendMessage("Starting APOD for time option " + timeOption + " for " + postChannels.length() + " servers.").queue();
+        if (NASABot.isLoggingEnabled()) {
+            PrivateChannel privateChannel = NASABot.jda.openPrivateChannelById("181588597558738954").complete();
+            privateChannel.sendMessage("Starting APOD for time option " + timeOption + " for " + postChannels.length() + " servers.").queue();
+        }
     }
 
     private void sendAPODToChannel(String serverId, String channelId, MessageEmbed embed) {
