@@ -7,7 +7,7 @@ public class ToggleLogging extends NASACommand{
 
     public ToggleLogging() {
         super();
-        this.name = "enableLogging";
+        this.name = "toggleLogging";
         this.help = "Allows the bot owner to enable or disable logging.";
         this.ownerCommand = true;
     }
