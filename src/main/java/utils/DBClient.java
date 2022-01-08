@@ -11,7 +11,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -258,10 +257,6 @@ public class DBClient {
             System.out.println(String.format("Failed to get Post Configuration for Post Channel id: %s.", postChannelId));
             return -1;
         }
-    }
-
-    public JSONArray getPostChannelConfigurations() {
-        return issueGetRequest("/postChannelConfigurations", null);
     }
 
     public boolean updatePostChannelConfiguration(int timeOption, int postChannelId) {

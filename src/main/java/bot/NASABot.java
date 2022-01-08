@@ -28,6 +28,7 @@ public class NASABot {
     public static String prefix = "NASA_";
     public static NASAClient NASAClient;
     public static DBClient dbClient;
+    public static HealthCheckClient healthCheckClient;
     public static TopGGClient topGGClient;
     public static ISSClient issClient;
     public static GeoNamesClient geoNamesClient;
@@ -56,6 +57,7 @@ public class NASABot {
 
         jda = JDABuilder.createDefault(token).addEventListeners(commandClient).build().awaitReady();
         dbClient = new DBClient();
+        healthCheckClient = new HealthCheckClient();
         NASAClient = new NASAClient();
         topGGClient = new TopGGClient();
         issClient = new ISSClient();
@@ -71,6 +73,8 @@ public class NASABot {
         for (HashMap.Entry<Integer, Integer> entry : postTimes.entrySet()) {
             scheduleAPODPostTask(entry.getKey());
         }
+
+        scheduleHealthCheckTask();
     }
 
     public static Date getAPODScheduleStartDate(int hours) {
@@ -89,6 +93,12 @@ public class NASABot {
         TimerTask APODSchedulePostTask = new APODSchedulePostTask(timeOption);
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(APODSchedulePostTask, getAPODScheduleStartDate(postTimes.get(timeOption)), 86400000);
+    }
+
+    private static void scheduleHealthCheckTask() {
+        TimerTask healthCheckTimerTask = new HealthCheckTimerTask();
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(healthCheckTimerTask, 0, 60000);
     }
 
     public static boolean isLoggingEnabled() {
