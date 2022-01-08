@@ -33,7 +33,7 @@ public class HealthCheckClient {
 
         try {
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), payload.toString());
-            Request request = new Request.Builder().addHeader("user", user).addHeader("password", password).url(url).post(requestBody).build();
+            Request request = new Request.Builder().addHeader("user", user).addHeader("password", password).url(url).put(requestBody).build();
             Response response = httpClient.newCall(request).execute();
 
             if (response.code() != 200) {

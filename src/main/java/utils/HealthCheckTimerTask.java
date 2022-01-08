@@ -2,7 +2,6 @@ package utils;
 
 import bot.NASABot;
 
-import java.sql.SQLException;
 import java.util.TimerTask;
 
 public class HealthCheckTimerTask extends TimerTask {
