@@ -1,6 +1,8 @@
 package utils;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.command.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -12,6 +14,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -151,6 +154,35 @@ public class DBClient {
             payload.put("servername", commandEvent.getGuild().getName());
             payload.put("command", command);
             payload.put("args", commandEvent.getArgs() == null ? "" : commandEvent.getArgs());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return issuePostRequest("/commands", payload);
+    }
+
+    /**
+     * Inserts a command issued by a user.
+     *
+     * @param slashCommandEvent Event in which the command occurred.
+     * @param command      The command issued.
+     */
+    public boolean insertCommand(SlashCommandEvent slashCommandEvent, String command) {
+        JSONObject payload = new JSONObject();
+        try {
+            payload.put("date", System.currentTimeMillis() / 1000);
+            payload.put("username", Objects.requireNonNull(slashCommandEvent.getMember()).getUser().getName());
+            payload.put("userid", slashCommandEvent.getMember().getId());
+            payload.put("serverid", Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
+            payload.put("servername", slashCommandEvent.getGuild().getName());
+            payload.put("command", command);
+
+            List<OptionMapping> options = slashCommandEvent.getOptions();
+            StringBuilder optionString = new StringBuilder();
+            for (OptionMapping optionMapping : options) {
+                optionString.append(String.format(" %s", optionMapping.getAsString()));
+            }
+            payload.put("args", optionString.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
