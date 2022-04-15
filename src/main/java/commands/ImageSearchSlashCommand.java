@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.util.Collections;
+import java.util.Objects;
 
 public class ImageSearchSlashCommand extends NASASlashCommand{
 
@@ -21,9 +22,13 @@ public class ImageSearchSlashCommand extends NASASlashCommand{
         this.insertCommand(slashCommandEvent);
 
         if (slashCommandEvent.getOptions().isEmpty()) {
-            slashCommandEvent.reply(String.format("No search term provided, please check your formatting: %s", this.getArgumentsString())).queue();
+            slashCommandEvent.reply("Missing search term, please retry.").queue();
         } else {
-            slashCommandEvent.replyEmbeds(NASABot.NASAClient.getNASAImage(slashCommandEvent.getOptions().get(0).getAsString())).queue();
+            try {
+                slashCommandEvent.replyEmbeds(NASABot.NASAClient.getNASAImage(Objects.requireNonNull(slashCommandEvent.getOption("search")).getAsString())).queue();
+            } catch (NullPointerException e) {
+                slashCommandEvent.reply("Missing search term, please retry.").queue();
+            }
         }
     }
 }
