@@ -54,7 +54,7 @@ public class NASABot {
         CommandClientBuilder builder = new CommandClientBuilder();
         builder.setPrefix(prefix);
         builder.addCommands(new APOD(), new ImageSearch(), new Info(), new SetPostChannel(), new GetPostChannel(), new RemovePostChannel(), new SetPostTime(), new GetPostTime(), new ISS(), new Announcement(), new ToggleLogging());
-        builder.addSlashCommands(new InfoSlashCommand(), new ImageSearchSlashCommand());
+        builder.addSlashCommands(new APODSlashCommand(), new GetPostChannelSlashCommand(), new GetPostTimeSlashCommand(), new ImageSearchSlashCommand(), new InfoSlashCommand());
         builder.setOwnerId(ownerId);
         CommandClient commandClient = builder.build();
 

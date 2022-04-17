@@ -14,9 +14,9 @@ public abstract class NASASlashCommand extends SlashCommand {
     public String getArgumentsString() {
         String arguments;
         try {
-            arguments =  String.format("\n```NASA_%s %s```", this.getName(), this.getArguments());
+            arguments =  String.format("\n```/%s %s```", this.getName(), this.getArguments());
         } catch (NullPointerException e) {
-            arguments = String.format("\n```NASA_%s %s```", this.getName(), "");
+            arguments = String.format("\n```/%s```", this.getName());
         }
 
         return arguments;
