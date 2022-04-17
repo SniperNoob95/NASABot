@@ -18,7 +18,7 @@ public class SetPostTimeSlashCommand extends NASASlashCommand {
         this.name = "setPostTime";
         this.help = "Sets the Post Time for the server.";
         this.arguments = "<post time option number (0 - 3)>";
-        this.options = Collections.singletonList(new OptionData(OptionType.INTEGER, "postTime", "The Post Time option you want to use.").setRequired(true));
+        this.options = Collections.singletonList(new OptionData(OptionType.INTEGER, "post_time", "The Post Time option you want to use.").setRequired(true));
     }
 
     @Override
@@ -35,9 +35,9 @@ public class SetPostTimeSlashCommand extends NASASlashCommand {
 
         int timeOption = -1;
         try {
-            timeOption = Objects.requireNonNull(slashCommandEvent.getOption("postTime")).getAsInt();
+            timeOption = Objects.requireNonNull(slashCommandEvent.getOption("post_time")).getAsInt();
         } catch (NumberFormatException e) {
-            slashCommandEvent.reply("Missing postTime, please retry.").queue();
+            slashCommandEvent.reply("Missing post_time, please retry.").queue();
             return;
         }
 
