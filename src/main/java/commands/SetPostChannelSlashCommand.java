@@ -18,7 +18,7 @@ public class SetPostChannelSlashCommand extends NASASlashCommand {
         this.name = "setPostChannel";
         this.help = "Sets the Post Channel for the server.";
         this.arguments = "<#channelMention>";
-        this.options = Collections.singletonList(new OptionData(OptionType.CHANNEL, "channelMention", "The channel to set as the Post Channel").setRequired(true));
+        this.options = Collections.singletonList(new OptionData(OptionType.CHANNEL, "channel_mention", "The channel to set as the Post Channel").setRequired(true));
     }
     
     @Override
@@ -54,8 +54,8 @@ public class SetPostChannelSlashCommand extends NASASlashCommand {
         }
 
         try {
-            if (slashCommandEvent.hasOption("channelMention")) {
-                List<GuildChannel> guildChannels = Objects.requireNonNull(slashCommandEvent.getOption("channelMention")).getMentionedChannels();
+            if (slashCommandEvent.hasOption("channel_mention")) {
+                List<GuildChannel> guildChannels = Objects.requireNonNull(slashCommandEvent.getOption("channel_mention")).getMentionedChannels();
                 if (guildChannels.size() == 0) {
                     slashCommandEvent.reply(String.format("No channels were mentioned, or the bot does not have permission to view the " +
                             "mentioned channel. Please check your permission settings or command formatting: %s", this.getArgumentsString())).queue();
@@ -74,7 +74,7 @@ public class SetPostChannelSlashCommand extends NASASlashCommand {
                     }
                 }
             } else {
-                slashCommandEvent.reply("Missing channelMention, please retry.").queue();
+                slashCommandEvent.reply("Missing channel_mention, please retry.").queue();
             }
         } catch (NullPointerException e) {
             slashCommandEvent.reply("There was a problem setting the server's Post Channel.").queue();
