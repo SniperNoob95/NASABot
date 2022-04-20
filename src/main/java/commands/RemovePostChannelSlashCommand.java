@@ -9,7 +9,7 @@ import java.util.Objects;
 public class RemovePostChannelSlashCommand extends NASASlashCommand{
 
     public RemovePostChannelSlashCommand() {
-        this.name = "removePostChannel";
+        this.name = "removepostchannel";
         this.help = "Removes the Post Channel for the server.";
     }
 

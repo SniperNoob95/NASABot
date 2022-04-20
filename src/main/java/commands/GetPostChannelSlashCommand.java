@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class GetPostChannelSlashCommand extends NASASlashCommand{
     public GetPostChannelSlashCommand() {
-        this.name = "getPostChannel";
+        this.name = "getpostchannel";
         this.help = "Gets the Post Channel for the server.";
     }
 

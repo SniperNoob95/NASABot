@@ -8,7 +8,7 @@ import java.util.Objects;
 public class GetPostTimeSlashCommand extends NASASlashCommand{
 
     public GetPostTimeSlashCommand() {
-        this.name = "getPostTime";
+        this.name = "getposttime";
         this.help = "Gets the Post Time for the server.";
     }
 

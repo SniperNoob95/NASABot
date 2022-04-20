@@ -15,7 +15,7 @@ public class SetPostTimeSlashCommand extends NASASlashCommand {
     private final int maximumOption = 3;
 
     public SetPostTimeSlashCommand() {
-        this.name = "setPostTime";
+        this.name = "setposttime";
         this.help = "Sets the Post Time for the server.";
         this.arguments = "<post time option number (0 - 3)>";
         this.options = Collections.singletonList(new OptionData(OptionType.INTEGER, "post_time", "The Post Time option you want to use.").setRequired(true));

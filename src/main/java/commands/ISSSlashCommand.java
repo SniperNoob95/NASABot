@@ -7,7 +7,7 @@ public class ISSSlashCommand extends NASASlashCommand{
 
     public ISSSlashCommand() {
         super();
-        this.name = "ISS";
+        this.name = "iss";
         this.help = "Displays the current location of the International Space Station.";
     }
 

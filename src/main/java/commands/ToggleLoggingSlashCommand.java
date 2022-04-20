@@ -9,7 +9,7 @@ public class ToggleLoggingSlashCommand extends NASASlashCommand {
 
     public ToggleLoggingSlashCommand() {
         super();
-        this.name = "toggleLogging";
+        this.name = "togglelogging";
         this.help = "Allows the bot owner to enable or disable logging.";
         this.ownerCommand = true;
     }
