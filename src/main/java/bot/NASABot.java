@@ -33,6 +33,7 @@ public class NASABot {
     public static ISSClient issClient;
     public static GeoNamesClient geoNamesClient;
     public static Map<Integer, Integer> postTimes;
+    public static String NASABotServerID;
     public static boolean loggingEnabled = false;
 
     public static void main(String[] args) throws LoginException, InterruptedException {
@@ -43,6 +44,7 @@ public class NASABot {
         try {
             token = resourceBundle.getString("token");
             ownerId = resourceBundle.getString("owner");
+            NASABotServerID = resourceBundle.getString("NASABotServer");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Cannot get Discord token.");
@@ -51,18 +53,18 @@ public class NASABot {
 
         CommandClientBuilder builder = new CommandClientBuilder();
         builder.setPrefix(prefix);
-        builder.addCommands(new APOD(),
-        		new ImageSearch(),
-        		new Info(),
-        		new SetPostChannel(),
-        		new GetPostChannel(),
-        		new RemovePostChannel(),
-        		new SetPostTime(),
-        		new GetPostTime(),
-        		new ISS(),
-        		new Announcement(),
-        		new ToggleLogging(),
-        		new Moonphase());
+        builder.addCommands(new APOD(), new ImageSearch(), new Info(), new SetPostChannel(), new GetPostChannel(), new RemovePostChannel(), new SetPostTime(), new GetPostTime(), new ISS(), new Announcement(), new ToggleLogging());
+        builder.addSlashCommands(new APODSlashCommand(),
+                                 new GetPostChannelSlashCommand(),
+                                 new GetPostTimeSlashCommand(),
+                                 new ImageSearchSlashCommand(),
+                                 new InfoSlashCommand(),
+                                 new ISSSlashCommand(),
+                                 new RemovePostChannelSlashCommand(),
+                                 new SetPostChannelSlashCommand(),
+                                 new SetPostTimeSlashCommand(),
+                                 new ToggleLoggingSlashCommand(),
+                                 new MoonphaseSlashCommand());
         builder.setOwnerId(ownerId);
         CommandClient commandClient = builder.build();
 
