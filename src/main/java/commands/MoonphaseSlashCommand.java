@@ -3,7 +3,7 @@ package commands;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.command.SlashCommandEvent;
 
 import utils.AstronomyCalc;
 import utils.AstronomyCalc.MoonType;
@@ -13,16 +13,16 @@ import utils.AstronomyCalc.MoonType;
  * 
  * @author Kyle Smith (kjsmita6)
  */
-public class Moonphase extends NASACommand {
+public class MoonphaseSlashCommand extends NASASlashCommand {
 
-	public Moonphase() {
+	public MoonphaseSlashCommand() {
 		super();
 		this.name = "moonphase";
 		this.help = "Displays the current phase of the moon.";
 	}
-	
+
 	@Override
-	protected void execute(CommandEvent event) {
+	protected void execute(SlashCommandEvent event) {
 		insertCommand(event);
 		LocalDate now= LocalDate.now();
 		
@@ -32,6 +32,7 @@ public class Moonphase extends NASACommand {
 		
 		MoonType phase = AstronomyCalc.getMoonphase(year, month, day);
 		double days = AstronomyCalc.getDaysSinceNewMoon(year, month, day);
-		event.reply(MessageFormat.format("The current moon phase is {0} ({1} days until new moon).", phase, (int) AstronomyCalc.MOON_PHASE_LENGTH - (int) days));
+		event.reply(MessageFormat.format("The current moon phase is {0} ({1} days until new moon).", phase, (int) AstronomyCalc.MOON_PHASE_LENGTH - (int) days)).queue();;
 	}
+
 }

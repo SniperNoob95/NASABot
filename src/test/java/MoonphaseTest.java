@@ -2,8 +2,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import commands.Moonphase.MoonType;
 import utils.AstronomyCalc;
+import utils.AstronomyCalc.MoonType;
 
 class MoonphaseTest {
 

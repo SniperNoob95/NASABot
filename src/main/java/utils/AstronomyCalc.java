@@ -71,4 +71,26 @@ public final class AstronomyCalc {
 		double cycleCount = refDiff / MOON_PHASE_LENGTH;
 		return (cycleCount % 1) * MOON_PHASE_LENGTH;
 	}
+
+	public static enum MoonType {
+		NEW("New"),
+		WANING_CRES("Waning Crescent"),
+		THIRD_QUART("Third Quarter"),
+		WANING_GIBB("Waning Gibbous"),
+		FULL("Full"),
+		WAXING_GIBB("Waxing Gibbous"),
+		FIRST_QUART("First Quarter"),
+		WAXING_CRES("Waxing Crescent");
+		
+		private String phaseString;
+		
+		private MoonType(String phaseString) {
+			this.phaseString = phaseString;
+		}
+		
+		@Override
+		public String toString() {
+			return phaseString;
+		}
+	}
 }
