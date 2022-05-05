@@ -2,8 +2,6 @@ package utils;
 
 import java.time.LocalDate;
 
-import commands.Moonphase.MoonType;
-
 /**
  * Utility class for miscellaneous astronomy calculations.
  * 
