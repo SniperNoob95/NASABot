@@ -1,5 +1,9 @@
 src/main/resources/
 *.iml
 .idea/
-/target
+target/
 *.sh
+bin/
+.classpath
+.project
+.settings/

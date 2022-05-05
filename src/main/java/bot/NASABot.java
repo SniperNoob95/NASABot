@@ -53,8 +53,34 @@ public class NASABot {
 
         CommandClientBuilder builder = new CommandClientBuilder();
         builder.setPrefix(prefix);
-        builder.addCommands(new APOD(), new ImageSearch(), new Info(), new SetPostChannel(), new GetPostChannel(), new RemovePostChannel(), new SetPostTime(), new GetPostTime(), new ISS(), new Announcement(), new ToggleLogging());
-        builder.addSlashCommands(new APODSlashCommand(), new GetPostChannelSlashCommand(), new GetPostTimeSlashCommand(), new ImageSearchSlashCommand(), new InfoSlashCommand(), new ISSSlashCommand(), new RemovePostChannelSlashCommand(), new SetPostChannelSlashCommand(), new SetPostTimeSlashCommand(), new ToggleLoggingSlashCommand());
+
+        // Normal commands
+        // XXX why do we need these?
+        builder.addCommands(new APOD(),
+                            new ImageSearch(),
+                            new Info(),
+                            new SetPostChannel(),
+                            new GetPostChannel(),
+                            new RemovePostChannel(),
+                            new SetPostTime(),
+                            new GetPostTime(),
+                            new ISS(),
+                            new Announcement(),
+                            new ToggleLogging(),
+                            new Moonphase());
+
+        // Slash commands
+        builder.addSlashCommands(new APODSlashCommand(),
+                                 new GetPostChannelSlashCommand(),
+                                 new GetPostTimeSlashCommand(),
+                                 new ImageSearchSlashCommand(),
+                                 new InfoSlashCommand(),
+                                 new ISSSlashCommand(),
+                                 new RemovePostChannelSlashCommand(),
+                                 new SetPostChannelSlashCommand(),
+                                 new SetPostTimeSlashCommand(),
+                                 new ToggleLoggingSlashCommand(),
+                                 new MoonphaseSlashCommand());
         builder.setOwnerId(ownerId);
         CommandClient commandClient = builder.build();
 
@@ -67,11 +93,11 @@ public class NASABot {
         geoNamesClient = new GeoNamesClient();
 
         postTimes = new HashMap<>(Map.ofEntries(
-                entry(0, 16), // OPTION 0
-                entry(1, 6), // OPTION 1
-                entry(2, 11), // OPTION 2
-                entry(3, 21) // OPTION 3
-        ));
+                                                entry(0, 16), // OPTION 0
+                                                entry(1, 6), // OPTION 1
+                                                entry(2, 11), // OPTION 2
+                                                entry(3, 21) // OPTION 3
+                ));
 
         for (HashMap.Entry<Integer, Integer> entry : postTimes.entrySet()) {
             scheduleAPODPostTask(entry.getKey());
