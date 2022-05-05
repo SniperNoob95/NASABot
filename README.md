@@ -1,4 +1,4 @@
-# NASABot v4.2.0
+# NASABot v4.3.0
 **Now featuring configurable automated APOD posting times!** A Discord bot that implements the NASA API to provide cool, interesting, and informative artifacts.\
 [![Discord Bots](https://top.gg/api/widget/status/748775876077813881.svg)](https://top.gg/bot/748775876077813881)
 [![Discord Bots](https://top.gg/api/widget/servers/748775876077813881.svg)](https://top.gg/bot/748775876077813881)
@@ -41,6 +41,10 @@ Returns the Post Time set for the server.
     NASA_APOD [date (YYYY-MM-DD)]
     Ex: NASA_APOD 2020-09-05
 Returns the Astronomy Picture of the Day for the previous day, or the given date if provided.
+
+#### moonphase
+    NASA_moonphase
+Returns the current moon phase and time until next new moon.
 
 #### ISS
     NASA_ISS
