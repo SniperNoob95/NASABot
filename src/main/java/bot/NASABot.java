@@ -35,6 +35,14 @@ public class NASABot {
     public static Map<Integer, Integer> postTimes;
     public static String NASABotServerID;
     public static boolean loggingEnabled = false;
+    public static final String deprecationMessage = "NASABot is moving to Slash Commands! In August, Discord is mandating that all verified bots transition to Slash Commands. " +
+            "From now until July, NASABot will be supporting both options as a transition period. In July, we will switch over to Slash Commands permanently to prepare our users for this change. " +
+            "All the NASABot commands you know and love already have slash command equivalents. We recommend switching over now to get used to this change. " +
+            "Type `/` to bring up a list of available Slash Commands in your server." +
+            "Please make sure NASABot has the \"Application Commands\" permission. If you still don't see any available commands, try re-inviting the bot using the following link:" +
+            "\nhttps://discord.com/oauth2/authorize?client_id=748775876077813881&scope=bot&permissions=2214710336" +
+            "\nTo read more about this change, please see the following post:" +
+            "\nhttps://support-dev.discord.com/hc/en-us/articles/4404772028055-Message-Content-Privileged-Intent-for-Verified-Bots";
 
     public static void main(String[] args) throws LoginException, InterruptedException {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
@@ -55,32 +63,31 @@ public class NASABot {
         builder.setPrefix(prefix);
 
         // Normal commands
-        // XXX why do we need these?
         builder.addCommands(new APOD(),
-                            new ImageSearch(),
-                            new Info(),
-                            new SetPostChannel(),
-                            new GetPostChannel(),
-                            new RemovePostChannel(),
-                            new SetPostTime(),
-                            new GetPostTime(),
-                            new ISS(),
-                            new Announcement(),
-                            new ToggleLogging(),
-                            new Moonphase());
+                new ImageSearch(),
+                new Info(),
+                new SetPostChannel(),
+                new GetPostChannel(),
+                new RemovePostChannel(),
+                new SetPostTime(),
+                new GetPostTime(),
+                new ISS(),
+                new Announcement(),
+                new ToggleLogging(),
+                new Moonphase());
 
         // Slash commands
         builder.addSlashCommands(new APODSlashCommand(),
-                                 new GetPostChannelSlashCommand(),
-                                 new GetPostTimeSlashCommand(),
-                                 new ImageSearchSlashCommand(),
-                                 new InfoSlashCommand(),
-                                 new ISSSlashCommand(),
-                                 new RemovePostChannelSlashCommand(),
-                                 new SetPostChannelSlashCommand(),
-                                 new SetPostTimeSlashCommand(),
-                                 new ToggleLoggingSlashCommand(),
-                                 new MoonphaseSlashCommand());
+                new GetPostChannelSlashCommand(),
+                new GetPostTimeSlashCommand(),
+                new ImageSearchSlashCommand(),
+                new InfoSlashCommand(),
+                new ISSSlashCommand(),
+                new RemovePostChannelSlashCommand(),
+                new SetPostChannelSlashCommand(),
+                new SetPostTimeSlashCommand(),
+                new ToggleLoggingSlashCommand(),
+                new MoonphaseSlashCommand());
         builder.setOwnerId(ownerId);
         CommandClient commandClient = builder.build();
 
@@ -93,11 +100,11 @@ public class NASABot {
         geoNamesClient = new GeoNamesClient();
 
         postTimes = new HashMap<>(Map.ofEntries(
-                                                entry(0, 16), // OPTION 0
-                                                entry(1, 6), // OPTION 1
-                                                entry(2, 11), // OPTION 2
-                                                entry(3, 21) // OPTION 3
-                ));
+                entry(0, 16), // OPTION 0
+                entry(1, 6), // OPTION 1
+                entry(2, 11), // OPTION 2
+                entry(3, 21) // OPTION 3
+        ));
 
         for (HashMap.Entry<Integer, Integer> entry : postTimes.entrySet()) {
             scheduleAPODPostTask(entry.getKey());

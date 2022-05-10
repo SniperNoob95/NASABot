@@ -1,5 +1,6 @@
 package utils;
 
+import bot.NASABot;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -13,11 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static java.util.Map.entry;
 
@@ -43,6 +40,14 @@ public class DBClient {
             e.printStackTrace();
             System.out.println("Cannot contact API.");
             System.exit(0);
+        }
+    }
+
+    private void randomDeprecationMessage(CommandEvent commandEvent) {
+        Random random = new Random();
+        int randomNum = random.nextInt(20) + 1;
+        if (randomNum == 10) {
+            commandEvent.reply(NASABot.deprecationMessage);
         }
     }
 
@@ -145,6 +150,7 @@ public class DBClient {
      * @param command      The command issued.
      */
     public boolean insertCommand(CommandEvent commandEvent, String command) {
+        randomDeprecationMessage(commandEvent);
         JSONObject payload = new JSONObject();
         try {
             payload.put("date", System.currentTimeMillis() / 1000);
@@ -165,7 +171,7 @@ public class DBClient {
      * Inserts a command issued by a user.
      *
      * @param slashCommandEvent Event in which the command occurred.
-     * @param command      The command issued.
+     * @param command           The command issued.
      */
     public boolean insertCommand(SlashCommandEvent slashCommandEvent, String command) {
         JSONObject payload = new JSONObject();

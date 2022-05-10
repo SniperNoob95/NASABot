@@ -30,7 +30,7 @@ public class TopGGClient {
 
         TimerTask timerTask = new TopGGTimerTask();
         Timer timer = new Timer(true);
-        timer.scheduleAtFixedRate(timerTask, 0, 5*1000);
+        timer.scheduleAtFixedRate(timerTask, 0, 5 * 1000);
     }
 
     private static void setStats(OkHttpClient httpClient, int serverCount) {
