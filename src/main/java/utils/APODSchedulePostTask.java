@@ -42,6 +42,7 @@ public class APODSchedulePostTask extends TimerTask {
             guild = NASABot.jda.getGuildById(serverId);
         } catch (Exception e) {
             System.out.println(String.format("Guild %s no longer visible to bot, deleting Post Channel", serverId));
+            ErrorLogging.handleError("APODSchedulePostTask", "sendAPODToChannel", String.format("Guild %s no longer visible to bot, deleting Post Channel", serverId), e);
             NASABot.dbClient.deletePostChannel(serverId);
             return;
         }
@@ -50,6 +51,7 @@ public class APODSchedulePostTask extends TimerTask {
             textChannel = Objects.requireNonNull(guild).getTextChannelById(channelId);
         } catch (Exception e) {
             System.out.println(String.format("Text channel %s in guild %s no longer visible to bot, skipping APOD post.", channelId, serverId));
+            ErrorLogging.handleError("APODSchedulePostTask", "sendAPODToChannel", String.format("Text channel %s in guild %s no longer visible to bot, skipping APOD post.", channelId, serverId), e);
             return;
         }
 
@@ -57,6 +59,7 @@ public class APODSchedulePostTask extends TimerTask {
             Objects.requireNonNull(textChannel).sendMessageEmbeds(embed).queue();
         } catch (Exception e) {
             System.out.println(String.format("Unable to send APOD to text channel %s in guild %s.", channelId, serverId));
+            ErrorLogging.handleError("APODSchedulePostTask", "sendAPODToChannel", String.format("Unable to send APOD to text channel %s in guild %s.", channelId, serverId), e);
         }
     }
 }

@@ -21,8 +21,7 @@ public class GeoNamesClient {
         try {
             username = resourceBundle.getString("geoNamesUsername");
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Cannot create GeoNamesClient.");
+            ErrorLogging.handleError("GeoNamesClient", "GeoNamesClient", "Cannot create GeoNamesClient.", e);
             System.exit(0);
         }
     }
@@ -42,7 +41,7 @@ public class GeoNamesClient {
             response.close();
             return country;
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorLogging.handleError("GeoNamesClient", "getCountryFromLatitudeLongitude", "Unable to get ISS location.", e);
         }
 
         return null;

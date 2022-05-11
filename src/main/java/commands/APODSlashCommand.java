@@ -4,6 +4,7 @@ import bot.NASABot;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import utils.ErrorLogging;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,7 +36,7 @@ public class APODSlashCommand extends NASASlashCommand{
                     slashCommandEvent.reply(String.format("Unable to get APOD, please check your formatting: %s", this.getArgumentsString())).queue();
                 }
             } catch (ParseException e) {
-                System.out.println(String.format("[APOD] Unable to parse date: %s", slashCommandEvent.getOptions()));
+                ErrorLogging.handleError("APODSlashCommand", "execute", String.format("Unable to parse date: %s", slashCommandEvent.getOption("date")), e);
                 slashCommandEvent.reply(String.format("Unable to get APOD, please check your formatting: %s", this.getArgumentsString())).queue();
             }
         }

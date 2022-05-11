@@ -2,6 +2,7 @@ package commands;
 
 import bot.NASABot;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import utils.ErrorLogging;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,7 +32,7 @@ public class APOD extends NASACommand {
                     commandEvent.reply(String.format("Unable to get APOD, please check your formatting: %s", this.getArgumentsString()));
                 }
             } catch (ParseException e) {
-                System.out.println(String.format("[APOD] Unable to parse date: %s", commandEvent.getArgs()));
+                ErrorLogging.handleError("APOD", "execute", String.format("Unable to parse date: %s", commandEvent.getArgs()), e);
                 commandEvent.reply(String.format("Unable to get APOD, please check your formatting: %s", this.getArgumentsString()));
             }
         }

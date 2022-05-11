@@ -23,8 +23,7 @@ public class TopGGClient {
         try {
             token = resourceBundle.getString("TopGGKey");
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Cannot load top.gg client.");
+            ErrorLogging.handleError("TopGGClient", "TopGGClient", "Cannot contact TopGG API.", e);
             System.exit(0);
         }
 
@@ -39,8 +38,7 @@ public class TopGGClient {
             Request request = new Request.Builder().url(url + "/stats").method("POST", requestBody).addHeader("Authorization", "Bearer " + token).build();
             httpClient.newCall(request).execute();
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Failed to update status.");
+            ErrorLogging.handleError("TopGGClient", "setStats", "Cannot set stats.", e);
         }
     }
 

@@ -29,7 +29,7 @@ public class NASAClient {
         try {
             apiKey = resourceBundle.getString("NASAKey");
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorLogging.handleError("NASAClient", "NASAClient", "Cannot contact NASA API.", e);
             System.exit(0);
         }
     }
@@ -44,7 +44,7 @@ public class NASAClient {
             response.close();
             return embed;
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorLogging.handleError("NASAClient", "getPictureOfTheDay", "Cannot get picture of the day.", e);
         }
 
         return null;
@@ -68,7 +68,7 @@ public class NASAClient {
             }
             return embedBuilder.build();
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorLogging.handleError("NASAClient", "formatPictureOfTheDay", "Cannot format picture of the day.", e);
             return new EmbedBuilder().setTitle("Picture of the Day").addField("ERROR", "Unable to obtain Picture of the Day.", false).setColor(Color.RED).build();
         }
     }
@@ -83,7 +83,7 @@ public class NASAClient {
             response.close();
             return embed;
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorLogging.handleError("NASAClient", "getNASAImage", "Cannot get NASA image.", e);
         }
 
         return null;
@@ -110,7 +110,7 @@ public class NASAClient {
                 return embedBuilder.build();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorLogging.handleError("NASAClient", "formatNASAImage", "Cannot format NASA image.", e);
             return new EmbedBuilder().setTitle("NASA Image").addField("ERROR", "Unable to obtain an image.", false).setColor(Color.RED).build();
         }
     }

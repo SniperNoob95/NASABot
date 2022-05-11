@@ -30,7 +30,7 @@ public class ISSClient {
             response.close();
             return embed;
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorLogging.handleError("ISSClient", "getISSLocation", "Cannot get ISS location.", e);
         }
 
         return null;
@@ -51,11 +51,11 @@ public class ISSClient {
                     .addField("Longitude", jsonObject.getJSONObject("iss_position").getString("longitude"), true)
                     .addField("Google Maps Location", getGoogleMapsLink(Double.parseDouble(jsonObject.getJSONObject("iss_position").getString("latitude")), Double.parseDouble(jsonObject.getJSONObject("iss_position").getString("longitude"))), false)
                     .addField("Currently Over Country", NASABot.geoNamesClient.getCountryFromLatitudeLongitude(jsonObject.getJSONObject("iss_position").getString("latitude"), jsonObject.getJSONObject("iss_position").getString("longitude")), false)
-                    .setThumbnail("https://www.nationalgeographic.com/content/dam/science/2020/10/28/ISS/international_space_station_in_2018.adapt.1900.1.jpg");
+                    .setThumbnail("https://i.imgur.com/xm3XSgc.jpg");
             return embedBuilder.build();
         } catch (Exception e) {
-            e.printStackTrace();
-            return new EmbedBuilder().setTitle("ISS Current Location").addField("ERROR", "Unable to obtain Picture of the Day.", false).setColor(Color.RED).build();
+            ErrorLogging.handleError("ISSClient", "updateHealthCheck", "Cannot format ISS location.", e);
+            return new EmbedBuilder().setTitle("ISS Current Location").addField("ERROR", "Unable to obtain ISS location.", false).setColor(Color.RED).build();
         }
     }
 
