@@ -45,8 +45,8 @@ public class DBClient {
 
     private void randomDeprecationMessage(CommandEvent commandEvent) {
         Random random = new Random();
-        int randomNum = random.nextInt(20) + 1;
-        if (randomNum == 10) {
+        int randomNum = random.nextInt(10) + 1;
+        if (randomNum == 5) {
             commandEvent.reply(NASABot.deprecationMessage);
         }
     }

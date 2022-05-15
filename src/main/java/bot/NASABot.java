@@ -35,14 +35,8 @@ public class NASABot {
     public static Map<Integer, Integer> postTimes;
     public static String NASABotServerID;
     public static boolean loggingEnabled = false;
-    public static final String deprecationMessage = "NASABot is moving to Slash Commands! In August, Discord is mandating that all verified bots transition to Slash Commands. " +
-            "From now until July, NASABot will be supporting both options as a transition period. In July, we will switch over to Slash Commands permanently to prepare our users for this change. " +
-            "All the NASABot commands you know and love already have slash command equivalents. We recommend switching over now to get used to this change. " +
-            "Type `/` to bring up a list of available Slash Commands in your server." +
-            "Please make sure NASABot has the \"Application Commands\" permission. If you still don't see any available commands, try re-inviting the bot using the following link:" +
-            "\nhttps://discord.com/oauth2/authorize?client_id=748775876077813881&scope=bot&permissions=2214710336" +
-            "\nTo read more about this change, please see the following post:" +
-            "\nhttps://support-dev.discord.com/hc/en-us/articles/4404772028055-Message-Content-Privileged-Intent-for-Verified-Bots";
+    public static final String deprecationMessage = "NASABot is moving to Slash Commands! We recommend switching over now to get used to this change. " +
+            "For more information, please read the full announcement: https://gist.github.com/SniperNoob95/a6815a406a7243c009baa298f704d2e4";
 
     public static void main(String[] args) throws LoginException, InterruptedException {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
