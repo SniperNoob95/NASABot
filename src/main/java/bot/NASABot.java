@@ -35,7 +35,7 @@ public class NASABot {
     public static Map<Integer, Integer> postTimes;
     public static String NASABotServerID;
     public static boolean loggingEnabled = false;
-    public static final String deprecationMessage = "NASABot is moving to Slash Commands! We recommend switching over now to for this soon-to-be-permanent change mandated by Discord. " +
+    public static final String deprecationMessage = "NASABot is moving to Slash Commands! We recommend switching over now to prepare for this soon-to-be-permanent change mandated by Discord. " +
             "For more information, please read the full announcement: https://gist.github.com/SniperNoob95/a6815a406a7243c009baa298f704d2e4";
 
     public static void main(String[] args) throws LoginException, InterruptedException {
