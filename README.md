@@ -1,4 +1,4 @@
-# NASABot v5.0.0
+# NASABot v5.1.0
 **Now featuring configurable automated APOD posting times!** A Discord bot that implements the NASA API to provide cool, interesting, and informative artifacts.\
 [![Discord Bots](https://top.gg/api/widget/status/748775876077813881.svg)](https://top.gg/bot/748775876077813881)
 [![Discord Bots](https://top.gg/api/widget/servers/748775876077813881.svg)](https://top.gg/bot/748775876077813881)
