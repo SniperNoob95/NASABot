@@ -5,6 +5,7 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.json.JSONObject;
 
 import java.util.ResourceBundle;
@@ -23,8 +24,7 @@ public class TopGGClient {
         try {
             token = resourceBundle.getString("TopGGKey");
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Cannot load top.gg client.");
+            ErrorLogging.handleError("TopGGClient", "TopGGClient", "Cannot contact TopGG API.", e);
             System.exit(0);
         }
 
@@ -37,10 +37,10 @@ public class TopGGClient {
         try {
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), new JSONObject().put("server_count", serverCount).toString());
             Request request = new Request.Builder().url(url + "/stats").method("POST", requestBody).addHeader("Authorization", "Bearer " + token).build();
-            httpClient.newCall(request).execute();
+            Response response = httpClient.newCall(request).execute();
+            response.close();
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Failed to update status.");
+            ErrorLogging.handleError("TopGGClient", "setStats", "Cannot set stats.", e);
         }
     }
 

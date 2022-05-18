@@ -29,7 +29,7 @@ public class NASAClient {
         try {
             apiKey = resourceBundle.getString("NASAKey");
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorLogging.handleError("NASAClient", "NASAClient", "Cannot contact NASA API.", e);
             System.exit(0);
         }
     }
@@ -44,7 +44,7 @@ public class NASAClient {
             response.close();
             return embed;
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorLogging.handleError("NASAClient", "getPictureOfTheDay", "Cannot get picture of the day.", e);
         }
 
         return null;
@@ -59,7 +59,7 @@ public class NASAClient {
             embedBuilder
                     .setTitle(jsonObject.getString("title"))
                     .setDescription(String.format("%s", outputDateFormat.format(inputDateFormat.parse(jsonObject.getString("date")))))
-                    .setColor(Color.GREEN)
+                    .setColor(new Color(192, 32, 232))
                     .addField("Description", jsonObject.getString("explanation").length() > 1024 ? String.format("%s", jsonObject.getString("explanation")).substring(0, 1020) + "..." : String.format("%s", jsonObject.getString("explanation")), false);
             if (jsonObject.getString("url").contains("youtube.com")) {
                 embedBuilder.addField("Video Link", jsonObject.getString("url"), false);
@@ -68,7 +68,7 @@ public class NASAClient {
             }
             return embedBuilder.build();
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorLogging.handleError("NASAClient", "formatPictureOfTheDay", "Cannot format picture of the day.", e);
             return new EmbedBuilder().setTitle("Picture of the Day").addField("ERROR", "Unable to obtain Picture of the Day.", false).setColor(Color.RED).build();
         }
     }
@@ -83,7 +83,7 @@ public class NASAClient {
             response.close();
             return embed;
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorLogging.handleError("NASAClient", "getNASAImage", "Cannot get NASA image.", e);
         }
 
         return null;
@@ -105,12 +105,12 @@ public class NASAClient {
                                 selection.getJSONArray("data").getJSONObject(0).getString("description").substring(0, 1500) + "..." :
                                 selection.getJSONArray("data").getJSONObject(0).getString("description"));
                 embedBuilder.addField("Date", outputDateFormat.format(inputDateFormat.parse(selection.getJSONArray("data").getJSONObject(0).getString("date_created"))), false);
-                embedBuilder.setColor(Color.GREEN);
+                embedBuilder.setColor(new Color(192, 32, 232));
                 embedBuilder.setImage(selection.getJSONArray("links").getJSONObject(0).getString("href"));
                 return embedBuilder.build();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorLogging.handleError("NASAClient", "formatNASAImage", "Cannot format NASA image.", e);
             return new EmbedBuilder().setTitle("NASA Image").addField("ERROR", "Unable to obtain an image.", false).setColor(Color.RED).build();
         }
     }

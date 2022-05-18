@@ -1,4 +1,4 @@
-# NASABot v4.3.1
+# NASABot v5.1.0
 **Now featuring configurable automated APOD posting times!** A Discord bot that implements the NASA API to provide cool, interesting, and informative artifacts.\
 [![Discord Bots](https://top.gg/api/widget/status/748775876077813881.svg)](https://top.gg/bot/748775876077813881)
 [![Discord Bots](https://top.gg/api/widget/servers/748775876077813881.svg)](https://top.gg/bot/748775876077813881)
@@ -6,7 +6,7 @@
 
 #### [Discord Invite Link](https://discord.com/api/oauth2/authorize?client_id=748775876077813881&permissions=67226688&scope=bot)
 
-This project is a work in progress, and will be updated iteratively as features are added.
+This project is a work in progress, and will be updated iteratively as additional features are added.
 
 See [the project board](https://github.com/SniperNoob95/NASABot/projects/1) for insight into upcoming additions/changes.
 

@@ -56,6 +56,21 @@ public class DBClient {
         return httpClient.newCall(request).execute();
     }
 
+    public boolean insertErrorLog(String className, String method, String log, String exception) {
+        JSONObject payload = new JSONObject();
+        try {
+            payload.put("date", System.currentTimeMillis() / 1000);
+            payload.put("class", className);
+            payload.put("method", method);
+            payload.put("log", log);
+            payload.put("exception", exception);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return issuePostRequest("/errors", payload);
+    }
+
     private JSONArray issueGetRequest(String path, Map<String, String> queryParameters) {
         try {
             HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url + path)).newBuilder();

@@ -20,8 +20,7 @@ public class HealthCheckClient {
             user = resourceBundle.getString("healthCheckUserName");
             password = resourceBundle.getString("healthCheckPassword");
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Cannot contact API.");
+            ErrorLogging.handleError("HealthCheckClient", "HealthCheckClient", "Cannot contact HealthCheck API.", e);
             System.exit(0);
         }
     }
@@ -44,7 +43,7 @@ public class HealthCheckClient {
             response.close();
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorLogging.handleError("HealthCheckClient", "updateHealthCheck", "Cannot contact HealthCheck API.", e);
             return false;
         }
     }
