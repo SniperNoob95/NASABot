@@ -62,7 +62,7 @@ public class NASAClient {
                     .setColor(new Color(192, 32, 232))
                     .addField("Description", jsonObject.getString("explanation").length() > 1024 ? String.format("%s", jsonObject.getString("explanation")).substring(0, 1020) + "..." : String.format("%s", jsonObject.getString("explanation")), false);
             if (jsonObject.has("hdurl")) embedBuilder.addField("HD Image Link", jsonObject.getString("hdurl"), false);
-            embedBuilder.addField("Full APOD Link", String.format("https://apod.nasa.gov/apod/ap%s.html", jsonObject.getString("date").replaceAll("-", "")), false);
+            embedBuilder.addField("Full APOD Link", String.format("https://apod.nasa.gov/apod/ap%s.html", jsonObject.getString("date").replaceAll("-", "").substring(2)), false);
             if (jsonObject.getString("url").contains("youtube.com")) {
                 embedBuilder.addField("Video Link", jsonObject.getString("url"), false);
             } else {
