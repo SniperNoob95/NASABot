@@ -4,7 +4,7 @@
 [![Discord Bots](https://top.gg/api/widget/servers/748775876077813881.svg)](https://top.gg/bot/748775876077813881)
 **Upvote us on [Top.gg](https://top.gg/bot/748775876077813881)!**
 
-#### [Discord Invite Link](https://discord.com/api/oauth2/authorize?client_id=748775876077813881&permissions=67226688&scope=bot)
+#### [Discord Invite Link](https://discord.com/api/oauth2/authorize?client_id=748775876077813881&permissions=2214710336&scope=applications.commands%20bot)
 
 This project is a work in progress, and will be updated iteratively as additional features are added.
 
