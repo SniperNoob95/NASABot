@@ -57,12 +57,13 @@ public class NASAClient {
             JSONObject jsonObject = new JSONObject(POTDResponse);
             EmbedBuilder embedBuilder = new EmbedBuilder();
             embedBuilder
-                    .setTitle(jsonObject.getString("title"))
+                    .setTitle(jsonObject.getString("title"), String.format("https://apod.nasa.gov/apod/ap%s.html", jsonObject.getString("date").replaceAll("-", "").substring(2)))
                     .setDescription(String.format("%s", outputDateFormat.format(inputDateFormat.parse(jsonObject.getString("date")))))
                     .setColor(new Color(192, 32, 232))
                     .addField("Description", jsonObject.getString("explanation").length() > 1024 ? String.format("%s", jsonObject.getString("explanation")).substring(0, 1020) + "..." : String.format("%s", jsonObject.getString("explanation")), false);
-            if (jsonObject.has("hdurl")) embedBuilder.addField("HD Image Link", jsonObject.getString("hdurl"), false);
-            embedBuilder.addField("Full APOD Link", String.format("https://apod.nasa.gov/apod/ap%s.html", jsonObject.getString("date").replaceAll("-", "").substring(2)), false);
+            if (jsonObject.has("hdurl")) {
+            	embedBuilder.addField("HD Image Link", jsonObject.getString("hdurl"), false);
+            }
             if (jsonObject.getString("url").contains("youtube.com")) {
                 embedBuilder.addField("Video Link", jsonObject.getString("url"), false);
             } else {
