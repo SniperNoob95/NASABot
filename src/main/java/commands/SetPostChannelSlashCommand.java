@@ -18,7 +18,7 @@ public class SetPostChannelSlashCommand extends NASASlashCommand {
         this.name = "setpostchannel";
         this.help = "Sets the Post Channel for the server.";
         this.arguments = "<#channelMention>";
-        this.options = Collections.singletonList(new OptionData(OptionType.MENTIONABLE, "channel_mention", "The channel to set as the Post Channel").setRequired(true));
+        this.options = Collections.singletonList(new OptionData(OptionType.CHANNEL, "channel_mention", "The channel to set as the Post Channel").setRequired(true));
     }
     
     @Override
@@ -55,17 +55,17 @@ public class SetPostChannelSlashCommand extends NASASlashCommand {
 
         try {
             if (slashCommandEvent.hasOption("channel_mention")) {
-                List<GuildChannel> guildChannels = Objects.requireNonNull(slashCommandEvent.getOption("channel_mention")).getMentionedChannels();
-                if (guildChannels.size() == 0) {
+                GuildChannel mentionedChannel = Objects.requireNonNull(slashCommandEvent.getOption("channel_mention")).getAsTextChannel();
+                if (mentionedChannel == null) {
                     slashCommandEvent.reply(String.format("No channels were mentioned, or the bot does not have permission to view the " +
                             "mentioned channel. Please check your permission settings or command formatting: %s", this.getArgumentsString())).queue();
                     return;
                 }
-                if (NASABot.dbClient.createPostChannel(Objects.requireNonNull(slashCommandEvent.getGuild()).getId(), guildChannels.get(0).getId())) {
+                if (NASABot.dbClient.createPostChannel(Objects.requireNonNull(slashCommandEvent.getGuild()).getId(), mentionedChannel.getId())) {
                     int postChannelId = NASABot.dbClient.getPostChannelId(Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
                     if (postChannelId != -1) {
                         if (NASABot.dbClient.createPostChannelConfiguration(postChannelId)) {
-                            slashCommandEvent.reply(String.format("%s has been set as the Post Channel for this server.", guildChannels.get(0).getAsMention())).queue();
+                            slashCommandEvent.reply(String.format("%s has been set as the Post Channel for this server.", mentionedChannel.getAsMention())).queue();
                         } else {
                             slashCommandEvent.reply("Unable to set Post Channel Configuration. Please contact the bot owner or join the NASABot Discord channel to report this error.").queue();
                         }
