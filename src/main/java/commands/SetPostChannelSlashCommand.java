@@ -18,7 +18,7 @@ public class SetPostChannelSlashCommand extends NASASlashCommand {
         this.name = "setpostchannel";
         this.help = "Sets the Post Channel for the server.";
         this.arguments = "<#channelMention>";
-        this.options = Collections.singletonList(new OptionData(OptionType.CHANNEL, "channel_mention", "The channel to set as the Post Channel").setRequired(true));
+        this.options = Collections.singletonList(new OptionData(OptionType.MENTIONABLE, "channel_mention", "The channel to set as the Post Channel").setRequired(true));
     }
     
     @Override
