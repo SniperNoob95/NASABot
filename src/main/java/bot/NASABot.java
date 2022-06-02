@@ -2,6 +2,7 @@ package bot;
 
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import com.jagrosh.jdautilities.command.SlashCommand;
 import commands.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -15,6 +16,7 @@ import java.time.ZoneId;
 import java.time.chrono.ChronoLocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Timer;
@@ -35,6 +37,7 @@ public class NASABot {
     public static Map<Integer, Integer> postTimes;
     public static String NASABotServerID;
     public static boolean loggingEnabled = false;
+    public static List<SlashCommand> slashCommands;
     public static final String deprecationMessage = "NASABot is moving to Slash Commands! We recommend switching over now to prepare for this soon-to-be-permanent change mandated by Discord. " +
             "For more information, please read the full announcement: https://gist.github.com/SniperNoob95/a6815a406a7243c009baa298f704d2e4";
 
@@ -74,6 +77,7 @@ public class NASABot {
         builder.addSlashCommands(new APODSlashCommand(),
                 new GetPostChannelSlashCommand(),
                 new GetPostTimeSlashCommand(),
+                new HelpSlashCommand(),
                 new ImageSearchSlashCommand(),
                 new InfoSlashCommand(),
                 new ISSSlashCommand(),
@@ -84,6 +88,7 @@ public class NASABot {
                 new MoonphaseSlashCommand());
         builder.setOwnerId(ownerId);
         CommandClient commandClient = builder.build();
+        slashCommands = commandClient.getSlashCommands();
 
         jda = JDABuilder.createDefault(token).addEventListeners(commandClient).build().awaitReady();
         dbClient = new DBClient();

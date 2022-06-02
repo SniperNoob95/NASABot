@@ -1,4 +1,4 @@
-# NASABot v5.3.1
+# NASABot v5.4.0
 **Now featuring configurable automated APOD posting times!** A Discord bot that implements the NASA API to provide cool, interesting, and informative artifacts.\
 [![Discord Bots](https://top.gg/api/widget/status/748775876077813881.svg)](https://top.gg/bot/748775876077813881)
 [![Discord Bots](https://top.gg/api/widget/servers/748775876077813881.svg)](https://top.gg/bot/748775876077813881)
@@ -59,4 +59,4 @@ Returns an image from the NASA image database that matches the given search term
 Returns information about the bot.
 
 #### /help
-Sends the caller a PM with help for using the bot.
+Sends the necessary information for using the bot.
