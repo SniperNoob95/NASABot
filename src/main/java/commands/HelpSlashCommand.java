@@ -18,12 +18,12 @@ public class HelpSlashCommand extends NASASlashCommand {
 
         this.insertCommand(slashCommandEvent);
 
-        StringBuilder stringBuilder = new StringBuilder("**NASABot commands**:\n");
+        StringBuilder stringBuilder = new StringBuilder("**NASABot** commands:\n");
         for (SlashCommand command : NASABot.slashCommands) {
-            stringBuilder.append(String.format("\n`%s` - %s", command.getName(), command.getHelp()));
+            stringBuilder.append(String.format("\n**`/%s`** - %s", command.getName(), command.getHelp()));
             if (command.getOptions().size() > 0) {
                 for (OptionData optionData : command.getOptions()) {
-                    stringBuilder.append(String.format("\n\t`%s` - %s (Required: %s)", optionData.getName(), optionData.getDescription(), optionData.isRequired()));
+                    stringBuilder.append(String.format("\n\t`[%s]` - %s **(Required: %s)**", optionData.getName(), optionData.getDescription(), optionData.isRequired()));
                 }
             }
         }

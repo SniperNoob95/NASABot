@@ -19,7 +19,7 @@ public class APODSlashCommand extends NASASlashCommand{
         this.name = "apod";
         this.help = "Displays the Picture of the Day from yesterday, or the specified date.";
         this.arguments = "[date (yyyy-mm-dd)]";
-        this.options = Collections.singletonList(new OptionData(OptionType.STRING, "date", "[yyyy-mm-dd] Date of the APOD to retrieve").setRequired(false));
+        this.options = Collections.singletonList(new OptionData(OptionType.STRING, "date", "[yyyy-mm-dd] Date of the APOD to retrieve.").setRequired(false));
     }
 
     @Override
