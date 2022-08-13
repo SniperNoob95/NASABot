@@ -44,11 +44,7 @@ public class DBClient {
     }
 
     private void randomDeprecationMessage(CommandEvent commandEvent) {
-        Random random = new Random();
-        int randomNum = random.nextInt(10) + 1;
-        if (randomNum == 5) {
-            commandEvent.reply(NASABot.deprecationMessage);
-        }
+        commandEvent.reply(NASABot.deprecationMessage);
     }
 
     public Response healthCheck() throws IOException {
