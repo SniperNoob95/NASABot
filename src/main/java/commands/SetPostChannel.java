@@ -3,6 +3,8 @@ package commands;
 import bot.NASABot;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.util.Objects;
@@ -38,8 +40,13 @@ public class SetPostChannel extends NASACommand {
 
         }
 
-        if (commandEvent.getMessage().getMentionedChannels().size() > 0) {
-            TextChannel textChannel = commandEvent.getMessage().getMentionedChannels().get(0);
+        if (commandEvent.getMessage().getMentions().getChannels().size() > 0) {
+            GuildChannel textChannel = commandEvent.getMessage().getMentions().getChannels().get(0);
+            if (!textChannel.getType().equals(ChannelType.TEXT)) {
+                commandEvent.replyError(String.format("No channels were mentioned, or the bot does not have permission to view the " +
+                        "mentioned channel. Please check your permission settings or command formatting: %s", this.getArgumentsString()));
+                return;
+            }
             if (NASABot.dbClient.createPostChannel(commandEvent.getGuild().getId(), textChannel.getId())) {
                 int postChannelId = NASABot.dbClient.getPostChannelId(commandEvent.getGuild().getId());
                 if (postChannelId != -1) {

@@ -55,7 +55,7 @@ public class SetPostChannelSlashCommand extends NASASlashCommand {
 
         try {
             if (slashCommandEvent.hasOption("channel_mention")) {
-                GuildChannel mentionedChannel = Objects.requireNonNull(slashCommandEvent.getOption("channel_mention")).getAsTextChannel();
+                GuildChannel mentionedChannel = Objects.requireNonNull(slashCommandEvent.getOption("channel_mention")).getAsChannel();
                 if (mentionedChannel == null) {
                     slashCommandEvent.reply(String.format("No channels were mentioned, or the bot does not have permission to view the " +
                             "mentioned channel. Please check your permission settings or command formatting: %s", this.getArgumentsString())).queue();
@@ -74,7 +74,8 @@ public class SetPostChannelSlashCommand extends NASASlashCommand {
                     }
                 }
             } else {
-                slashCommandEvent.reply("Missing channel_mention, please retry.").queue();
+                slashCommandEvent.reply(String.format("No channels were mentioned, or the bot does not have permission to view the " +
+                        "mentioned channel. Please check your permission settings or command formatting: %s", this.getArgumentsString())).queue();
             }
         } catch (NullPointerException e) {
             slashCommandEvent.reply("There was a problem setting the server's Post Channel.").queue();
