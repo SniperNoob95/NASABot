@@ -43,10 +43,6 @@ public class DBClient {
         }
     }
 
-    private void randomDeprecationMessage(CommandEvent commandEvent) {
-        commandEvent.reply(NASABot.deprecationMessage);
-    }
-
     public Response healthCheck() throws IOException {
         Request request = new Request.Builder().url(url + "/health").method("GET", null).build();
         return httpClient.newCall(request).execute();
@@ -161,7 +157,6 @@ public class DBClient {
      * @param command      The command issued.
      */
     public boolean insertCommand(CommandEvent commandEvent, String command) {
-        randomDeprecationMessage(commandEvent);
         JSONObject payload = new JSONObject();
         try {
             payload.put("date", System.currentTimeMillis() / 1000);
