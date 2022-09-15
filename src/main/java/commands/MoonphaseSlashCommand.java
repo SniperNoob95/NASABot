@@ -5,6 +5,7 @@ import java.time.LocalDate;
 
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import utils.AstronomyCalc;
 import utils.AstronomyCalc.MoonType;
 
@@ -31,8 +32,27 @@ public class MoonphaseSlashCommand extends NASASlashCommand {
         int day = now.getDayOfMonth();
 
         MoonType phase = AstronomyCalc.getMoonphase(year, month, day);
+        Emoji phaseEmoji = null;
+        switch (phase) {
+            case NEW:
+                phaseEmoji = Emoji.fromUnicode("U+1F311");
+            case WANING_CRES:
+                phaseEmoji = Emoji.fromUnicode("U+1F318");
+            case THIRD_QUART:
+                phaseEmoji = Emoji.fromUnicode("U+1F317");
+            case WANING_GIBB:
+                phaseEmoji = Emoji.fromUnicode("U+1F316");
+            case FULL:
+                phaseEmoji = Emoji.fromUnicode("U+1F315");
+            case WAXING_GIBB:
+                phaseEmoji = Emoji.fromUnicode("U+1F314");
+            case FIRST_QUART:
+                phaseEmoji = Emoji.fromUnicode("U+1F313");
+            case WAXING_CRES:
+                phaseEmoji = Emoji.fromUnicode("U+1F312");
+        }
         double days = AstronomyCalc.getDaysSinceNewMoon(year, month, day);
-        event.reply(MessageFormat.format("The current moon phase is {0} ({1} days until new moon).", phase, (int) AstronomyCalc.MOON_PHASE_LENGTH - (int) days)).queue();;
+        event.reply(MessageFormat.format("The current moon phase is {0} {1} ({2} days until new moon).", phase, phaseEmoji.getFormatted(), (int) AstronomyCalc.MOON_PHASE_LENGTH - (int) days)).queue();;
     }
 
 }
