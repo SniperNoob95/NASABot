@@ -57,20 +57,6 @@ public class NASABot {
         CommandClientBuilder builder = new CommandClientBuilder();
         builder.setPrefix(prefix);
 
-        // Normal commands
-        builder.addCommands(new APOD(),
-                new ImageSearch(),
-                new Info(),
-                new SetPostChannel(),
-                new GetPostChannel(),
-                new RemovePostChannel(),
-                new SetPostTime(),
-                new GetPostTime(),
-                new ISS(),
-                new Announcement(),
-                new ToggleLogging(),
-                new Moonphase());
-
         // Slash commands
         builder.addSlashCommands(new APODSlashCommand(),
                 new GetPostChannelSlashCommand(),
