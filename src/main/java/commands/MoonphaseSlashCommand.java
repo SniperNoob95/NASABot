@@ -36,20 +36,28 @@ public class MoonphaseSlashCommand extends NASASlashCommand {
         switch (phase) {
             case NEW:
                 phaseEmoji = Emoji.fromUnicode("U+1F311");
+                break;
             case WANING_CRES:
                 phaseEmoji = Emoji.fromUnicode("U+1F318");
+                break;
             case THIRD_QUART:
                 phaseEmoji = Emoji.fromUnicode("U+1F317");
+                break;
             case WANING_GIBB:
                 phaseEmoji = Emoji.fromUnicode("U+1F316");
+                break;
             case FULL:
                 phaseEmoji = Emoji.fromUnicode("U+1F315");
+                break;
             case WAXING_GIBB:
                 phaseEmoji = Emoji.fromUnicode("U+1F314");
+                break;
             case FIRST_QUART:
                 phaseEmoji = Emoji.fromUnicode("U+1F313");
+                break;
             case WAXING_CRES:
                 phaseEmoji = Emoji.fromUnicode("U+1F312");
+                break;
         }
         double days = AstronomyCalc.getDaysSinceNewMoon(year, month, day);
         event.reply(MessageFormat.format("The current moon phase is {0} {1} ({2} days until new moon).", phase, phaseEmoji.getFormatted(), (int) AstronomyCalc.MOON_PHASE_LENGTH - (int) days)).queue();;
