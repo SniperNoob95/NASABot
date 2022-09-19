@@ -1,13 +1,15 @@
-package commands;
-
-import bot.NASABot;
-import com.jagrosh.jdautilities.command.SlashCommandEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
+package org.firepowered.nasabot.commands;
 
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+
+import org.firepowered.nasabot.NASABot;
+
+import com.jagrosh.jdautilities.command.SlashCommandEvent;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 
 public class InfoSlashCommand extends NASASlashCommand {
 

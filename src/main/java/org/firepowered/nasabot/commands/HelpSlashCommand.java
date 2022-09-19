@@ -1,10 +1,12 @@
-package commands;
+package org.firepowered.nasabot.commands;
 
-import bot.NASABot;
+import org.firepowered.nasabot.NASABot;
+import org.firepowered.nasabot.utils.ErrorLogging;
+
 import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
+
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import utils.ErrorLogging;
 
 public class HelpSlashCommand extends NASASlashCommand {
 

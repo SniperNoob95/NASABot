@@ -1,14 +1,7 @@
-package bot;
+package org.firepowered.nasabot;
 
-import com.jagrosh.jdautilities.command.CommandClient;
-import com.jagrosh.jdautilities.command.CommandClientBuilder;
-import com.jagrosh.jdautilities.command.SlashCommand;
-import commands.*;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import utils.*;
+import static java.util.Map.entry;
 
-import javax.security.auth.login.LoginException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -22,7 +15,35 @@ import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static java.util.Map.entry;
+import javax.security.auth.login.LoginException;
+
+import org.firepowered.nasabot.commands.APODSlashCommand;
+import org.firepowered.nasabot.commands.GetPostChannelSlashCommand;
+import org.firepowered.nasabot.commands.GetPostTimeSlashCommand;
+import org.firepowered.nasabot.commands.HelpSlashCommand;
+import org.firepowered.nasabot.commands.ISSSlashCommand;
+import org.firepowered.nasabot.commands.ImageSearchSlashCommand;
+import org.firepowered.nasabot.commands.InfoSlashCommand;
+import org.firepowered.nasabot.commands.MoonphaseSlashCommand;
+import org.firepowered.nasabot.commands.RemovePostChannelSlashCommand;
+import org.firepowered.nasabot.commands.SetPostChannelSlashCommand;
+import org.firepowered.nasabot.commands.SetPostTimeSlashCommand;
+import org.firepowered.nasabot.commands.ToggleLoggingSlashCommand;
+import org.firepowered.nasabot.utils.APODSchedulePostTask;
+import org.firepowered.nasabot.utils.DBClient;
+import org.firepowered.nasabot.utils.GeoNamesClient;
+import org.firepowered.nasabot.utils.HealthCheckClient;
+import org.firepowered.nasabot.utils.HealthCheckTimerTask;
+import org.firepowered.nasabot.utils.ISSClient;
+import org.firepowered.nasabot.utils.NASAClient;
+import org.firepowered.nasabot.utils.TopGGClient;
+
+import com.jagrosh.jdautilities.command.CommandClient;
+import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import com.jagrosh.jdautilities.command.SlashCommand;
+
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
 
 public class NASABot {
 

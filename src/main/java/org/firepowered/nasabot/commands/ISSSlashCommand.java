@@ -1,6 +1,7 @@
-package commands;
+package org.firepowered.nasabot.commands;
 
-import bot.NASABot;
+import org.firepowered.nasabot.NASABot;
+
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 
 public class ISSSlashCommand extends NASASlashCommand{

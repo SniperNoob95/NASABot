@@ -1,8 +1,20 @@
-package utils;
+package org.firepowered.nasabot.utils;
 
-import bot.NASABot;
+import static java.util.Map.entry;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.ResourceBundle;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
+
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -10,13 +22,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.*;
-
-import static java.util.Map.entry;
 
 public class DBClient {
 

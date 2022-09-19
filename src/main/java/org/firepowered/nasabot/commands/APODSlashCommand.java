@@ -1,15 +1,17 @@
-package commands;
-
-import bot.NASABot;
-import com.jagrosh.jdautilities.command.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import utils.ErrorLogging;
+package org.firepowered.nasabot.commands;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Objects;
+
+import org.firepowered.nasabot.NASABot;
+import org.firepowered.nasabot.utils.ErrorLogging;
+
+import com.jagrosh.jdautilities.command.SlashCommandEvent;
+
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class APODSlashCommand extends NASASlashCommand{
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");

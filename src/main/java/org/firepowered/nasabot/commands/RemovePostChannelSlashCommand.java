@@ -1,10 +1,12 @@
-package commands;
-
-import bot.NASABot;
-import com.jagrosh.jdautilities.command.SlashCommandEvent;
-import net.dv8tion.jda.api.Permission;
+package org.firepowered.nasabot.commands;
 
 import java.util.Objects;
+
+import org.firepowered.nasabot.NASABot;
+
+import com.jagrosh.jdautilities.command.SlashCommandEvent;
+
+import net.dv8tion.jda.api.Permission;
 
 public class RemovePostChannelSlashCommand extends NASASlashCommand{
 

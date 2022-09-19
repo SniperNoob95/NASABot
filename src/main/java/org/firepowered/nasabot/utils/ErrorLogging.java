@@ -1,6 +1,6 @@
-package utils;
+package org.firepowered.nasabot.utils;
 
-import bot.NASABot;
+import org.firepowered.nasabot.NASABot;
 
 public class ErrorLogging {
 

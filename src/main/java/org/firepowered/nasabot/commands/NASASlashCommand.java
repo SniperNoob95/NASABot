@@ -1,7 +1,7 @@
-package commands;
+package org.firepowered.nasabot.commands;
 
-import bot.NASABot;
-import com.jagrosh.jdautilities.command.CommandEvent;
+import org.firepowered.nasabot.NASABot;
+
 import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 

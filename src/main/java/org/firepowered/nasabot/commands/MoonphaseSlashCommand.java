@@ -1,13 +1,14 @@
-package commands;
+package org.firepowered.nasabot.commands;
 
 import java.text.MessageFormat;
 import java.time.LocalDate;
 
+import org.firepowered.nasabot.utils.AstronomyCalc;
+import org.firepowered.nasabot.utils.AstronomyCalc.MoonType;
+
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import utils.AstronomyCalc;
-import utils.AstronomyCalc.MoonType;
 
 /**
  * Command to calculate the current moonphase.

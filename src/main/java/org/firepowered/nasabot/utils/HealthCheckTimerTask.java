@@ -1,8 +1,8 @@
-package utils;
-
-import bot.NASABot;
+package org.firepowered.nasabot.utils;
 
 import java.util.TimerTask;
+
+import org.firepowered.nasabot.NASABot;
 
 public class HealthCheckTimerTask extends TimerTask {
 

@@ -1,15 +1,16 @@
-package utils;
-
-import bot.NASABot;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.PrivateChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
-import org.json.JSONArray;
+package org.firepowered.nasabot.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Objects;
 import java.util.TimerTask;
+
+import org.firepowered.nasabot.NASABot;
+import org.json.JSONArray;
+
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
 
 public class APODSchedulePostTask extends TimerTask {
 

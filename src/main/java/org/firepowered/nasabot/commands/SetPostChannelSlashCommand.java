@@ -1,16 +1,17 @@
-package commands;
+package org.firepowered.nasabot.commands;
 
-import bot.NASABot;
+import java.util.Collections;
+import java.util.Objects;
+
+import org.firepowered.nasabot.NASABot;
+
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 
 public class SetPostChannelSlashCommand extends NASASlashCommand {
 

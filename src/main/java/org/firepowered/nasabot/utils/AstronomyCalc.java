@@ -1,4 +1,4 @@
-package utils;
+package org.firepowered.nasabot.utils;
 
 import java.time.LocalDate;
 
