@@ -1,6 +1,6 @@
-package utils;
+package org.nasabot.nasabot.utils;
 
-import bot.NASABot;
+import org.nasabot.nasabot.NASABot;
 
 public class ErrorLogging {
 

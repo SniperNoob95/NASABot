@@ -1,6 +1,5 @@
-package utils;
+package org.nasabot.nasabot.utils;
 
-import bot.NASABot;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -170,7 +169,7 @@ public class DBClient {
             e.printStackTrace();
         }
 
-        return issuePostRequest("/commands", payload);
+        return issuePostRequest("/org/nasabot", payload);
     }
 
     /**
@@ -199,7 +198,7 @@ public class DBClient {
             e.printStackTrace();
         }
 
-        return issuePostRequest("/commands", payload);
+        return issuePostRequest("/org/nasabot", payload);
     }
 
     /**

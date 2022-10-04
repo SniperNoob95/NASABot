@@ -1,4 +1,4 @@
-package utils;
+package org.nasabot.nasabot.utils;
 
 import java.time.LocalDate;
 

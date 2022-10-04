@@ -1,12 +1,23 @@
-package bot;
+package org.nasabot.nasabot;
 
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.SlashCommand;
-import commands.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import utils.*;
+import org.nasabot.nasabot.commands.APODSlashCommand;
+import org.nasabot.nasabot.commands.GetPostChannelSlashCommand;
+import org.nasabot.nasabot.commands.GetPostTimeSlashCommand;
+import org.nasabot.nasabot.commands.HelpSlashCommand;
+import org.nasabot.nasabot.commands.ISSSlashCommand;
+import org.nasabot.nasabot.commands.ImageSearchSlashCommand;
+import org.nasabot.nasabot.commands.InfoSlashCommand;
+import org.nasabot.nasabot.commands.MoonphaseSlashCommand;
+import org.nasabot.nasabot.commands.RemovePostChannelSlashCommand;
+import org.nasabot.nasabot.commands.SetPostChannelSlashCommand;
+import org.nasabot.nasabot.commands.SetPostTimeSlashCommand;
+import org.nasabot.nasabot.commands.ToggleLoggingSlashCommand;
+import org.nasabot.nasabot.utils.*;
 
 import javax.security.auth.login.LoginException;
 import java.time.LocalDate;

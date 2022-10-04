@@ -1,6 +1,6 @@
-package utils;
+package org.nasabot.nasabot.utils;
 
-import bot.NASABot;
+import org.nasabot.nasabot.NASABot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import okhttp3.HttpUrl;

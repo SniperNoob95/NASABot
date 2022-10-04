@@ -1,6 +1,6 @@
-package commands;
+package org.nasabot.nasabot.commands;
 
-import bot.NASABot;
+import org.nasabot.nasabot.NASABot;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.Permission;
 

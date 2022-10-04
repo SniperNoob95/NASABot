@@ -1,4 +1,4 @@
-package utils;
+package org.nasabot.nasabot.utils;
 
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;

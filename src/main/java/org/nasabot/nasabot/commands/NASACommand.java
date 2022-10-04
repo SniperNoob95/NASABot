@@ -1,6 +1,6 @@
-package commands;
+package org.nasabot.nasabot.commands;
 
-import bot.NASABot;
+import org.nasabot.nasabot.NASABot;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
