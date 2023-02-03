@@ -5,6 +5,8 @@ import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.Activity;
 import org.nasabot.nasabot.commands.APODSlashCommand;
 import org.nasabot.nasabot.commands.GetPostChannelSlashCommand;
 import org.nasabot.nasabot.commands.GetPostTimeSlashCommand;
@@ -86,6 +88,7 @@ public class NASABot {
         slashCommands = commandClient.getSlashCommands();
 
         jda = JDABuilder.createDefault(token).addEventListeners(commandClient).build().awaitReady();
+        jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.of(Activity.ActivityType.LISTENING, "for commands..."));
         dbClient = new DBClient();
         healthCheckClient = new HealthCheckClient();
         NASAClient = new NASAClient();
