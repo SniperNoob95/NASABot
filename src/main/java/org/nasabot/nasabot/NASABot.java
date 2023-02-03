@@ -88,7 +88,7 @@ public class NASABot {
         slashCommands = commandClient.getSlashCommands();
 
         jda = JDABuilder.createDefault(token).addEventListeners(commandClient).build().awaitReady();
-        jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.of(Activity.ActivityType.LISTENING, "for commands..."));
+        jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.of(Activity.ActivityType.LISTENING, "commands..."));
         dbClient = new DBClient();
         healthCheckClient = new HealthCheckClient();
         NASAClient = new NASAClient();
