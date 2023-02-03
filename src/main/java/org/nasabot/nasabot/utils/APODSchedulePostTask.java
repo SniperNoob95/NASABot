@@ -1,10 +1,10 @@
 package org.nasabot.nasabot.utils;
 
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.nasabot.nasabot.NASABot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.PrivateChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
 import org.json.JSONArray;
 
 import java.text.SimpleDateFormat;
