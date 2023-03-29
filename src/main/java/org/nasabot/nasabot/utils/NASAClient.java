@@ -64,7 +64,7 @@ public class NASAClient {
             if (jsonObject.has("hdurl")) {
             	embedBuilder.addField("HD Image Link", jsonObject.getString("hdurl"), false);
             }
-            if (jsonObject.getString("url").contains("youtube.com")) {
+            if (jsonObject.getString("url").contains("youtube.com") || jsonObject.getString("url").contains("video")) {
                 embedBuilder.addField("Video Link", jsonObject.getString("url"), false);
             } else {
                 embedBuilder.setImage(jsonObject.getString("url"));
