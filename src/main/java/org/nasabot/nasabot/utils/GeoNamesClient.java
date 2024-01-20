@@ -22,7 +22,7 @@ public class GeoNamesClient {
             username = resourceBundle.getString("geoNamesUsername");
         } catch (Exception e) {
             ErrorLogging.handleError("GeoNamesClient", "GeoNamesClient", "Cannot create GeoNamesClient.", e);
-            System.exit(0);
+            System.exit(1);
         }
     }
 
@@ -34,12 +34,12 @@ public class GeoNamesClient {
                     .addQueryParameter("lng", longitude)
                     .addQueryParameter("username", username);
             Request request = new Request.Builder().url(builder.build().toString()).build();
-            Response response = httpClient.newCall(request).execute();
-            JSONObject jsonObject = new JSONObject(Objects.requireNonNull(response.body()).string());
-            String country = jsonObject.optString("countryName", "Not currently over a country. " +
-                    "Generally this means the ISS is currently in international territory or over an ocean.");
-            response.close();
-            return country;
+            try (Response response = httpClient.newCall(request).execute()) {
+                JSONObject jsonObject = new JSONObject(Objects.requireNonNull(response.body()).string());
+                String country = jsonObject.optString("countryName", "Not currently over a country. " +
+                        "Generally this means the ISS is currently in international territory or over an ocean.");
+                return country;
+            }
         } catch (Exception e) {
             ErrorLogging.handleError("GeoNamesClient", "getCountryFromLatitudeLongitude", "Unable to get ISS location.", e);
         }

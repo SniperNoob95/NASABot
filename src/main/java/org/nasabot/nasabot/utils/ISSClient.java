@@ -1,19 +1,20 @@
 package org.nasabot.nasabot.utils;
 
+import java.awt.Color;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Objects;
+import java.util.TimeZone;
+
+import org.json.JSONObject;
 import org.nasabot.nasabot.NASABot;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.json.JSONObject;
-
-import java.awt.Color;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Objects;
-import java.util.TimeZone;
 
 public class ISSClient {
 
@@ -25,10 +26,10 @@ public class ISSClient {
         try {
             HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url)).newBuilder();
             Request request = new Request.Builder().url(builder.build().toString()).build();
-            Response response = httpClient.newCall(request).execute();
-            MessageEmbed embed = formatISSLocation(Objects.requireNonNull(response.body()).string());
-            response.close();
-            return embed;
+            try (Response response = httpClient.newCall(request).execute()) {
+                MessageEmbed embed = formatISSLocation(Objects.requireNonNull(response.body()).string());
+                return embed;
+            }
         } catch (Exception e) {
             ErrorLogging.handleError("ISSClient", "getISSLocation", "Cannot get ISS location.", e);
         }
@@ -43,19 +44,29 @@ public class ISSClient {
             JSONObject jsonObject = new JSONObject(issLocationResponse);
 
             EmbedBuilder embedBuilder = new EmbedBuilder();
-            embedBuilder
-                    .setTitle("ISS Current Location")
-                    .setDescription(String.format("%s", outputDateFormat.format(new Date(jsonObject.getLong("timestamp") * 1000))))
+            embedBuilder.setTitle("ISS Current Location")
+                    .setDescription(String.format("%s",
+                            outputDateFormat.format(new Date(jsonObject.getLong("timestamp") * 1000))))
                     .setColor(new Color(192, 32, 232))
                     .addField("Latitude", jsonObject.getJSONObject("iss_position").getString("latitude"), true)
                     .addField("Longitude", jsonObject.getJSONObject("iss_position").getString("longitude"), true)
-                    .addField("Google Maps Location", getGoogleMapsLink(Double.parseDouble(jsonObject.getJSONObject("iss_position").getString("latitude")), Double.parseDouble(jsonObject.getJSONObject("iss_position").getString("longitude"))), false)
-                    .addField("Currently Over Country", NASABot.geoNamesClient.getCountryFromLatitudeLongitude(jsonObject.getJSONObject("iss_position").getString("latitude"), jsonObject.getJSONObject("iss_position").getString("longitude")), false)
+                    .addField("Google Maps Location",
+                            getGoogleMapsLink(
+                                    Double.parseDouble(jsonObject.getJSONObject("iss_position").getString("latitude")),
+                                    Double.parseDouble(
+                                            jsonObject.getJSONObject("iss_position").getString("longitude"))),
+                            false)
+                    .addField("Currently Over Country",
+                            NASABot.geoNamesClient.getCountryFromLatitudeLongitude(
+                                    jsonObject.getJSONObject("iss_position").getString("latitude"),
+                                    jsonObject.getJSONObject("iss_position").getString("longitude")),
+                            false)
                     .setThumbnail("https://i.imgur.com/xm3XSgc.jpg");
             return embedBuilder.build();
         } catch (Exception e) {
             ErrorLogging.handleError("ISSClient", "updateHealthCheck", "Cannot format ISS location.", e);
-            return new EmbedBuilder().setTitle("ISS Current Location").addField("ERROR", "Unable to obtain ISS location.", false).setColor(Color.RED).build();
+            return new EmbedBuilder().setTitle("ISS Current Location")
+                    .addField("ERROR", "Unable to obtain ISS location.", false).setColor(Color.RED).build();
         }
     }
 

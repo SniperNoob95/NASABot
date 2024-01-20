@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class InfoSlashCommand extends NASASlashCommand {
 
@@ -20,13 +21,10 @@ public class InfoSlashCommand extends NASASlashCommand {
     protected void execute(SlashCommandEvent slashCommandEvent) {
         this.insertCommand(slashCommandEvent);
 
-        List<Guild> guildList = NASABot.jda.getGuilds();
-        int numServers = guildList.size();
-        int numPlayers  = 0;
-        for (Guild guild : guildList) {
-            numPlayers += guild.getMemberCount();
-        }
-
+        final List<Guild> guilds = NASABot.jda.getGuilds();
+        final int numServers = guilds.size();
+        final int numPlayers = guilds.stream().collect(Collectors.summingInt(Guild::getMemberCount));
+        
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setTitle("NASABot");
         embedBuilder.setDescription("Information about the bot.");
