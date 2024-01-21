@@ -6,6 +6,7 @@ import org.nasabot.nasabot.NASABot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Objects;
@@ -26,7 +27,8 @@ public class APODSchedulePostTask extends TimerTask {
         JSONArray postChannels = NASABot.dbClient.getPostChannelsForPostTimeOption(timeOption);
 
         for (int i = 0; i < postChannels.length(); i++) {
-            sendAPODToChannel(postChannels.getJSONObject(i).getString("server_id"), postChannels.getJSONObject(i).getString("channel_id"), embed);
+            JSONObject channelObject = postChannels.getJSONObject(i);
+            sendAPODToChannel(channelObject.getString("server_id"), channelObject.getString("channel_id"), embed);
         }
 
         if (NASABot.isLoggingEnabled()) {

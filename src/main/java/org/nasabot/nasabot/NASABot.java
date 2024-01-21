@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+
 import org.nasabot.nasabot.commands.APODSlashCommand;
 import org.nasabot.nasabot.commands.GetPostChannelSlashCommand;
 import org.nasabot.nasabot.commands.GetPostTimeSlashCommand;
@@ -64,7 +66,7 @@ public class NASABot {
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Cannot get Discord token.");
-            System.exit(0);
+            System.exit(1);
         }
 
         CommandClientBuilder builder = new CommandClientBuilder();
@@ -87,7 +89,7 @@ public class NASABot {
         CommandClient commandClient = builder.build();
         slashCommands = commandClient.getSlashCommands();
 
-        jda = JDABuilder.createDefault(token).addEventListeners(commandClient).build().awaitReady();
+        jda = JDABuilder.createLight(token, GatewayIntent.GUILD_MESSAGES) .addEventListeners(commandClient).build().awaitReady();
         jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.of(Activity.ActivityType.LISTENING, "commands..."));
         dbClient = new DBClient();
         healthCheckClient = new HealthCheckClient();
