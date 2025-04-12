@@ -54,7 +54,9 @@ public class NASABot {
     public static boolean loggingEnabled = false;
     public static List<SlashCommand> slashCommands;
 
-    public static void main(String[] args) throws LoginException, InterruptedException {
+    public static final String VERSION = "8.0.0";
+
+    public static void main(String[] args) throws InterruptedException {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
         String token = null;
         String ownerId = null;

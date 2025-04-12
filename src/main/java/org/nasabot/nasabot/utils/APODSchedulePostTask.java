@@ -1,21 +1,26 @@
 package org.nasabot.nasabot.utils;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.nasabot.nasabot.NASABot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.TimerTask;
 
 public class APODSchedulePostTask extends TimerTask {
 
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    private int timeOption;
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private final int timeOption;
 
     public APODSchedulePostTask(int timeOption) {
         this.timeOption = timeOption;
@@ -23,12 +28,27 @@ public class APODSchedulePostTask extends TimerTask {
 
     @Override
     public void run() {
-        MessageEmbed embed = NASABot.NASAClient.getPictureOfTheDay(simpleDateFormat.format(System.currentTimeMillis() - 86400000));
+        EmbedBuilder embedBuilder = NASABot.NASAClient.getPictureOfTheDay(simpleDateFormat.format(System.currentTimeMillis() - 86400000));
+        InputStream file = null;
+        Optional<MessageEmbed.Field> imageUrl = embedBuilder.getFields().stream()
+            .filter(field -> field.getName() != null)
+            .filter(field -> field.getName().equals("HD Image Link"))
+            .findFirst();
+
+        if (imageUrl.isPresent()) {
+            try {
+                file = new URL(Objects.requireNonNull(imageUrl.get().getValue())).openStream();
+                embedBuilder.setImage("attachment://image.png");
+            } catch (NullPointerException | IOException e) {
+                ErrorLogging.handleError("APODSlashCommand", "execute", "Unable to format embed.", e);
+                return;
+            }
+        }
+
         JSONArray postChannels = NASABot.dbClient.getPostChannelsForPostTimeOption(timeOption);
 
         for (int i = 0; i < postChannels.length(); i++) {
-            JSONObject channelObject = postChannels.getJSONObject(i);
-            sendAPODToChannel(channelObject.getString("server_id"), channelObject.getString("channel_id"), embed);
+            sendAPODToChannel(postChannels.getJSONObject(i).getString("server_id"), postChannels.getJSONObject(i).getString("channel_id"), embedBuilder, file);
         }
 
         if (NASABot.isLoggingEnabled()) {
@@ -37,7 +57,7 @@ public class APODSchedulePostTask extends TimerTask {
         }
     }
 
-    private void sendAPODToChannel(String serverId, String channelId, MessageEmbed embed) {
+    private void sendAPODToChannel(String serverId, String channelId, EmbedBuilder embedBuilder, InputStream file) {
         Guild guild;
         TextChannel textChannel;
         try {
@@ -58,7 +78,11 @@ public class APODSchedulePostTask extends TimerTask {
         }
 
         try {
-            Objects.requireNonNull(textChannel).sendMessageEmbeds(embed).queue();
+            if (file != null) {
+                Objects.requireNonNull(textChannel).sendFiles(FileUpload.fromData(file, "image.png")).setEmbeds(embedBuilder.build()).queue();
+            } else {
+                Objects.requireNonNull(textChannel).sendMessageEmbeds(embedBuilder.build()).queue();
+            }
         } catch (Exception e) {
             System.out.println(String.format("Unable to send APOD to text channel %s in guild %s.", channelId, serverId));
             ErrorLogging.handleError("APODSchedulePostTask", "sendAPODToChannel", String.format("Unable to send APOD to text channel %s in guild %s.", channelId, serverId), e);

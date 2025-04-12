@@ -1,20 +1,7 @@
 package org.nasabot.nasabot.utils;
 
-import static java.util.Map.entry;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
-
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -22,6 +9,14 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.nasabot.nasabot.NASABot;
+
+import java.io.IOException;
+import java.util.*;
+
+import static java.util.Map.entry;
 
 public class DBClient {
 
@@ -30,17 +25,21 @@ public class DBClient {
 
     public DBClient() {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
-        url = resourceBundle.getString("DBUrl");
 
-        try (Response healthCheck = healthCheck()) {
+        try {
+            url = resourceBundle.getString("DBUrl");
+            Response healthCheck = healthCheck();
+
             if (healthCheck.code() != 200) {
                 System.out.println("Healthcheck failed.");
-                System.exit(1);
+                System.exit(0);
             }
+
+            healthCheck.close();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Cannot contact API.");
-            System.exit(1);
+            System.exit(0);
         }
     }
 
@@ -58,7 +57,7 @@ public class DBClient {
             payload.put("log", log);
             payload.put("exception", exception);
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
         }
 
         return issuePostRequest("/errors", payload);
@@ -73,41 +72,63 @@ public class DBClient {
                 }
             }
             Request request = new Request.Builder().url(builder.build()).get().build();
-            try (Response response = httpClient.newCall(request).execute()) {
-                if (response.code() != 200) {
-                    return null;
-                }
+            Response response = httpClient.newCall(request).execute();
 
-                JSONArray jsonArray = new JSONArray(Objects.requireNonNull(response.body()).string());
-                if (jsonArray.isEmpty()) {
-                    return null;
-                } else {
-                    return jsonArray;
-                }
+            if (response.code() != 200) {
+                response.close();
+                return null;
+            }
+
+            JSONArray jsonArray = new JSONArray(Objects.requireNonNull(response.body()).string());
+            response.close();
+
+            if (jsonArray.length() == 0) {
+                return null;
+            } else {
+                return jsonArray;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
             return null;
         }
     }
 
-    private boolean issueBasicRequest(String method, String path, JSONObject payload) {
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), payload.toString());
-        Request request = new Request.Builder().url(url + path).method(method, requestBody).build();
-        try (Response response = httpClient.newCall(request).execute()) {
-            return response.isSuccessful();
-        } catch (IOException e) {
-            e.printStackTrace();
+    public boolean issuePostRequest(String path, JSONObject payload) {
+        try {
+            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), payload.toString());
+            Request request = new Request.Builder().url(url + path).post(requestBody).build();
+            Response response = httpClient.newCall(request).execute();
+
+            if (response.code() != 201) {
+                response.close();
+                return false;
+            }
+
+            response.close();
+            return true;
+        } catch (Exception e) {
+            if (NASABot.loggingEnabled) e.printStackTrace();
             return false;
         }
     }
 
-    public boolean issuePostRequest(String path, JSONObject payload) {
-        return issueBasicRequest("POST", path, payload);
-    }
-
     public boolean issuePutRequest(String path, JSONObject payload) {
-        return issueBasicRequest("PUT", path, payload);
+        try {
+            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), payload.toString());
+            Request request = new Request.Builder().url(url + path).put(requestBody).build();
+            Response response = httpClient.newCall(request).execute();
+
+            if (response.code() != 201) {
+                response.close();
+                return false;
+            }
+
+            response.close();
+            return true;
+        } catch (Exception e) {
+            if (NASABot.loggingEnabled) e.printStackTrace();
+            return false;
+        }
     }
 
     public boolean issueDeleteRequest(String path, Map<String, String> queryParameters) {
@@ -119,15 +140,16 @@ public class DBClient {
                 }
             }
             Request request = new Request.Builder().url(builder.build()).delete().build();
-            try (Response response = httpClient.newCall(request).execute()) {
-                return response.isSuccessful();
-            }
+            Response response = httpClient.newCall(request).execute();
+
+            response.close();
+            return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
             return false;
         }
     }
-    
+
     /**
      * Inserts a command issued by a user.
      *
@@ -145,7 +167,7 @@ public class DBClient {
             payload.put("command", command);
             payload.put("args", commandEvent.getArgs() == null ? "" : commandEvent.getArgs());
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
         }
 
         return issuePostRequest("/org/nasabot", payload);
@@ -174,7 +196,7 @@ public class DBClient {
             }
             payload.put("args", optionString.toString());
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
         }
 
         return issuePostRequest("/org/nasabot", payload);
@@ -206,7 +228,7 @@ public class DBClient {
         try {
             return issueDeleteRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))));
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
             System.out.println(String.format("Failed to delete Post Channel for server: %s", serverId));
             return false;
         }
@@ -224,12 +246,9 @@ public class DBClient {
      */
     public String getPostChannelForServer(String serverId) {
         try {
-            return Objects
-                    .requireNonNull(
-                            issueGetRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId)))))
-                    .getJSONObject(0).getString("channel_id");
+            return Objects.requireNonNull(issueGetRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))))).getJSONObject(0).getString("channel_id");
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
             System.out.println(String.format("Failed to get Post Channel for server ID: %s", serverId));
             return null;
         }
@@ -243,12 +262,9 @@ public class DBClient {
      */
     public int getPostChannelId(String serverId) {
         try {
-            return Objects
-                    .requireNonNull(
-                            issueGetRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId)))))
-                    .getJSONObject(0).getInt("id");
+            return Objects.requireNonNull(issueGetRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))))).getJSONObject(0).getInt("id");
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
             System.out.println(String.format("Failed to get Post Channel for server ID: %s", serverId));
             return -1;
         }
@@ -261,8 +277,7 @@ public class DBClient {
      * @return postChannels that match the query.
      */
     public JSONArray getPostChannelsForPostTimeOption(int timeOption) {
-        return issueGetRequest("/postChannels",
-                new HashMap<>(Map.ofEntries(entry("timeOption", String.valueOf(timeOption)))));
+        return issueGetRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("timeOption", String.valueOf(timeOption)))));
     }
 
     /**
@@ -280,14 +295,10 @@ public class DBClient {
 
     public int getPostTimeForServer(int postChannelId) {
         try {
-            return Objects
-                    .requireNonNull(issueGetRequest("/postChannelConfigurations",
-                            new HashMap<>(Map.ofEntries(entry("postChannelId", String.valueOf(postChannelId))))))
-                    .getJSONObject(0).getInt("time_option");
+            return Objects.requireNonNull(issueGetRequest("/postChannelConfigurations", new HashMap<>(Map.ofEntries(entry("postChannelId", String.valueOf(postChannelId)))))).getJSONObject(0).getInt("time_option");
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out
-                    .println(String.format("Failed to get Post Configuration for Post Channel id: %s.", postChannelId));
+            if (NASABot.loggingEnabled) e.printStackTrace();
+            System.out.println(String.format("Failed to get Post Configuration for Post Channel id: %s.", postChannelId));
             return -1;
         }
     }
