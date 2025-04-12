@@ -34,13 +34,13 @@ public class NASAClient {
         }
     }
 
-    public MessageEmbed getPictureOfTheDay(String date) {
+    public EmbedBuilder getPictureOfTheDay(String date) {
         try {
             HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(baseUrl + "/planetary/apod")).newBuilder();
             builder.addQueryParameter("api_key", apiKey).addQueryParameter("date", date);
             Request request = new Request.Builder().url(builder.build().toString()).build();
             Response response = httpClient.newCall(request).execute();
-            MessageEmbed embed = formatPictureOfTheDay(Objects.requireNonNull(response.body()).string());
+            EmbedBuilder embed = formatPictureOfTheDay(Objects.requireNonNull(response.body()).string());
             response.close();
             return embed;
         } catch (Exception e) {
@@ -50,29 +50,27 @@ public class NASAClient {
         return null;
     }
 
-    private MessageEmbed formatPictureOfTheDay(String POTDResponse) {
+    private EmbedBuilder formatPictureOfTheDay(String POTDResponse) {
         SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         try {
             JSONObject jsonObject = new JSONObject(POTDResponse);
             EmbedBuilder embedBuilder = new EmbedBuilder();
             embedBuilder
-                    .setTitle(jsonObject.getString("title"), String.format("https://apod.nasa.gov/apod/ap%s.html", jsonObject.getString("date").replaceAll("-", "").substring(2)))
-                    .setDescription(String.format("%s", outputDateFormat.format(inputDateFormat.parse(jsonObject.getString("date")))))
-                    .setColor(new Color(192, 32, 232))
-                    .addField("Description", jsonObject.getString("explanation").length() > 1024 ? String.format("%s", jsonObject.getString("explanation")).substring(0, 1020) + "..." : String.format("%s", jsonObject.getString("explanation")), false);
+                .setTitle(jsonObject.getString("title"), String.format("https://apod.nasa.gov/apod/ap%s.html", jsonObject.getString("date").replaceAll("-", "").substring(2)))
+                .setDescription(String.format("%s", outputDateFormat.format(inputDateFormat.parse(jsonObject.getString("date")))))
+                .setColor(new Color(192, 32, 232))
+                .addField("Description", jsonObject.getString("explanation").length() > 1024 ? String.format("%s", jsonObject.getString("explanation")).substring(0, 1020) + "..." : String.format("%s", jsonObject.getString("explanation")), false);
             if (jsonObject.has("hdurl")) {
-            	embedBuilder.addField("HD Image Link", jsonObject.getString("hdurl"), false);
+                embedBuilder.addField("HD Image Link", jsonObject.getString("hdurl"), false);
             }
             if (jsonObject.getString("url").contains("youtube.com") || jsonObject.getString("url").contains("video")) {
                 embedBuilder.addField("Video Link", jsonObject.getString("url"), false);
-            } else {
-                embedBuilder.setImage(jsonObject.getString("url"));
             }
-            return embedBuilder.build();
+            return embedBuilder;
         } catch (Exception e) {
             ErrorLogging.handleError("NASAClient", "formatPictureOfTheDay", "Cannot format picture of the day.", e);
-            return new EmbedBuilder().setTitle("Picture of the Day").addField("ERROR", "Unable to obtain Picture of the Day.", false).setColor(Color.RED).build();
+            return new EmbedBuilder().setTitle("Picture of the Day").addField("ERROR", "Unable to obtain Picture of the Day.", false).setColor(Color.RED);
         }
     }
 

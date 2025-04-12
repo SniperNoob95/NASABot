@@ -21,7 +21,7 @@ public class SetPostTimeSlashCommand extends NASASlashCommand {
         this.options = Collections.singletonList(new OptionData(OptionType.INTEGER, "post_time", "The Post Time option you want to use.").setRequired(true)
                 .addChoice("16:00 UTC (default)", 0)
                 .addChoice("6:00 UTC", 1)
-                .addChoice("11L00 UTC", 2)
+                .addChoice("11:00 UTC", 2)
                 .addChoice("21:00 UTC", 3));
     }
 

@@ -1,4 +1,4 @@
-# NASABot v7.0.1
+# NASABot v8.0.0
 **Now featuring configurable automated APOD posting times!** A Discord bot that implements the NASA API to provide cool, interesting, and informative artifacts.\
 [![Discord Bots](https://top.gg/api/widget/status/748775876077813881.svg)](https://top.gg/bot/748775876077813881)
 [![Discord Bots](https://top.gg/api/widget/servers/748775876077813881.svg)](https://top.gg/bot/748775876077813881)
@@ -12,7 +12,7 @@ See [the project board](https://github.com/SniperNoob95/NASABot/projects/1) for 
 
 Join the [Discord server](https://discord.gg/b4wS5q4) if interested.
 
-**Contact Sniper Noob#5606 (181588597558738954) on Discord if needed.**
+**Contact `snipernoob` on Discord if needed.**
 
 ## Command Usage
 #### /setpostchannel

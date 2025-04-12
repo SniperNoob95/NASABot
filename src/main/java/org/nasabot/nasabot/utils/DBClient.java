@@ -11,6 +11,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.nasabot.nasabot.NASABot;
 
 import java.io.IOException;
 import java.util.*;
@@ -56,7 +57,7 @@ public class DBClient {
             payload.put("log", log);
             payload.put("exception", exception);
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
         }
 
         return issuePostRequest("/errors", payload);
@@ -87,7 +88,7 @@ public class DBClient {
                 return jsonArray;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
             return null;
         }
     }
@@ -106,7 +107,7 @@ public class DBClient {
             response.close();
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
             return false;
         }
     }
@@ -125,7 +126,7 @@ public class DBClient {
             response.close();
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
             return false;
         }
     }
@@ -144,7 +145,7 @@ public class DBClient {
             response.close();
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
             return false;
         }
     }
@@ -166,7 +167,7 @@ public class DBClient {
             payload.put("command", command);
             payload.put("args", commandEvent.getArgs() == null ? "" : commandEvent.getArgs());
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
         }
 
         return issuePostRequest("/org/nasabot", payload);
@@ -195,7 +196,7 @@ public class DBClient {
             }
             payload.put("args", optionString.toString());
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
         }
 
         return issuePostRequest("/org/nasabot", payload);
@@ -227,7 +228,7 @@ public class DBClient {
         try {
             return issueDeleteRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))));
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
             System.out.println(String.format("Failed to delete Post Channel for server: %s", serverId));
             return false;
         }
@@ -247,7 +248,7 @@ public class DBClient {
         try {
             return Objects.requireNonNull(issueGetRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))))).getJSONObject(0).getString("channel_id");
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
             System.out.println(String.format("Failed to get Post Channel for server ID: %s", serverId));
             return null;
         }
@@ -263,7 +264,7 @@ public class DBClient {
         try {
             return Objects.requireNonNull(issueGetRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))))).getJSONObject(0).getInt("id");
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
             System.out.println(String.format("Failed to get Post Channel for server ID: %s", serverId));
             return -1;
         }
@@ -296,7 +297,7 @@ public class DBClient {
         try {
             return Objects.requireNonNull(issueGetRequest("/postChannelConfigurations", new HashMap<>(Map.ofEntries(entry("postChannelId", String.valueOf(postChannelId)))))).getJSONObject(0).getInt("time_option");
         } catch (Exception e) {
-            e.printStackTrace();
+            if (NASABot.loggingEnabled) e.printStackTrace();
             System.out.println(String.format("Failed to get Post Configuration for Post Channel id: %s.", postChannelId));
             return -1;
         }
