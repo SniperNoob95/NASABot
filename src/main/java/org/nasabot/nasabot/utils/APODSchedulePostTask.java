@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.json.JSONArray;
 import org.nasabot.nasabot.NASABot;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -28,15 +29,35 @@ public class APODSchedulePostTask extends TimerTask {
     @Override
     public void run() {
         EmbedBuilder embedBuilder = NASABot.NASAClient.getPictureOfTheDay(simpleDateFormat.format(System.currentTimeMillis() - 86400000));
-        Optional<MessageEmbed.Field> imageUrl = embedBuilder.getFields().stream()
+        FileUpload fileUpload = null;
+        Optional<MessageEmbed.Field> imageField = embedBuilder.getFields().stream()
             .filter(field -> field.getName() != null)
             .filter(field -> field.getName().equals("HD Image Link"))
             .findFirst();
 
+        if (imageField.isPresent()) {
+            try {
+                InputStream file = new URL(Objects.requireNonNull(imageField.get().getValue())).openStream();
+                fileUpload = FileUpload.fromData(file, "image.png");
+                embedBuilder.setImage("attachment://image.png");
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+        }
+
         JSONArray postChannels = NASABot.dbClient.getPostChannelsForPostTimeOption(timeOption);
 
         for (int i = 0; i < postChannels.length(); i++) {
-            sendAPODToChannel(postChannels.getJSONObject(i).getString("server_id"), postChannels.getJSONObject(i).getString("channel_id"), embedBuilder, imageUrl);
+            sendAPODToChannel(postChannels.getJSONObject(i).getString("server_id"), postChannels.getJSONObject(i).getString("channel_id"), embedBuilder, fileUpload);
+        }
+
+        try {
+            if (fileUpload != null) {
+                fileUpload.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         if (NASABot.isLoggingEnabled()) {
@@ -45,7 +66,7 @@ public class APODSchedulePostTask extends TimerTask {
         }
     }
 
-    private void sendAPODToChannel(String serverId, String channelId, EmbedBuilder embedBuilder, Optional<MessageEmbed.Field> imageField) {
+    private void sendAPODToChannel(String serverId, String channelId, EmbedBuilder embedBuilder, FileUpload fileUpload) {
         Guild guild;
         TextChannel textChannel;
         try {
@@ -67,10 +88,8 @@ public class APODSchedulePostTask extends TimerTask {
         }
 
         try {
-            if (imageField.isPresent()) {
-                InputStream file = new URL(Objects.requireNonNull(imageField.get().getValue())).openStream();
-                embedBuilder.setImage("attachment://image.png");
-                Objects.requireNonNull(textChannel).sendFiles(FileUpload.fromData(file, "image.png")).setEmbeds(embedBuilder.build()).queue();
+            if (fileUpload != null) {
+                Objects.requireNonNull(textChannel).sendFiles(fileUpload).setEmbeds(embedBuilder.build()).queue();
 
             } else {
                 Objects.requireNonNull(textChannel).sendMessageEmbeds(embedBuilder.build()).queue();
