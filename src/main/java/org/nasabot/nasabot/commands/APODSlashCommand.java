@@ -68,7 +68,7 @@ public class APODSlashCommand extends NASASlashCommand{
                         try {
                             file = new URL(Objects.requireNonNull(imageUrl.get().getValue())).openStream();
                             embedBuilder.setImage("attachment://image.png");
-                            slashCommandEvent.getChannel().sendFiles(FileUpload.fromData(file, "image.png")).setEmbeds(embedBuilder.build()).queue();
+                            slashCommandEvent.getHook().sendFiles(FileUpload.fromData(file, "image.png")).setEmbeds(embedBuilder.build()).queue();
                         } catch (NullPointerException | IOException e) {
                             ErrorLogging.handleError("APODSlashCommand", "execute", "Unable to format embed.", e);
                             slashCommandEvent.getHook().sendMessageEmbeds(new EmbedBuilder().setTitle("Picture of the Day").addField("ERROR", "Unable to obtain Picture of the Day.", false).setColor(Color.RED).build()).queue();

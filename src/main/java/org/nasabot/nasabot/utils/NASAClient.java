@@ -64,11 +64,14 @@ public class NASAClient {
             if (jsonObject.has("hdurl")) {
                 embedBuilder.addField("HD Image Link", jsonObject.getString("hdurl"), false);
             }
-            if (jsonObject.getString("url").contains("youtube.com") || jsonObject.getString("url").contains("video")) {
-                embedBuilder.addField("Video Link", jsonObject.getString("url"), false);
+            if (jsonObject.has("url")) {
+                if (jsonObject.getString("url").contains("youtube.com") || jsonObject.getString("url").contains("video")) {
+                    embedBuilder.addField("Video Link", jsonObject.getString("url"), false);
+                }
             }
             return embedBuilder;
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             ErrorLogging.handleError("NASAClient", "formatPictureOfTheDay", "Cannot format picture of the day.", e);
             return new EmbedBuilder().setTitle("Picture of the Day").addField("ERROR", "Unable to obtain Picture of the Day.", false).setColor(Color.RED);
         }
@@ -102,9 +105,9 @@ public class NASAClient {
                 EmbedBuilder embedBuilder = new EmbedBuilder();
                 embedBuilder.setTitle(selection.getJSONArray("data").getJSONObject(0).getString("nasa_id"));
                 embedBuilder.setDescription(
-                        selection.getJSONArray("data").getJSONObject(0).getString("description").length() > 1850 ?
-                                selection.getJSONArray("data").getJSONObject(0).getString("description").substring(0, 1500) + "..." :
-                                selection.getJSONArray("data").getJSONObject(0).getString("description"));
+                    selection.getJSONArray("data").getJSONObject(0).getString("description").length() > 1850 ?
+                        selection.getJSONArray("data").getJSONObject(0).getString("description").substring(0, 1500) + "..." :
+                        selection.getJSONArray("data").getJSONObject(0).getString("description"));
                 embedBuilder.addField("Date", outputDateFormat.format(inputDateFormat.parse(selection.getJSONArray("data").getJSONObject(0).getString("date_created"))), false);
                 embedBuilder.setColor(new Color(192, 32, 232));
                 embedBuilder.setImage(selection.getJSONArray("links").getJSONObject(0).getString("href"));
