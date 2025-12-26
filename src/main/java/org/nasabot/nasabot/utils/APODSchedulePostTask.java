@@ -3,8 +3,8 @@ package org.nasabot.nasabot.utils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.json.JSONArray;
 import org.nasabot.nasabot.NASABot;
@@ -31,9 +31,9 @@ public class APODSchedulePostTask extends TimerTask {
         EmbedBuilder embedBuilder = NASABot.NASAClient.getPictureOfTheDay(simpleDateFormat.format(System.currentTimeMillis() - 86400000));
         FileUpload fileUpload = null;
         Optional<MessageEmbed.Field> imageField = embedBuilder.getFields().stream()
-            .filter(field -> field.getName() != null)
-            .filter(field -> field.getName().equals("HD Image Link"))
-            .findFirst();
+                .filter(field -> field.getName() != null)
+                .filter(field -> field.getName().equals("HD Image Link"))
+                .findFirst();
 
         if (imageField.isPresent()) {
             try {
@@ -61,8 +61,12 @@ public class APODSchedulePostTask extends TimerTask {
         }
 
         if (NASABot.isLoggingEnabled()) {
-            PrivateChannel privateChannel = NASABot.jda.openPrivateChannelById("181588597558738954").complete();
-            privateChannel.sendMessage("Starting APOD for time option " + timeOption + " for " + postChannels.length() + " servers.").queue();
+            try {
+                NASABot.shardManager.getShards().get(0).openPrivateChannelById("181588597558738954").queue(channel ->
+                        channel.sendMessage("Starting APOD for time option " + timeOption + " for " + postChannels.length() + " servers.").queue());
+            } catch (NullPointerException e) {
+                ErrorLogging.handleError("APODSchedulePostTask", "run", "Unable to find bot owner for logging.", e);
+            }
         }
     }
 
@@ -70,7 +74,7 @@ public class APODSchedulePostTask extends TimerTask {
         Guild guild;
         TextChannel textChannel;
         try {
-            guild = NASABot.jda.getGuildById(serverId);
+            guild = NASABot.shardManager.getGuildById(serverId);
         } catch (Exception e) {
             System.out.println(String.format("Guild %s no longer visible to bot, deleting Post Channel", serverId));
             ErrorLogging.handleError("APODSchedulePostTask", "sendAPODToChannel", String.format("Guild %s no longer visible to bot, deleting Post Channel", serverId), e);
@@ -94,6 +98,9 @@ public class APODSchedulePostTask extends TimerTask {
             } else {
                 Objects.requireNonNull(textChannel).sendMessageEmbeds(embedBuilder.build()).queue();
             }
+        } catch (InsufficientPermissionException e) {
+            Objects.requireNonNull(textChannel).sendMessage(
+                    "NASABot does not have permission to send Files and/or Embeds in this channel! Please verify that all permissions are correctly set up.").queue();
         } catch (Exception e) {
             System.out.println(String.format("Unable to send APOD to text channel %s in guild %s.", channelId, serverId));
             ErrorLogging.handleError("APODSchedulePostTask", "sendAPODToChannel", String.format("Unable to send APOD to text channel %s in guild %s.", channelId, serverId), e);

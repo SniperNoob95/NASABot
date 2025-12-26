@@ -1,12 +1,12 @@
 package org.nasabot.nasabot.commands;
 
+import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.utils.FileUpload;
-import org.nasabot.nasabot.NASABot;
-import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.utils.FileUpload;
+import org.nasabot.nasabot.NASABot;
 import org.nasabot.nasabot.utils.ErrorLogging;
 
 import java.awt.Color;
@@ -19,8 +19,8 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 
-public class APODSlashCommand extends NASASlashCommand{
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+public class APODSlashCommand extends NASASlashCommand {
+    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public APODSlashCommand() {
         super();
@@ -40,9 +40,9 @@ public class APODSlashCommand extends NASASlashCommand{
             EmbedBuilder embedBuilder = NASABot.NASAClient.getPictureOfTheDay(simpleDateFormat.format(System.currentTimeMillis() - 86400000));
             InputStream file;
             Optional<MessageEmbed.Field> imageUrl = embedBuilder.getFields().stream()
-                .filter(field -> field.getName() != null)
-                .filter(field -> field.getName().equals("HD Image Link"))
-                .findFirst();
+                    .filter(field -> field.getName() != null)
+                    .filter(field -> field.getName().equals("HD Image Link"))
+                    .findFirst();
             if (imageUrl.isPresent()) {
                 try {
                     file = new URL(Objects.requireNonNull(imageUrl.get().getValue())).openStream();
@@ -61,9 +61,9 @@ public class APODSlashCommand extends NASASlashCommand{
                     EmbedBuilder embedBuilder = NASABot.NASAClient.getPictureOfTheDay(Objects.requireNonNull(slashCommandEvent.getOption("date")).getAsString());
                     InputStream file;
                     Optional<MessageEmbed.Field> imageUrl = embedBuilder.getFields().stream()
-                        .filter(field -> field.getName() != null)
-                        .filter(field -> field.getName().equals("HD Image Link"))
-                        .findFirst();
+                            .filter(field -> field.getName() != null)
+                            .filter(field -> field.getName().equals("HD Image Link"))
+                            .findFirst();
                     if (imageUrl.isPresent()) {
                         try {
                             file = new URL(Objects.requireNonNull(imageUrl.get().getValue())).openStream();

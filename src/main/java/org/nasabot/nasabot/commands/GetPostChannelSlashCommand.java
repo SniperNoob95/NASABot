@@ -1,13 +1,13 @@
 package org.nasabot.nasabot.commands;
 
-import org.nasabot.nasabot.NASABot;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import org.nasabot.nasabot.NASABot;
 
 import java.util.Objects;
 
-public class GetPostChannelSlashCommand extends NASASlashCommand{
+public class GetPostChannelSlashCommand extends NASASlashCommand {
     public GetPostChannelSlashCommand() {
         this.name = "getpostchannel";
         this.help = "Gets the Post Channel for the server.";

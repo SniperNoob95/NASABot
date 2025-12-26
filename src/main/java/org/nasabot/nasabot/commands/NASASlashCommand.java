@@ -1,8 +1,8 @@
 package org.nasabot.nasabot.commands;
 
-import org.nasabot.nasabot.NASABot;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
+import org.nasabot.nasabot.NASABot;
 
 public abstract class NASASlashCommand extends SlashCommand {
 
@@ -13,7 +13,7 @@ public abstract class NASASlashCommand extends SlashCommand {
     public String getArgumentsString() {
         String arguments;
         try {
-            arguments =  String.format("\n```/%s %s```", this.getName(), this.getArguments());
+            arguments = String.format("\n```/%s %s```", this.getName(), this.getArguments());
         } catch (NullPointerException e) {
             arguments = String.format("\n```/%s```", this.getName());
         }

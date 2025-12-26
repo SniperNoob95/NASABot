@@ -3,12 +3,10 @@ package org.nasabot.nasabot;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.SlashCommand;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-
+import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
+import net.dv8tion.jda.api.sharding.ShardManager;
 import org.nasabot.nasabot.commands.APODSlashCommand;
 import org.nasabot.nasabot.commands.GetPostChannelSlashCommand;
 import org.nasabot.nasabot.commands.GetPostTimeSlashCommand;
@@ -21,9 +19,13 @@ import org.nasabot.nasabot.commands.RemovePostChannelSlashCommand;
 import org.nasabot.nasabot.commands.SetPostChannelSlashCommand;
 import org.nasabot.nasabot.commands.SetPostTimeSlashCommand;
 import org.nasabot.nasabot.commands.ToggleLoggingSlashCommand;
-import org.nasabot.nasabot.utils.*;
+import org.nasabot.nasabot.utils.APODSchedulePostTask;
+import org.nasabot.nasabot.utils.DBClient;
+import org.nasabot.nasabot.utils.GeoNamesClient;
+import org.nasabot.nasabot.utils.ISSClient;
+import org.nasabot.nasabot.utils.NASAClient;
+import org.nasabot.nasabot.utils.TopGGClient;
 
-import javax.security.auth.login.LoginException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -41,8 +43,7 @@ import static java.util.Map.entry;
 
 public class NASABot {
 
-    public static JDA jda;
-    public static String prefix = "NASA_";
+    public static ShardManager shardManager;
     public static NASAClient NASAClient;
     public static DBClient dbClient;
     public static TopGGClient topGGClient;
@@ -71,7 +72,6 @@ public class NASABot {
         }
 
         CommandClientBuilder builder = new CommandClientBuilder();
-        builder.setPrefix(prefix);
 
         // Slash commands
         builder.addSlashCommands(new APODSlashCommand(),
@@ -81,17 +81,20 @@ public class NASABot {
                 new ImageSearchSlashCommand(),
                 new InfoSlashCommand(),
                 new ISSSlashCommand(),
+                new MoonphaseSlashCommand(),
                 new RemovePostChannelSlashCommand(),
                 new SetPostChannelSlashCommand(),
                 new SetPostTimeSlashCommand(),
-                new ToggleLoggingSlashCommand(),
-                new MoonphaseSlashCommand());
+                new ToggleLoggingSlashCommand());
         builder.setOwnerId(ownerId);
+        builder.setActivity(Activity.of(Activity.ActivityType.WATCHING, "the sky..."));
         CommandClient commandClient = builder.build();
         slashCommands = commandClient.getSlashCommands();
 
-        jda = JDABuilder.createLight(token).disableIntents(GatewayIntent.GUILD_MESSAGES).addEventListeners(commandClient).build().awaitReady();
-        jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.of(Activity.ActivityType.LISTENING, "commands..."));
+        shardManager = DefaultShardManagerBuilder.createLight(token)
+                .disableIntents(GatewayIntent.GUILD_MESSAGES)
+                .addEventListeners(commandClient)
+                .build();
         dbClient = new DBClient();
         NASAClient = new NASAClient();
         topGGClient = new TopGGClient();
@@ -105,8 +108,11 @@ public class NASABot {
                 entry(3, 21) // OPTION 3
         ));
 
-        for (HashMap.Entry<Integer, Integer> entry : postTimes.entrySet()) {
-            scheduleAPODPostTask(entry.getKey());
+        // When testing locally don't schedule APODs
+        if (!Boolean.parseBoolean(System.getProperty("testMode"))) {
+            for (HashMap.Entry<Integer, Integer> entry : postTimes.entrySet()) {
+                scheduleAPODPostTask(entry.getKey());
+            }
         }
     }
 

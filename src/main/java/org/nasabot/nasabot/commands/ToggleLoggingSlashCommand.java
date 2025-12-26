@@ -1,7 +1,7 @@
 package org.nasabot.nasabot.commands;
 
-import org.nasabot.nasabot.NASABot;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
+import org.nasabot.nasabot.NASABot;
 
 import java.util.Objects;
 

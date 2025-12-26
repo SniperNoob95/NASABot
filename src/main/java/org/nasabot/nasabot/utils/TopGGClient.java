@@ -1,17 +1,16 @@
 package org.nasabot.nasabot.utils;
 
-import java.util.ResourceBundle;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import org.json.JSONObject;
-import org.nasabot.nasabot.NASABot;
-
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.json.JSONObject;
+import org.nasabot.nasabot.NASABot;
+
+import java.util.ResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class TopGGClient {
 
@@ -31,27 +30,25 @@ public class TopGGClient {
 
         TimerTask timerTask = new TopGGTimerTask();
         Timer timer = new Timer(true);
-        timer.scheduleAtFixedRate(timerTask, 0, 5 * 1000);
-    }
-
-    private static void setStats(OkHttpClient httpClient, int serverCount) {
-        try {
-            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"),
-                    new JSONObject().put("server_count", serverCount).toString());
-            Request request = new Request.Builder().url(url + "/stats").method("POST", requestBody)
-                    .addHeader("Authorization", "Bearer " + token).build();
-            try (Response response = httpClient.newCall(request).execute()) {
-            }
-        } catch (Exception e) {
-            ErrorLogging.handleError("TopGGClient", "setStats", "Cannot set stats.", e);
-        }
+        // 1 minute
+        timer.scheduleAtFixedRate(timerTask, 0, 60 * 1000);
     }
 
     private class TopGGTimerTask extends TimerTask {
 
         @Override
         public void run() {
-            setStats(httpClient, NASABot.jda.getGuilds().size());
+            int serverCount = NASABot.shardManager.getGuilds().size();
+            try {
+                RequestBody requestBody = RequestBody.create(new JSONObject().put("server_count", serverCount).toString(),
+                        MediaType.parse("application/json"));
+                Request request = new Request.Builder().url(url + "/stats").method("POST", requestBody)
+                        .addHeader("Authorization", "Bearer " + token).build();
+                try (Response response = httpClient.newCall(request).execute()) {
+                }
+            } catch (Exception e) {
+                ErrorLogging.handleError("TopGGClient", "setStats", "Cannot set stats.", e);
+            }
         }
     }
 }

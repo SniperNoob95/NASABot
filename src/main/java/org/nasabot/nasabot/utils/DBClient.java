@@ -14,7 +14,11 @@ import org.json.JSONObject;
 import org.nasabot.nasabot.NASABot;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
 import static java.util.Map.entry;
 
@@ -48,7 +52,7 @@ public class DBClient {
         return httpClient.newCall(request).execute();
     }
 
-    public boolean insertErrorLog(String className, String method, String log, String exception) {
+    public void insertErrorLog(String className, String method, String log, String exception) {
         JSONObject payload = new JSONObject();
         try {
             payload.put("date", System.currentTimeMillis() / 1000);
@@ -60,7 +64,7 @@ public class DBClient {
             if (NASABot.loggingEnabled) e.printStackTrace();
         }
 
-        return issuePostRequest("/errors", payload);
+        issuePostRequest("/errors", payload);
     }
 
     private JSONArray issueGetRequest(String path, Map<String, String> queryParameters) {
@@ -153,29 +157,6 @@ public class DBClient {
     /**
      * Inserts a command issued by a user.
      *
-     * @param commandEvent Event in which the command occurred.
-     * @param command      The command issued.
-     */
-    public boolean insertCommand(CommandEvent commandEvent, String command) {
-        JSONObject payload = new JSONObject();
-        try {
-            payload.put("date", System.currentTimeMillis() / 1000);
-            payload.put("username", commandEvent.getMember().getUser().getName());
-            payload.put("userid", commandEvent.getMember().getId());
-            payload.put("serverid", commandEvent.getGuild().getId());
-            payload.put("servername", commandEvent.getGuild().getName());
-            payload.put("command", command);
-            payload.put("args", commandEvent.getArgs() == null ? "" : commandEvent.getArgs());
-        } catch (Exception e) {
-            if (NASABot.loggingEnabled) e.printStackTrace();
-        }
-
-        return issuePostRequest("/org/nasabot", payload);
-    }
-
-    /**
-     * Inserts a command issued by a user.
-     *
      * @param slashCommandEvent Event in which the command occurred.
      * @param command           The command issued.
      */
@@ -199,7 +180,7 @@ public class DBClient {
             if (NASABot.loggingEnabled) e.printStackTrace();
         }
 
-        return issuePostRequest("/org/nasabot", payload);
+        return issuePostRequest("/commands", payload);
     }
 
     /**

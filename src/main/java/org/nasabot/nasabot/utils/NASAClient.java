@@ -17,8 +17,8 @@ import java.util.ResourceBundle;
 
 public class NASAClient {
 
-    private final String baseUrl = "https://api.nasa.gov";
-    private final String imageUrl = "https://images-api.nasa.gov";
+    private static final String baseUrl = "https://api.nasa.gov";
+    private static final String imageUrl = "https://images-api.nasa.gov";
     private final OkHttpClient httpClient = new OkHttpClient().newBuilder().build();
     private final SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMM dd, yyyy");
     private String apiKey;
@@ -57,10 +57,10 @@ public class NASAClient {
             JSONObject jsonObject = new JSONObject(POTDResponse);
             EmbedBuilder embedBuilder = new EmbedBuilder();
             embedBuilder
-                .setTitle(jsonObject.getString("title"), String.format("https://apod.nasa.gov/apod/ap%s.html", jsonObject.getString("date").replaceAll("-", "").substring(2)))
-                .setDescription(String.format("%s", outputDateFormat.format(inputDateFormat.parse(jsonObject.getString("date")))))
-                .setColor(new Color(192, 32, 232))
-                .addField("Description", jsonObject.getString("explanation").length() > 1024 ? String.format("%s", jsonObject.getString("explanation")).substring(0, 1020) + "..." : String.format("%s", jsonObject.getString("explanation")), false);
+                    .setTitle(jsonObject.getString("title"), String.format("https://apod.nasa.gov/apod/ap%s.html", jsonObject.getString("date").replaceAll("-", "").substring(2)))
+                    .setDescription(String.format("%s", outputDateFormat.format(inputDateFormat.parse(jsonObject.getString("date")))))
+                    .setColor(new Color(192, 32, 232))
+                    .addField("Description", jsonObject.getString("explanation").length() > 1024 ? String.format("%s", jsonObject.getString("explanation")).substring(0, 1020) + "..." : String.format("%s", jsonObject.getString("explanation")), false);
             if (jsonObject.has("hdurl")) {
                 embedBuilder.addField("HD Image Link", jsonObject.getString("hdurl"), false);
             }
@@ -98,16 +98,16 @@ public class NASAClient {
 
         try {
             JSONArray responseArray = new JSONObject(imageResponse).getJSONObject("collection").getJSONArray("items");
-            if (responseArray.length() == 0) {
+            if (responseArray.isEmpty()) {
                 return new EmbedBuilder().setTitle("NASA Image").addField("ERROR", "No images found with that search term.", false).setColor(Color.RED).build();
             } else {
                 JSONObject selection = responseArray.getJSONObject(findSuitableImageSelection(responseArray));
                 EmbedBuilder embedBuilder = new EmbedBuilder();
                 embedBuilder.setTitle(selection.getJSONArray("data").getJSONObject(0).getString("nasa_id"));
                 embedBuilder.setDescription(
-                    selection.getJSONArray("data").getJSONObject(0).getString("description").length() > 1850 ?
-                        selection.getJSONArray("data").getJSONObject(0).getString("description").substring(0, 1500) + "..." :
-                        selection.getJSONArray("data").getJSONObject(0).getString("description"));
+                        selection.getJSONArray("data").getJSONObject(0).getString("description").length() > 1850 ?
+                                selection.getJSONArray("data").getJSONObject(0).getString("description").substring(0, 1500) + "..." :
+                                selection.getJSONArray("data").getJSONObject(0).getString("description"));
                 embedBuilder.addField("Date", outputDateFormat.format(inputDateFormat.parse(selection.getJSONArray("data").getJSONObject(0).getString("date_created"))), false);
                 embedBuilder.setColor(new Color(192, 32, 232));
                 embedBuilder.setImage(selection.getJSONArray("links").getJSONObject(0).getString("href"));

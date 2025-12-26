@@ -1,12 +1,12 @@
 package org.nasabot.nasabot.commands;
 
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
-import org.nasabot.nasabot.NASABot;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.nasabot.nasabot.NASABot;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -19,7 +19,7 @@ public class SetPostChannelSlashCommand extends NASASlashCommand {
         this.arguments = "<#channelMention>";
         this.options = Collections.singletonList(new OptionData(OptionType.CHANNEL, "channel_mention", "The channel to set as the Post Channel.").setRequired(true));
     }
-    
+
     @Override
     protected void execute(SlashCommandEvent slashCommandEvent) {
         this.insertCommand(slashCommandEvent);
@@ -35,9 +35,10 @@ public class SetPostChannelSlashCommand extends NASASlashCommand {
         }
 
         try {
-            if (NASABot.dbClient.getPostChannelForServer(Objects.requireNonNull(slashCommandEvent.getGuild()).getId()) != null) {
+            String existingPostChannelId = NASABot.dbClient.getPostChannelForServer(Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
+            if (existingPostChannelId != null) {
                 try {
-                    TextChannel textChannel = slashCommandEvent.getGuild().getTextChannelById(NASABot.dbClient.getPostChannelForServer(slashCommandEvent.getGuild().getId()));
+                    TextChannel textChannel = slashCommandEvent.getGuild().getTextChannelById(existingPostChannelId);
                     slashCommandEvent.reply(String.format("This server is already using %s as the Post Channel. Please clear " +
                             "it before setting a new one with the removePostChannel command.", Objects.requireNonNull(textChannel).getAsMention())).queue();
                     return;
@@ -55,11 +56,6 @@ public class SetPostChannelSlashCommand extends NASASlashCommand {
         try {
             if (slashCommandEvent.hasOption("channel_mention")) {
                 GuildChannel mentionedChannel = Objects.requireNonNull(slashCommandEvent.getOption("channel_mention")).getAsChannel();
-                if (mentionedChannel == null) {
-                    slashCommandEvent.reply(String.format("No channels were mentioned, or the bot does not have permission to view the " +
-                            "mentioned channel. Please check your permission settings or command formatting: %s", this.getArgumentsString())).queue();
-                    return;
-                }
                 if (NASABot.dbClient.createPostChannel(Objects.requireNonNull(slashCommandEvent.getGuild()).getId(), mentionedChannel.getId())) {
                     int postChannelId = NASABot.dbClient.getPostChannelId(Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
                     if (postChannelId != -1) {

@@ -1,24 +1,23 @@
 package org.nasabot.nasabot.utils;
 
-import java.awt.Color;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Objects;
-import java.util.TimeZone;
-
-import org.json.JSONObject;
-import org.nasabot.nasabot.NASABot;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.json.JSONObject;
+import org.nasabot.nasabot.NASABot;
+
+import java.awt.Color;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Objects;
+import java.util.TimeZone;
 
 public class ISSClient {
 
-    private final String url = "http://api.open-notify.org/iss-now.json";
+    private static final String url = "http://api.open-notify.org/iss-now.json";
     private final OkHttpClient httpClient = new OkHttpClient().newBuilder().build();
     private final SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMM dd, yyyy - HH:mm:ss z");
 
@@ -27,8 +26,7 @@ public class ISSClient {
             HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url)).newBuilder();
             Request request = new Request.Builder().url(builder.build().toString()).build();
             try (Response response = httpClient.newCall(request).execute()) {
-                MessageEmbed embed = formatISSLocation(Objects.requireNonNull(response.body()).string());
-                return embed;
+                return formatISSLocation(Objects.requireNonNull(response.body()).string());
             }
         } catch (Exception e) {
             ErrorLogging.handleError("ISSClient", "getISSLocation", "Cannot get ISS location.", e);

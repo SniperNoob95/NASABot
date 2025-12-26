@@ -1,17 +1,16 @@
 package org.nasabot.nasabot.commands;
 
-import java.text.MessageFormat;
-import java.time.LocalDate;
-
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
-
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.nasabot.nasabot.utils.AstronomyCalc;
 import org.nasabot.nasabot.utils.AstronomyCalc.MoonType;
 
+import java.text.MessageFormat;
+import java.time.LocalDate;
+
 /**
  * Command to calculate the current moonphase.
- * 
+ *
  * @author Kyle Smith (kjsmita6)
  */
 public class MoonphaseSlashCommand extends NASASlashCommand {
@@ -25,7 +24,7 @@ public class MoonphaseSlashCommand extends NASASlashCommand {
     @Override
     protected void execute(SlashCommandEvent event) {
         insertCommand(event);
-        LocalDate now= LocalDate.now();
+        LocalDate now = LocalDate.now();
 
         int year = now.getYear();
         int month = now.getMonthValue();
@@ -60,7 +59,8 @@ public class MoonphaseSlashCommand extends NASASlashCommand {
                 break;
         }
         double days = AstronomyCalc.getDaysSinceNewMoon(year, month, day);
-        event.reply(MessageFormat.format("The current moon phase is {0} {1} ({2} days until new moon).", phase, phaseEmoji.getFormatted(), (int) AstronomyCalc.MOON_PHASE_LENGTH - (int) days)).queue();;
+        event.reply(MessageFormat.format("The current moon phase is {0} {1} ({2} days until new moon).",
+                phase, phaseEmoji.getFormatted(), (int) AstronomyCalc.MOON_PHASE_LENGTH - (int) days)).queue();
     }
 
 }

@@ -1,9 +1,9 @@
 package org.nasabot.nasabot.commands;
 
-import org.nasabot.nasabot.NASABot;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
+import org.nasabot.nasabot.NASABot;
 
-public class ISSSlashCommand extends NASASlashCommand{
+public class ISSSlashCommand extends NASASlashCommand {
 
     public ISSSlashCommand() {
         super();

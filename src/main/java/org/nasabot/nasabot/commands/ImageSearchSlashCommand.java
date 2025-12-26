@@ -1,14 +1,14 @@
 package org.nasabot.nasabot.commands;
 
-import org.nasabot.nasabot.NASABot;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.nasabot.nasabot.NASABot;
 
 import java.util.Collections;
 import java.util.Objects;
 
-public class ImageSearchSlashCommand extends NASASlashCommand{
+public class ImageSearchSlashCommand extends NASASlashCommand {
 
     public ImageSearchSlashCommand() {
         this.name = "image";

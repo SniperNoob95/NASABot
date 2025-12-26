@@ -1,12 +1,12 @@
 package org.nasabot.nasabot.commands;
 
-import org.nasabot.nasabot.NASABot;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.Permission;
+import org.nasabot.nasabot.NASABot;
 
 import java.util.Objects;
 
-public class RemovePostChannelSlashCommand extends NASASlashCommand{
+public class RemovePostChannelSlashCommand extends NASASlashCommand {
 
     public RemovePostChannelSlashCommand() {
         this.name = "removepostchannel";

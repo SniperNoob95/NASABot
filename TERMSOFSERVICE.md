@@ -16,11 +16,11 @@ under the sole discretion of the creator.
 
 ## Third-Party referenced content
 The bot uses several APIs and services to provide for its users via links, images, or other forms of media created by third-parties that are not owned 
-or controlled by NASABot. You acknowledge and agree that AstroBot shall not be responsible or liable for any damages or other unlawful behaviour performed by the third party.
-It is strongly advised that you read the terms and conditions and privacy policies of any third party web sites or services that you visit.
+or controlled by NASABot. You acknowledge and agree that NASABot shall not be responsible or liable for any damages or other unlawful behaviour performed by the third party.
+It is strongly advised that you read the terms and conditions and privacy policies of any third party websites or services that you visit.
 The creator therefore reserves the right to change or update information and to correct errors, inaccuracies, or omissions at any time without prior notice.
 
-The creator can be contacted at Sniper Noob#5606 (181588597558738954).
+The creator can be contacted at snipernoob on Discord.
 
 
-##### Updated 9 Nov 2022
+##### Updated 23 Dec 2025

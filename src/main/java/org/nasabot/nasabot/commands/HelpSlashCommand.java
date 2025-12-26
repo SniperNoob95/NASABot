@@ -1,9 +1,9 @@
 package org.nasabot.nasabot.commands;
 
-import org.nasabot.nasabot.NASABot;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.nasabot.nasabot.NASABot;
 import org.nasabot.nasabot.utils.ErrorLogging;
 
 public class HelpSlashCommand extends NASASlashCommand {
@@ -21,7 +21,7 @@ public class HelpSlashCommand extends NASASlashCommand {
         StringBuilder stringBuilder = new StringBuilder("**NASABot** commands:\n");
         for (SlashCommand command : NASABot.slashCommands) {
             stringBuilder.append(String.format("\n**`/%s`** - %s", command.getName(), command.getHelp()));
-            if (command.getOptions().size() > 0) {
+            if (!command.getOptions().isEmpty()) {
                 for (OptionData optionData : command.getOptions()) {
                     stringBuilder.append(String.format("\n\t`[%s]` - %s **(Required: %s)**", optionData.getName(), optionData.getDescription(), optionData.isRequired()));
                 }

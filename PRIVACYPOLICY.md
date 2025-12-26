@@ -7,8 +7,8 @@ Information stored by NASABot
 * Commands usage - These are logs that keep track of the number of times each command has been called. The command logs are not used for user tracking purposes.
 
 ### Use of Data
-The stored data is only used to provide bot functionality, and is not sold, distributed, or otherwise processes for non-NASABot purposes.
+The stored data is only used to provide bot functionality, and is not sold, distributed, or otherwise processed for non-NASABot purposes.
 
-For any queries contact Sniper Noob#5606 (181588597558738954).
+For any queries contact Sniper Noob (snipernoob) on Discord.
 
-##### Updated 9 Nov 2022
+##### Updated 23 Dec 2025

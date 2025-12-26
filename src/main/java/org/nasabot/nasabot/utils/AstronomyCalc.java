@@ -4,22 +4,26 @@ import java.time.LocalDate;
 
 /**
  * Utility class for miscellaneous astronomy calculations.
- * 
+ *
  * @author Kyle Smith (kjsmita6)
  *
  */
 public final class AstronomyCalc {
 
-    /** There was a new moon on April 30th, 2022. Use this as a reference. */
+    /**
+     * There was a new moon on April 30th, 2022. Use this as a reference.
+     */
     public static final long MOON_REF = LocalDate.of(2022, 4, 30).toEpochDay();
 
-    /** Moon cycles every 29.53 days */
+    /**
+     * Moon cycles every 29.53 days
+     */
     public static final double MOON_PHASE_LENGTH = 29.53059;
 
     /**
      * Gets the moon phase for the given date. This date must be after 4/30/2022.
      * Note that this calculation is not 100% accurate and may be off by a few days.
-     * 
+     *
      * @param year  The year
      * @param month The month
      * @param day   The day
@@ -57,7 +61,7 @@ public final class AstronomyCalc {
     /**
      * Gets the number of days since the last new moon. This can be used to figure
      * out what the current phase is (new moon occurs every 29.53 days)
-     * 
+     *
      * @param year  Current year
      * @param month Current month (1-12)
      * @param day   Current day (1-28/29/30/31)
