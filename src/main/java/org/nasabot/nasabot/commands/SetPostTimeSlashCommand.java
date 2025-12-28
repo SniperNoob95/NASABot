@@ -1,32 +1,31 @@
 package org.nasabot.nasabot.commands;
 
-import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.jetbrains.annotations.NotNull;
 import org.nasabot.nasabot.NASABot;
 
 import java.util.Collections;
 import java.util.Objects;
 
-public class SetPostTimeSlashCommand extends NASASlashCommand {
+public class SetPostTimeSlashCommand extends NASABotSlashCommand {
 
     private final int minimumOption = 0;
     private final int maximumOption = 3;
 
     public SetPostTimeSlashCommand() {
-        this.name = "setposttime";
-        this.help = "Sets the Post Time for the server.";
-        this.arguments = "<post time option number (0 - 3)>";
-        this.options = Collections.singletonList(new OptionData(OptionType.INTEGER, "post_time", "The Post Time option you want to use.").setRequired(true)
-                .addChoice("16:00 UTC (default)", 0)
-                .addChoice("6:00 UTC", 1)
-                .addChoice("11:00 UTC", 2)
-                .addChoice("21:00 UTC", 3));
+        super("setposttime", "Sets the Post Time for the server.",
+                Collections.singletonList(new OptionData(OptionType.INTEGER, "post_time", "The Post Time option you want to use.").setRequired(true)
+                        .addChoice("16:00 UTC (default)", 0)
+                        .addChoice("6:00 UTC", 1)
+                        .addChoice("11:00 UTC", 2)
+                        .addChoice("21:00 UTC", 3)));
     }
 
     @Override
-    protected void execute(SlashCommandEvent slashCommandEvent) {
+    public void execute(@NotNull SlashCommandInteractionEvent slashCommandEvent) {
         try {
             if (!Objects.requireNonNull(slashCommandEvent.getMember()).hasPermission(Permission.ADMINISTRATOR) && !Objects.equals(Objects.requireNonNull(slashCommandEvent.getGuild()).getOwner(), slashCommandEvent.getMember())) {
                 slashCommandEvent.reply("Only server administrators or the server owner may use this command.").queue();
@@ -55,14 +54,14 @@ public class SetPostTimeSlashCommand extends NASASlashCommand {
         }
 
         if (timeOption < minimumOption || timeOption > maximumOption) {
-            slashCommandEvent.reply(String.format("The Post Time options are \n```%s```\nFor more information, please visit the top.gg or GitHub pages, which can be found via the `NASA_info` command.", timeOptions)).queue();
+            slashCommandEvent.reply(String.format("The Post Time options are \n```%s```\nFor more information, please visit the top.gg or GitHub pages, which can be found via the `/info` command.", timeOptions)).queue();
             return;
         }
 
         int postChannelId = 0;
 
         try {
-            postChannelId = NASABot.dbClient.getPostChannelId(Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
+            postChannelId = dbClient.getPostChannelId(Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
         } catch (NullPointerException e) {
             slashCommandEvent.reply("There was a problem setting the server's Post Time.").queue();
             return;
@@ -71,7 +70,7 @@ public class SetPostTimeSlashCommand extends NASASlashCommand {
         if (postChannelId == -1) {
             slashCommandEvent.reply("This server does not have a Post Channel configured. To set a Post Channel, use the setPostChannel command.").queue();
         } else {
-            boolean result = NASABot.dbClient.updatePostChannelConfiguration(timeOption, postChannelId);
+            boolean result = dbClient.updatePostChannelConfiguration(timeOption, postChannelId);
             if (result) {
                 slashCommandEvent.reply(String.format("Post Time set to %s:00 UTC.", NASABot.postTimes.get(timeOption))).queue();
             } else {

@@ -1,11 +1,9 @@
-package org.nasabot.nasabot.utils;
+package org.nasabot.nasabot.clients;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.command.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -22,34 +20,38 @@ import java.util.ResourceBundle;
 
 import static java.util.Map.entry;
 
-public class DBClient {
-
+public class DBClient extends NASABotClient {
     private String url;
-    private final OkHttpClient httpClient = new OkHttpClient().newBuilder().build();
 
-    public DBClient() {
+    private DBClient() {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
 
         try {
             url = resourceBundle.getString("DBUrl");
-            Response healthCheck = healthCheck();
-
-            if (healthCheck.code() != 200) {
-                System.out.println("Healthcheck failed.");
-                System.exit(0);
-            }
-
-            healthCheck.close();
+            healthCheck();
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Cannot contact API.");
+            System.out.println("Error loading DBClient config.");
             System.exit(0);
         }
     }
 
-    public Response healthCheck() throws IOException {
+    private static class DBClientSingleton {
+        private static final DBClient INSTANCE = new DBClient();
+    }
+
+    public static DBClient getInstance() {
+        return DBClient.DBClientSingleton.INSTANCE;
+    }
+
+    public void healthCheck() throws IOException {
         Request request = new Request.Builder().url(url + "/health").method("GET", null).build();
-        return httpClient.newCall(request).execute();
+        try (Response response = httpClient.newCall(request).execute()) {
+            if (response.code() != 200) {
+                System.out.println("Healthcheck failed.");
+                System.exit(0);
+            }
+        }
     }
 
     public void insertErrorLog(String className, String method, String log, String exception) {
@@ -68,25 +70,21 @@ public class DBClient {
     }
 
     private JSONArray issueGetRequest(String path, Map<String, String> queryParameters) {
-        try {
-            HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url + path)).newBuilder();
-            if (queryParameters != null) {
-                for (Map.Entry<String, String> entry : queryParameters.entrySet()) {
-                    builder.addQueryParameter(entry.getKey(), entry.getValue());
-                }
+        HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url + path)).newBuilder();
+        if (queryParameters != null) {
+            for (Map.Entry<String, String> entry : queryParameters.entrySet()) {
+                builder.addQueryParameter(entry.getKey(), entry.getValue());
             }
-            Request request = new Request.Builder().url(builder.build()).get().build();
-            Response response = httpClient.newCall(request).execute();
-
+        }
+        Request request = new Request.Builder().url(builder.build()).get().build();
+        try (Response response = httpClient.newCall(request).execute()) {
             if (response.code() != 200) {
-                response.close();
                 return null;
             }
 
             JSONArray jsonArray = new JSONArray(Objects.requireNonNull(response.body()).string());
-            response.close();
 
-            if (jsonArray.length() == 0) {
+            if (jsonArray.isEmpty()) {
                 return null;
             } else {
                 return jsonArray;
@@ -98,18 +96,10 @@ public class DBClient {
     }
 
     public boolean issuePostRequest(String path, JSONObject payload) {
-        try {
-            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), payload.toString());
-            Request request = new Request.Builder().url(url + path).post(requestBody).build();
-            Response response = httpClient.newCall(request).execute();
-
-            if (response.code() != 201) {
-                response.close();
-                return false;
-            }
-
-            response.close();
-            return true;
+        RequestBody requestBody = RequestBody.create(payload.toString(), MediaType.parse("application/json"));
+        Request request = new Request.Builder().url(url + path).post(requestBody).build();
+        try (Response response = httpClient.newCall(request).execute()) {
+            return response.code() == 201;
         } catch (Exception e) {
             if (NASABot.loggingEnabled) e.printStackTrace();
             return false;
@@ -117,18 +107,10 @@ public class DBClient {
     }
 
     public boolean issuePutRequest(String path, JSONObject payload) {
-        try {
-            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), payload.toString());
-            Request request = new Request.Builder().url(url + path).put(requestBody).build();
-            Response response = httpClient.newCall(request).execute();
-
-            if (response.code() != 201) {
-                response.close();
-                return false;
-            }
-
-            response.close();
-            return true;
+        RequestBody requestBody = RequestBody.create(payload.toString(), MediaType.parse("application/json"));
+        Request request = new Request.Builder().url(url + path).put(requestBody).build();
+        try (Response response = httpClient.newCall(request).execute()) {
+            return response.code() == 201;
         } catch (Exception e) {
             if (NASABot.loggingEnabled) e.printStackTrace();
             return false;
@@ -136,17 +118,14 @@ public class DBClient {
     }
 
     public boolean issueDeleteRequest(String path, Map<String, String> queryParameters) {
-        try {
-            HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url + path)).newBuilder();
-            if (queryParameters != null) {
-                for (Map.Entry<String, String> entry : queryParameters.entrySet()) {
-                    builder.addQueryParameter(entry.getKey(), entry.getValue());
-                }
+        HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url + path)).newBuilder();
+        if (queryParameters != null) {
+            for (Map.Entry<String, String> entry : queryParameters.entrySet()) {
+                builder.addQueryParameter(entry.getKey(), entry.getValue());
             }
-            Request request = new Request.Builder().url(builder.build()).delete().build();
-            Response response = httpClient.newCall(request).execute();
-
-            response.close();
+        }
+        Request request = new Request.Builder().url(builder.build()).delete().build();
+        try (Response response = httpClient.newCall(request).execute()) {
             return true;
         } catch (Exception e) {
             if (NASABot.loggingEnabled) e.printStackTrace();
@@ -160,12 +139,12 @@ public class DBClient {
      * @param slashCommandEvent Event in which the command occurred.
      * @param command           The command issued.
      */
-    public boolean insertCommand(SlashCommandEvent slashCommandEvent, String command) {
+    public boolean insertCommand(SlashCommandInteractionEvent slashCommandEvent, String command) {
         JSONObject payload = new JSONObject();
         try {
             payload.put("date", System.currentTimeMillis() / 1000);
-            payload.put("username", Objects.requireNonNull(slashCommandEvent.getMember()).getUser().getName());
-            payload.put("userid", slashCommandEvent.getMember().getId());
+            payload.put("username", slashCommandEvent.getUser().getName());
+            payload.put("userid", slashCommandEvent.getUser().getId());
             payload.put("serverid", Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
             payload.put("servername", slashCommandEvent.getGuild().getName());
             payload.put("command", command);
@@ -230,7 +209,6 @@ public class DBClient {
             return Objects.requireNonNull(issueGetRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))))).getJSONObject(0).getString("channel_id");
         } catch (Exception e) {
             if (NASABot.loggingEnabled) e.printStackTrace();
-            System.out.println(String.format("Failed to get Post Channel for server ID: %s", serverId));
             return null;
         }
     }
@@ -246,7 +224,6 @@ public class DBClient {
             return Objects.requireNonNull(issueGetRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))))).getJSONObject(0).getInt("id");
         } catch (Exception e) {
             if (NASABot.loggingEnabled) e.printStackTrace();
-            System.out.println(String.format("Failed to get Post Channel for server ID: %s", serverId));
             return -1;
         }
     }

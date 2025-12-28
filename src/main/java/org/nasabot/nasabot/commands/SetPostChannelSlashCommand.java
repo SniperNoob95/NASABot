@@ -1,27 +1,25 @@
 package org.nasabot.nasabot.commands;
 
-import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.nasabot.nasabot.NASABot;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Objects;
 
-public class SetPostChannelSlashCommand extends NASASlashCommand {
+public class SetPostChannelSlashCommand extends NASABotSlashCommand {
 
     public SetPostChannelSlashCommand() {
-        this.name = "setpostchannel";
-        this.help = "Sets the Post Channel for the server.";
-        this.arguments = "<#channelMention>";
-        this.options = Collections.singletonList(new OptionData(OptionType.CHANNEL, "channel_mention", "The channel to set as the Post Channel.").setRequired(true));
+        super("setpostchannel", "Sets the Post Channel for the server.",
+                Collections.singletonList(new OptionData(OptionType.CHANNEL, "channel_mention", "The channel to set as the Post Channel.").setRequired(true)));
     }
 
     @Override
-    protected void execute(SlashCommandEvent slashCommandEvent) {
+    public void execute(@NotNull SlashCommandInteractionEvent slashCommandEvent) {
         this.insertCommand(slashCommandEvent);
 
         try {
@@ -35,7 +33,7 @@ public class SetPostChannelSlashCommand extends NASASlashCommand {
         }
 
         try {
-            String existingPostChannelId = NASABot.dbClient.getPostChannelForServer(Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
+            String existingPostChannelId = dbClient.getPostChannelForServer(Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
             if (existingPostChannelId != null) {
                 try {
                     TextChannel textChannel = slashCommandEvent.getGuild().getTextChannelById(existingPostChannelId);
@@ -54,12 +52,12 @@ public class SetPostChannelSlashCommand extends NASASlashCommand {
         }
 
         try {
-            if (slashCommandEvent.hasOption("channel_mention")) {
+            if (slashCommandEvent.getOption("channel_mention") != null) {
                 GuildChannel mentionedChannel = Objects.requireNonNull(slashCommandEvent.getOption("channel_mention")).getAsChannel();
-                if (NASABot.dbClient.createPostChannel(Objects.requireNonNull(slashCommandEvent.getGuild()).getId(), mentionedChannel.getId())) {
-                    int postChannelId = NASABot.dbClient.getPostChannelId(Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
+                if (dbClient.createPostChannel(Objects.requireNonNull(slashCommandEvent.getGuild()).getId(), mentionedChannel.getId())) {
+                    int postChannelId = dbClient.getPostChannelId(Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
                     if (postChannelId != -1) {
-                        if (NASABot.dbClient.createPostChannelConfiguration(postChannelId)) {
+                        if (dbClient.createPostChannelConfiguration(postChannelId)) {
                             slashCommandEvent.reply(String.format("%s has been set as the Post Channel for this server.", mentionedChannel.getAsMention())).queue();
                         } else {
                             slashCommandEvent.reply("Unable to set Post Channel Configuration. Please contact the bot owner or join the NASABot Discord channel to report this error.").queue();

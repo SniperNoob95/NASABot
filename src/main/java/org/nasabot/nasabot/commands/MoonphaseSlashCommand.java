@@ -1,66 +1,86 @@
 package org.nasabot.nasabot.commands;
 
-import com.jagrosh.jdautilities.command.SlashCommandEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import org.nasabot.nasabot.utils.AstronomyCalc;
-import org.nasabot.nasabot.utils.AstronomyCalc.MoonType;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.jetbrains.annotations.NotNull;
+import org.shredzone.commons.suncalc.MoonIllumination;
+import org.shredzone.commons.suncalc.MoonPhase;
 
-import java.text.MessageFormat;
-import java.time.LocalDate;
+import java.awt.Color;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 
-/**
- * Command to calculate the current moonphase.
- *
- * @author Kyle Smith (kjsmita6)
- */
-public class MoonphaseSlashCommand extends NASASlashCommand {
+public class MoonphaseSlashCommand extends NASABotSlashCommand {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("LLLL dd, yyyy");
 
     public MoonphaseSlashCommand() {
-        super();
-        this.name = "moonphase";
-        this.help = "Displays the current phase of the moon.";
+        super("moonphase", "Displays the current phase of the moon.", Collections.emptyList());
     }
 
     @Override
-    protected void execute(SlashCommandEvent event) {
+    public void execute(@NotNull SlashCommandInteractionEvent event) {
         insertCommand(event);
-        LocalDate now = LocalDate.now();
 
-        int year = now.getYear();
-        int month = now.getMonthValue();
-        int day = now.getDayOfMonth();
+        LocalDateTime localDateTime = LocalDateTime.now();
+        MoonIllumination illumination = MoonIllumination.compute().on(localDateTime).execute();
+        double phaseNumber = illumination.getPhase();
 
-        MoonType phase = AstronomyCalc.getMoonphase(year, month, day);
-        Emoji phaseEmoji = null;
-        switch (phase) {
-            case NEW:
-                phaseEmoji = Emoji.fromUnicode("U+1F311");
-                break;
-            case WANING_CRES:
-                phaseEmoji = Emoji.fromUnicode("U+1F318");
-                break;
-            case THIRD_QUART:
-                phaseEmoji = Emoji.fromUnicode("U+1F317");
-                break;
-            case WANING_GIBB:
-                phaseEmoji = Emoji.fromUnicode("U+1F316");
-                break;
-            case FULL:
-                phaseEmoji = Emoji.fromUnicode("U+1F315");
-                break;
-            case WAXING_GIBB:
-                phaseEmoji = Emoji.fromUnicode("U+1F314");
-                break;
-            case FIRST_QUART:
-                phaseEmoji = Emoji.fromUnicode("U+1F313");
-                break;
-            case WAXING_CRES:
-                phaseEmoji = Emoji.fromUnicode("U+1F312");
-                break;
+        Emoji phaseEmoji = Emoji.fromUnicode("U+2753");
+        String phaseName = "UNKNOWN";
+
+        if (phaseNumber == -180.0d || phaseNumber == 180.0d) {
+            phaseEmoji = Emoji.fromUnicode("U+1F311");
+            phaseName = "New Moon";
+        } else if (phaseNumber < -90.0d) {
+            phaseEmoji = Emoji.fromUnicode("U+1F314");
+            phaseName = "Waxing Gibbous";
+        } else if (phaseNumber == -90.0d) {
+            phaseEmoji = Emoji.fromUnicode("U+1F313");
+            phaseName = "First Quarter";
+        } else if (phaseNumber < 0.0d) {
+            phaseEmoji = Emoji.fromUnicode("U+1F314");
+            phaseName = "Waxing Gibbous";
+        } else if (phaseNumber == 0.0d) {
+            phaseEmoji = Emoji.fromUnicode("U+1F315");
+            phaseName = "Full Moon";
+        } else if (phaseNumber > 90.0d) {
+            phaseEmoji = Emoji.fromUnicode("U+1F318");
+            phaseName = "Waning Crescent";
+        } else if (phaseNumber == 90.0d) {
+            phaseEmoji = Emoji.fromUnicode("U+1F317");
+            phaseName = "Last Quarter";
+        } else if (phaseNumber > 0.0d) {
+            phaseEmoji = Emoji.fromUnicode("U+1F316");
+            phaseName = "Waning Gibbous";
         }
-        double days = AstronomyCalc.getDaysSinceNewMoon(year, month, day);
-        event.reply(MessageFormat.format("The current moon phase is {0} {1} ({2} days until new moon).",
-                phase, phaseEmoji.getFormatted(), (int) AstronomyCalc.MOON_PHASE_LENGTH - (int) days)).queue();
+
+        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneOffset.UTC);
+
+        MoonPhase.Parameters parametersNew = MoonPhase.compute().on(zonedDateTime)
+                .phase(MoonPhase.Phase.NEW_MOON);
+        MoonPhase.Parameters parametersFull = MoonPhase.compute().on(zonedDateTime)
+                .phase(MoonPhase.Phase.FULL_MOON);
+
+        ZonedDateTime nextNewMoon = parametersNew.execute().getTime();
+        ZonedDateTime nextFullMoon = parametersFull.execute().getTime();
+
+        MessageEmbed embed = new EmbedBuilder()
+                .setColor(Color.YELLOW)
+                .setTitle("Current Moon Phase")
+                .setDescription(zonedDateTime.format(formatter))
+                .addField("Current Phase", phaseName + " " + phaseEmoji.getFormatted(), false)
+                .addField("Illumination", String.format("%.1f%%", illumination.getFraction() * 100), false)
+                .addField("Next New Moon", nextNewMoon.format(formatter) + " - " + ChronoUnit.DAYS.between(zonedDateTime, nextNewMoon) + " days", false)
+                .addField("Next Full Moon", nextFullMoon.format(formatter) + " - " + ChronoUnit.DAYS.between(zonedDateTime, nextFullMoon) + " days", false)
+                .build();
+
+        event.replyEmbeds(embed).queue();
     }
 
 }

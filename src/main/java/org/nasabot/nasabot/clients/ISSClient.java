@@ -1,13 +1,11 @@
-package org.nasabot.nasabot.utils;
+package org.nasabot.nasabot.clients;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONObject;
-import org.nasabot.nasabot.NASABot;
 
 import java.awt.Color;
 import java.text.SimpleDateFormat;
@@ -15,11 +13,21 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.TimeZone;
 
-public class ISSClient {
-
-    private static final String url = "http://api.open-notify.org/iss-now.json";
-    private final OkHttpClient httpClient = new OkHttpClient().newBuilder().build();
+public class ISSClient extends NASABotClient {
+    private final GeoNamesClient geoNamesClient = GeoNamesClient.getInstance();
+    private final String url = "http://api.open-notify.org/iss-now.json";
     private final SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMM dd, yyyy - HH:mm:ss z");
+
+    private ISSClient() {
+    }
+
+    private static class ISSClientSingleton {
+        private static final ISSClient INSTANCE = new ISSClient();
+    }
+
+    public static ISSClient getInstance() {
+        return ISSClient.ISSClientSingleton.INSTANCE;
+    }
 
     public MessageEmbed getISSLocation() {
         try {
@@ -29,7 +37,7 @@ public class ISSClient {
                 return formatISSLocation(Objects.requireNonNull(response.body()).string());
             }
         } catch (Exception e) {
-            ErrorLogging.handleError("ISSClient", "getISSLocation", "Cannot get ISS location.", e);
+            errorLoggingClient.handleError("ISSClient", "getISSLocation", "Cannot get ISS location.", e);
         }
 
         return null;
@@ -55,14 +63,14 @@ public class ISSClient {
                                             jsonObject.getJSONObject("iss_position").getString("longitude"))),
                             false)
                     .addField("Currently Over Country",
-                            NASABot.geoNamesClient.getCountryFromLatitudeLongitude(
+                            geoNamesClient.getCountryFromLatitudeLongitude(
                                     jsonObject.getJSONObject("iss_position").getString("latitude"),
                                     jsonObject.getJSONObject("iss_position").getString("longitude")),
                             false)
                     .setThumbnail("https://i.imgur.com/xm3XSgc.jpg");
             return embedBuilder.build();
         } catch (Exception e) {
-            ErrorLogging.handleError("ISSClient", "updateHealthCheck", "Cannot format ISS location.", e);
+            errorLoggingClient.handleError("ISSClient", "formatISSLocation", "Cannot format ISS location.", e);
             return new EmbedBuilder().setTitle("ISS Current Location")
                     .addField("ERROR", "Unable to obtain ISS location.", false).setColor(Color.RED).build();
         }
