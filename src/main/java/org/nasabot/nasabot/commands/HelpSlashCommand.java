@@ -1,37 +1,37 @@
 package org.nasabot.nasabot.commands;
 
-import com.jagrosh.jdautilities.command.SlashCommand;
-import com.jagrosh.jdautilities.command.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.jetbrains.annotations.NotNull;
 import org.nasabot.nasabot.NASABot;
-import org.nasabot.nasabot.utils.ErrorLogging;
 
-public class HelpSlashCommand extends NASASlashCommand {
+import java.util.Collections;
+
+public class HelpSlashCommand extends NASABotSlashCommand {
 
     public HelpSlashCommand() {
-        this.name = "help";
-        this.help = "Displays helpful information about using the bot.";
+        super("help", "Displays helpful information about using the bot.", Collections.emptyList());
     }
 
     @Override
-    protected void execute(SlashCommandEvent slashCommandEvent) {
-
+    public void execute(@NotNull SlashCommandInteractionEvent slashCommandEvent) {
         this.insertCommand(slashCommandEvent);
 
         StringBuilder stringBuilder = new StringBuilder("**NASABot** commands:\n");
-        for (SlashCommand command : NASABot.slashCommands) {
-            stringBuilder.append(String.format("\n**`/%s`** - %s", command.getName(), command.getHelp()));
-            if (!command.getOptions().isEmpty()) {
-                for (OptionData optionData : command.getOptions()) {
-                    stringBuilder.append(String.format("\n\t`[%s]` - %s **(Required: %s)**", optionData.getName(), optionData.getDescription(), optionData.isRequired()));
-                }
+        for (NASABotSlashCommand command : NASABot.slashCommands) {
+            if (command.isOwnerCommand()) {
+                continue;
+            }
+            stringBuilder.append(String.format("\n**`/%s`** - %s", command.getName(), command.getDescription()));
+            for (OptionData optionData : command.getOptionData()) {
+                stringBuilder.append(String.format("\n\t`[%s]` - %s **(%s)**", optionData.getName(), optionData.getDescription(), optionData.isRequired() ? "Required" : "Optional"));
             }
         }
 
         try {
             slashCommandEvent.reply(stringBuilder.toString()).queue();
         } catch (Exception e) {
-            ErrorLogging.handleError("HelpSlashCommand", "execute", "Unable to send help content.", e);
+            errorLoggingClient.handleError("HelpSlashCommand", "execute", "Unable to send help content.", e);
             slashCommandEvent.reply("Unable to send help content").queue();
         }
     }

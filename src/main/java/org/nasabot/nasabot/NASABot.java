@@ -1,12 +1,16 @@
 package org.nasabot.nasabot;
 
-import com.jagrosh.jdautilities.command.CommandClient;
-import com.jagrosh.jdautilities.command.CommandClientBuilder;
-import com.jagrosh.jdautilities.command.SlashCommand;
+import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import org.jetbrains.annotations.NotNull;
 import org.nasabot.nasabot.commands.APODSlashCommand;
 import org.nasabot.nasabot.commands.GetPostChannelSlashCommand;
 import org.nasabot.nasabot.commands.GetPostTimeSlashCommand;
@@ -15,16 +19,15 @@ import org.nasabot.nasabot.commands.ISSSlashCommand;
 import org.nasabot.nasabot.commands.ImageSearchSlashCommand;
 import org.nasabot.nasabot.commands.InfoSlashCommand;
 import org.nasabot.nasabot.commands.MoonphaseSlashCommand;
+import org.nasabot.nasabot.commands.NASABotSlashCommand;
 import org.nasabot.nasabot.commands.RemovePostChannelSlashCommand;
 import org.nasabot.nasabot.commands.SetPostChannelSlashCommand;
 import org.nasabot.nasabot.commands.SetPostTimeSlashCommand;
 import org.nasabot.nasabot.commands.ToggleLoggingSlashCommand;
-import org.nasabot.nasabot.utils.APODSchedulePostTask;
-import org.nasabot.nasabot.utils.DBClient;
-import org.nasabot.nasabot.utils.GeoNamesClient;
-import org.nasabot.nasabot.utils.ISSClient;
-import org.nasabot.nasabot.utils.NASAClient;
-import org.nasabot.nasabot.utils.TopGGClient;
+import org.nasabot.nasabot.listeners.ButtonHandler;
+import org.nasabot.nasabot.listeners.SlashCommandHandler;
+import org.nasabot.nasabot.timers.APODSchedulePostTimerTask;
+import org.nasabot.nasabot.timers.TopGGTimerTask;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,34 +35,31 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.chrono.ChronoLocalDateTime;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 import static java.util.Map.entry;
 
-public class NASABot {
+public class NASABot extends ListenerAdapter {
 
     public static ShardManager shardManager;
-    public static NASAClient NASAClient;
-    public static DBClient dbClient;
-    public static TopGGClient topGGClient;
-    public static ISSClient issClient;
-    public static GeoNamesClient geoNamesClient;
     public static Map<Integer, Integer> postTimes;
     public static String NASABotServerID;
-    public static boolean loggingEnabled = false;
-    public static List<SlashCommand> slashCommands;
+    public static boolean loggingEnabled;
+    public static List<NASABotSlashCommand> slashCommands;
+    public static String ownerId;
+    private static boolean commandsUpdated;
+    public static final String VERSION = "10.0.0";
 
-    public static final String VERSION = "8.0.1";
-
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
         String token = null;
-        String ownerId = null;
 
         try {
             token = resourceBundle.getString("token");
@@ -71,10 +71,8 @@ public class NASABot {
             System.exit(1);
         }
 
-        CommandClientBuilder builder = new CommandClientBuilder();
-
         // Slash commands
-        builder.addSlashCommands(new APODSlashCommand(),
+        slashCommands = List.of(new APODSlashCommand(),
                 new GetPostChannelSlashCommand(),
                 new GetPostTimeSlashCommand(),
                 new HelpSlashCommand(),
@@ -86,20 +84,15 @@ public class NASABot {
                 new SetPostChannelSlashCommand(),
                 new SetPostTimeSlashCommand(),
                 new ToggleLoggingSlashCommand());
-        builder.setOwnerId(ownerId);
-        builder.setActivity(Activity.of(Activity.ActivityType.WATCHING, "the sky..."));
-        CommandClient commandClient = builder.build();
-        slashCommands = commandClient.getSlashCommands();
 
         shardManager = DefaultShardManagerBuilder.createLight(token)
-                .disableIntents(GatewayIntent.GUILD_MESSAGES)
-                .addEventListeners(commandClient)
+                .disableIntents(EnumSet.allOf(GatewayIntent.class))
+                .addEventListeners(new NASABot(), new SlashCommandHandler(), new ButtonHandler())
+                .setStatus(OnlineStatus.ONLINE)
+                .setActivity(Activity.customStatus("Watching the sky..."))
+                .setMemberCachePolicy(MemberCachePolicy.NONE)
+                .setChunkingFilter(ChunkingFilter.NONE)
                 .build();
-        dbClient = new DBClient();
-        NASAClient = new NASAClient();
-        topGGClient = new TopGGClient();
-        issClient = new ISSClient();
-        geoNamesClient = new GeoNamesClient();
 
         postTimes = new HashMap<>(Map.ofEntries(
                 entry(0, 16), // OPTION 0
@@ -109,11 +102,14 @@ public class NASABot {
         ));
 
         // When testing locally don't schedule APODs
-        if (!Boolean.parseBoolean(System.getProperty("testMode"))) {
+        if (!Boolean.parseBoolean(System.getenv("testMode"))) {
+            System.out.println("Scheduling APODs.");
             for (HashMap.Entry<Integer, Integer> entry : postTimes.entrySet()) {
                 scheduleAPODPostTask(entry.getKey());
             }
         }
+
+        scheduleTopGGTask();
     }
 
     public static Date getAPODScheduleStartDate(int hours) {
@@ -129,16 +125,28 @@ public class NASABot {
     }
 
     private static void scheduleAPODPostTask(int timeOption) {
-        TimerTask APODSchedulePostTask = new APODSchedulePostTask(timeOption);
+        TimerTask APODSchedulePostTask = new APODSchedulePostTimerTask(timeOption);
         Timer timer = new Timer();
+        // 1 day
         timer.scheduleAtFixedRate(APODSchedulePostTask, getAPODScheduleStartDate(postTimes.get(timeOption)), 86400000);
     }
 
-    public static boolean isLoggingEnabled() {
-        return loggingEnabled;
+    private static void scheduleTopGGTask() {
+        TimerTask timerTask = new TopGGTimerTask();
+        Timer timer = new Timer(true);
+        // 10 minutes
+        timer.scheduleAtFixedRate(timerTask, 0, 60 * 1000 * 10);
     }
 
-    public static void setLoggingEnabled(boolean value) {
-        loggingEnabled = value;
+    @Override
+    public void onReady(@NotNull ReadyEvent event) {
+        if (!commandsUpdated) {
+            commandsUpdated = true;
+            System.out.println("Loading commands...");
+            List<CommandData> commandData = slashCommands.stream()
+                    .map(NASABotSlashCommand::getCommandData)
+                    .collect(Collectors.toList());
+            event.getJDA().updateCommands().addCommands(commandData).queue();
+        }
     }
 }

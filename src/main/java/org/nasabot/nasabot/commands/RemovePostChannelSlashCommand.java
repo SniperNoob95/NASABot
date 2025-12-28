@@ -1,24 +1,24 @@
 package org.nasabot.nasabot.commands;
 
-import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.Permission;
-import org.nasabot.nasabot.NASABot;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.Objects;
 
-public class RemovePostChannelSlashCommand extends NASASlashCommand {
+public class RemovePostChannelSlashCommand extends NASABotSlashCommand {
 
     public RemovePostChannelSlashCommand() {
-        this.name = "removepostchannel";
-        this.help = "Removes the Post Channel for the server.";
+        super("removepostchannel", "Removes the Post Channel for the server.", Collections.emptyList());
     }
 
     @Override
-    protected void execute(SlashCommandEvent slashCommandEvent) {
+    public void execute(@NotNull SlashCommandInteractionEvent slashCommandEvent) {
         this.insertCommand(slashCommandEvent);
 
         try {
-            if (!Objects.requireNonNull(slashCommandEvent.getMember()).hasPermission(Permission.ADMINISTRATOR) && !Objects.equals(Objects.requireNonNull(slashCommandEvent.getGuild()).getOwner(), slashCommandEvent.getMember())) {
+            if (!Objects.requireNonNull(slashCommandEvent.getMember()).hasPermission(Permission.ADMINISTRATOR) && !Objects.requireNonNull(slashCommandEvent.getMember()).isOwner()) {
                 slashCommandEvent.reply("Only server administrators or the server owner may use this command.").queue();
                 return;
             }
@@ -28,7 +28,7 @@ public class RemovePostChannelSlashCommand extends NASASlashCommand {
         }
 
         try {
-            if (NASABot.dbClient.deletePostChannel(Objects.requireNonNull(slashCommandEvent.getGuild()).getId())) {
+            if (dbClient.deletePostChannel(Objects.requireNonNull(slashCommandEvent.getGuild()).getId())) {
                 slashCommandEvent.reply("Post Channels for this server have been removed.").queue();
             } else {
                 slashCommandEvent.reply("There was a problem removing the server's Post Channel.").queue();

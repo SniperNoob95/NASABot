@@ -1,5 +1,12 @@
-# NASABot v9.0.0
-**Now featuring configurable automated APOD posting times!** A Discord bot that implements the NASA API to provide cool, interesting, and informative artifacts.\
+# NASABot v10.0.0
+A Discord bot that implements the NASA API to provide cool, interesting, and informative artifacts.
+This includes daily APOD postings, ISS location, NASA image database search, moonphases, and more!
+
+## Credit/Attribution
+**All data presented is owned by NASA and/or its affiliates which provide this data. For more information,
+please refer to the open source code in this repository to check the hosts of the various APIs used to retrieve data.**
+
+\
 **Upvote us on [Top.gg](https://top.gg/bot/748775876077813881)!**
 
 #### [Discord Invite Link](https://discord.com/api/oauth2/authorize?client_id=748775876077813881&permissions=2214710336&scope=applications.commands%20bot)

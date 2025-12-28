@@ -1,21 +1,20 @@
 package org.nasabot.nasabot.commands;
 
-import com.jagrosh.jdautilities.command.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.jetbrains.annotations.NotNull;
 import org.nasabot.nasabot.NASABot;
 
+import java.util.Collections;
 import java.util.Objects;
 
-public class ToggleLoggingSlashCommand extends NASASlashCommand {
+public class ToggleLoggingSlashCommand extends NASABotSlashCommand {
 
     public ToggleLoggingSlashCommand() {
-        super();
-        this.name = "togglelogging";
-        this.help = "Allows the bot owner to enable or disable logging.";
-        this.ownerCommand = true;
+        super("togglelogging", "Allows the bot owner to enable or disable logging.", Collections.emptyList(), true);
     }
 
     @Override
-    protected void execute(SlashCommandEvent slashCommandEvent) {
+    public void execute(@NotNull SlashCommandInteractionEvent slashCommandEvent) {
         this.insertCommand(slashCommandEvent);
 
         try {
@@ -28,12 +27,14 @@ public class ToggleLoggingSlashCommand extends NASASlashCommand {
             return;
         }
 
-        if (NASABot.isLoggingEnabled()) {
-            NASABot.setLoggingEnabled(false);
+        if (NASABot.loggingEnabled) {
+            NASABot.loggingEnabled = false;
             slashCommandEvent.reply("Logging has been disabled.").queue();
+            System.out.println(NASABot.loggingEnabled);
         } else {
-            NASABot.setLoggingEnabled(true);
+            NASABot.loggingEnabled = true;
             slashCommandEvent.reply("Logging has been enabled.").queue();
+            System.out.println(NASABot.loggingEnabled);
         }
     }
 }

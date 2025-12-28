@@ -1,20 +1,30 @@
 package org.nasabot.nasabot.commands;
 
-import com.jagrosh.jdautilities.command.SlashCommandEvent;
-import org.nasabot.nasabot.NASABot;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.jetbrains.annotations.NotNull;
+import org.nasabot.nasabot.clients.ISSClient;
 
-public class ISSSlashCommand extends NASASlashCommand {
+import java.util.Collections;
+
+public class ISSSlashCommand extends NASABotSlashCommand {
+    private final ISSClient issClient = ISSClient.getInstance();
 
     public ISSSlashCommand() {
-        super();
-        this.name = "iss";
-        this.help = "Displays the current location of the International Space Station.";
+        super("iss", "Displays the current location of the International Space Station.", Collections.emptyList());
     }
 
     @Override
-    protected void execute(SlashCommandEvent slashCommandEvent) {
+    public void execute(@NotNull SlashCommandInteractionEvent slashCommandEvent) {
         this.insertCommand(slashCommandEvent);
 
-        slashCommandEvent.replyEmbeds(NASABot.issClient.getISSLocation()).queue();
+        slashCommandEvent.deferReply().queue();
+
+        MessageEmbed messageEmbed = issClient.getISSLocation();
+        if (messageEmbed != null) {
+            slashCommandEvent.getHook().sendMessageEmbeds(messageEmbed).queue();
+        } else {
+            slashCommandEvent.getHook().sendMessage("Unable to retrieve ISS location. This is usually due to a failure in the ISS API. Please try again.").queue();
+        }
     }
 }
