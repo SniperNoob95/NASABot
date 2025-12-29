@@ -1,13 +1,14 @@
 package org.nasabot.nasabot.managers;
 
+import kotlin.Pair;
 import org.nasabot.nasabot.objects.NASAImage;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ButtonManager {
-    // <ButtonID, Pair<MessageID, NASAImage>>
-    private final ConcurrentHashMap<String, NASAImage> buttonImageMap = new ConcurrentHashMap<>();
+    // <ButtonID, Pair<UserID, NASAImage>>
+    private final ConcurrentHashMap<String, Pair<String, NASAImage>> buttonImageMap = new ConcurrentHashMap<>();
     // <MessageID, List<ButtonID>>
     private final ConcurrentHashMap<String, List<String>> messageButtonsMap = new ConcurrentHashMap<>();
 
@@ -22,12 +23,12 @@ public class ButtonManager {
         return ButtonSingleton.INSTANCE;
     }
 
-    public NASAImage getImageForButton(String buttonId) {
+    public Pair<String, NASAImage> getUserImageForButton(String buttonId) {
         return buttonImageMap.get(buttonId);
     }
 
-    public void addButtonToMap(String buttonId, NASAImage nasaImage) {
-        buttonImageMap.put(buttonId, nasaImage);
+    public void addButtonToMap(String buttonId, Pair<String, NASAImage> userImage) {
+        buttonImageMap.put(buttonId, userImage);
     }
 
     private void removeButtonFromMap(String buttonId) {

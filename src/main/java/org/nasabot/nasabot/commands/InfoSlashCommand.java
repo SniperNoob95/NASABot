@@ -28,6 +28,8 @@ public class InfoSlashCommand extends NASABotSlashCommand {
         embedBuilder.setDescription("Information about the bot.");
         embedBuilder.addField("Servers Present", NumberFormat.getNumberInstance(Locale.US).format(guilds.size()), false);
         embedBuilder.addField("NASABot Discord Server", "https://discord.gg/b4wS5q4", false);
+        embedBuilder.addField("Help/Questions?", "Join the Discord server for questions, help, request features, " +
+                "report bugs, talk with the owner, or just to chat with other users!", false);
         embedBuilder.addField("Top.gg Link - Give us an upvote!", "https://top.gg/bot/748775876077813881", false);
         embedBuilder.addField("GitHub", "https://github.com/SniperNoob95/NASABot", false);
         embedBuilder.setFooter("Created by Sniper Noob", "https://i.imgur.com/6WHhKrR.png");

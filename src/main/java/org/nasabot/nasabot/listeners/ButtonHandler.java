@@ -1,5 +1,6 @@
 package org.nasabot.nasabot.listeners;
 
+import kotlin.Pair;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -20,17 +21,20 @@ public class ButtonHandler extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+        String userId = event.getUser().getId();
         String buttonId = event.getComponentId();
-        NASAImage buttonImage = buttonManager.getImageForButton(buttonId);
+        Pair<String, NASAImage> buttonImage = buttonManager.getUserImageForButton(buttonId);
         if (buttonImage == null) {
             event.reply("Encountered an error while processing your request. This can happen if the message " +
                     "sent by NASABot has been deleted, or if the button you are clicking is very old. Please try again.").queue();
             return;
         }
-        MessageEmbed embed = formatNASAImage(buttonImage);
-        event.editMessageEmbeds(embed).setReplace(true).queue(s -> {
-            buttonManager.removeButtonsFromMap(event.getMessageId());
-        });
+        if (!buttonImage.getFirst().equals(userId)) {
+            event.reply("You cannot choose the image for someone else's event!").setEphemeral(true).queue();
+            return;
+        }
+        MessageEmbed embed = formatNASAImage(buttonImage.getSecond());
+        event.editMessageEmbeds(embed).setReplace(true).queue(s -> buttonManager.removeButtonsFromMap(event.getMessageId()));
     }
 
     private MessageEmbed formatNASAImage(NASAImage nasaImage) {
@@ -47,7 +51,6 @@ public class ButtonHandler extends ListenerAdapter {
             return embedBuilder.build();
 
         } catch (Exception e) {
-            e.printStackTrace();
             errorLoggingClient.handleError("NASAClient", "formatNASAImage", "Cannot format NASA image.", e);
             return new EmbedBuilder().setTitle("NASA Image").addField("ERROR", "Unable to format the NASA image.", false).setColor(Color.RED).build();
         }

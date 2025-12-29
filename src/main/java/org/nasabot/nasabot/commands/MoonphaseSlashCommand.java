@@ -76,8 +76,8 @@ public class MoonphaseSlashCommand extends NASABotSlashCommand {
                 .setDescription(zonedDateTime.format(formatter))
                 .addField("Current Phase", phaseName + " " + phaseEmoji.getFormatted(), false)
                 .addField("Illumination", String.format("%.1f%%", illumination.getFraction() * 100), false)
-                .addField("Next New Moon", nextNewMoon.format(formatter) + " - " + ChronoUnit.DAYS.between(zonedDateTime, nextNewMoon) + " days", false)
-                .addField("Next Full Moon", nextFullMoon.format(formatter) + " - " + ChronoUnit.DAYS.between(zonedDateTime, nextFullMoon) + " days", false)
+                .addField("Next New Moon", nextNewMoon.format(formatter) + " - " + ChronoUnit.DAYS.between(zonedDateTime, nextNewMoon.plusDays(1)) + " days", false)
+                .addField("Next Full Moon", nextFullMoon.format(formatter) + " - " + ChronoUnit.DAYS.between(zonedDateTime, nextFullMoon.plusDays(1)) + " days", false)
                 .build();
 
         event.replyEmbeds(embed).queue();

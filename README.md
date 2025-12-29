@@ -1,6 +1,7 @@
-# NASABot v10.0.0
-A Discord bot that implements the NASA API to provide cool, interesting, and informative artifacts.
-This includes daily APOD postings, ISS location, NASA image database search, moonphases, and more!
+# NASABot v10.1.0
+A Discord bot that implements NASA and other space-related APIs to provide fun, interesting, and informative artifacts.
+This includes daily APOD postings, ISS location, NASA image database search, moonphases, and more! New features are always 
+being explored and added!
 
 ## Credit/Attribution
 **All data presented is owned by NASA and/or its affiliates which provide this data. For more information,
@@ -50,9 +51,9 @@ Returns the current moon phase and time until next new moon.
 Displays the current location of the International Space Station.
 
 #### /image
-    /image <search term>
+    /image <search term> [page]
     Ex: /image black hole
-Returns an image from the NASA image database that matches the given search term.
+Returns images from the NASA image database that matches the given search term.
 
 #### /info
 Returns information about the bot.

@@ -64,7 +64,7 @@ public class ImageSearchSlashCommand extends NASABotSlashCommand {
                     .queue(s -> {
                         String messageId = s.getId();
                         for (Pair<Button, NASAImage> pair : buttonOptions) {
-                            buttonManager.addButtonToMap(pair.getFirst().getCustomId(), pair.getSecond());
+                            buttonManager.addButtonToMap(pair.getFirst().getCustomId(), new Pair<>(slashCommandEvent.getUser().getId(), pair.getSecond()));
                         }
                         buttonManager.addButtonsToMap(messageId, buttonOptions.stream()
                                 .map(pair -> pair.getFirst().getCustomId())
@@ -97,7 +97,7 @@ public class ImageSearchSlashCommand extends NASABotSlashCommand {
         List<Pair<Button, NASAImage>> buttons = new ArrayList<>();
         int i = 1;
         for (NASAImage image : images) {
-            buttons.add(new Pair<>(Button.primary(UUID.randomUUID().toString(), "Image " + i), image));
+            buttons.add(new Pair<>(Button.success(UUID.randomUUID().toString(), "Image " + i), image));
             i++;
         }
         return buttons;
@@ -111,7 +111,7 @@ public class ImageSearchSlashCommand extends NASABotSlashCommand {
             int i = 1;
             for (Pair<Button, NASAImage> pair : imageOptions) {
                 NASAImage image = pair.getSecond();
-                embedBuilder.addField("Option " + i, image.getDescription().length() > 300
+                embedBuilder.addField("Option " + i + " - " + image.getTitle(), image.getDescription().length() > 300
                         ? image.getDescription().substring(0, 300) + "..."
                         : image.getDescription(), false);
                 i++;

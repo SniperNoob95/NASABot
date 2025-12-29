@@ -24,7 +24,7 @@ public class HelpSlashCommand extends NASABotSlashCommand {
             }
             stringBuilder.append(String.format("\n**`/%s`** - %s", command.getName(), command.getDescription()));
             for (OptionData optionData : command.getOptionData()) {
-                stringBuilder.append(String.format("\n\t`[%s]` - %s **(%s)**", optionData.getName(), optionData.getDescription(), optionData.isRequired() ? "Required" : "Optional"));
+                stringBuilder.append(String.format("\n\t**`[%s]`** - %s ***(%s)***", optionData.getName(), optionData.getDescription(), optionData.isRequired() ? "Required" : "Optional"));
             }
         }
 
