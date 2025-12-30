@@ -4,13 +4,17 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.nasabot.nasabot.objects.NASAImage;
 
 import java.awt.Color;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -19,6 +23,7 @@ public class NASAClient extends NASABotClient {
     private final String baseUrl = "https://api.nasa.gov";
     private final String imageUrl = "https://images-api.nasa.gov";
     private final SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMM dd, yyyy");
+    private final SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private String apiKey;
 
     private NASAClient() {
@@ -53,6 +58,27 @@ public class NASAClient extends NASABotClient {
         return null;
     }
 
+    public EmbedBuilder getLatestPictureOfTheDay() {
+        LocalDate now = LocalDate.now().plusDays(2);
+        while (true) {
+            HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(baseUrl + "/planetary/apod")).newBuilder();
+            builder.addQueryParameter("api_key", apiKey).addQueryParameter("date", inputDateFormat.format(Date.from(now.atStartOfDay(ZoneOffset.UTC).toInstant())));
+            Request request = new Request.Builder().url(builder.build().toString()).build();
+            try (Response response = httpClient.newCall(request).execute()) {
+                ResponseBody responseBody = response.body();
+                String responseString = responseBody.string();
+                if (responseString.contains("No data available") || responseString.contains("Date must be between")) {
+                    now = now.minusDays(1);
+                    continue;
+                }
+                return formatPictureOfTheDay(responseString);
+            } catch (Exception e) {
+                errorLoggingClient.handleError("NASAClient", "getPictureOfTheDay", "Cannot get picture of the day.", e);
+                return null;
+            }
+        }
+    }
+
     private EmbedBuilder formatPictureOfTheDay(String POTDResponse) {
         SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -74,7 +100,6 @@ public class NASAClient extends NASABotClient {
             }
             return embedBuilder;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             errorLoggingClient.handleError("NASAClient", "formatPictureOfTheDay", "Cannot format picture of the day.", e);
             return new EmbedBuilder().setTitle("Picture of the Day").addField("ERROR", "Unable to obtain Picture of the Day.", false).setColor(Color.RED);
         }
@@ -119,8 +144,8 @@ public class NASAClient extends NASABotClient {
                 if (valid) {
                     images.add(formatImageFromJSON(selection));
                 }
-            } catch (Exception ignored) {
-                ignored.printStackTrace();
+            } catch (Exception e) {
+                errorLoggingClient.handleError("NASAClient", "filterSuitableImages", "Uncaught exception when filtering images.", e);
             }
         }
 

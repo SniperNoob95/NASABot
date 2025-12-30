@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class APODSlashCommand extends NASABotSlashCommand {
-    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public APODSlashCommand() {
         super("apod", "Displays the Picture of the Day from yesterday, or the specified date.",
@@ -33,7 +33,7 @@ public class APODSlashCommand extends NASABotSlashCommand {
         slashCommandEvent.deferReply().queue();
 
         if (slashCommandEvent.getOption("date") == null) {
-            EmbedBuilder embedBuilder = nasaClient.getPictureOfTheDay(simpleDateFormat.format(System.currentTimeMillis() - 86400000));
+            EmbedBuilder embedBuilder = nasaClient.getLatestPictureOfTheDay();
             InputStream file;
             Optional<MessageEmbed.Field> imageUrl = embedBuilder.getFields().stream()
                     .filter(field -> field.getName() != null)

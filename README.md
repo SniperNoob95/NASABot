@@ -1,4 +1,4 @@
-# NASABot v10.1.0
+# NASABot v10.2.0
 A Discord bot that implements NASA and other space-related APIs to provide fun, interesting, and informative artifacts.
 This includes daily APOD postings, ISS location, NASA image database search, moonphases, and more! New features are always 
 being explored and added!
