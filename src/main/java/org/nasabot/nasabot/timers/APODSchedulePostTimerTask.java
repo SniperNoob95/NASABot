@@ -106,7 +106,7 @@ public class APODSchedulePostTimerTask extends TimerTask {
                 Objects.requireNonNull(textChannel).sendMessage(
                         "NASABot does not have permission to send Files and/or Embeds in this channel! Please verify that all permissions are correctly set up.").queue();
             } catch (InsufficientPermissionException e2) {
-                errorLoggingClient.handleError("APODSchedulePostTask", "sendAPODToChannel", String.format("Guild %s and channel %s inaccessible, deleting Post Channel", serverId, channelId), e);
+                errorLoggingClient.handleError("APODSchedulePostTask", "sendAPODToChannel", String.format("Guild %s and channel %s inaccessible, deleting Post Channel", serverId, channelId), e2);
                 dbClient.deletePostChannel(serverId);
             }
         } catch (Exception e) {
