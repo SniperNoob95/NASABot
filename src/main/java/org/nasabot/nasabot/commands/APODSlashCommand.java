@@ -22,7 +22,7 @@ public class APODSlashCommand extends NASABotSlashCommand {
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public APODSlashCommand() {
-        super("apod", "Displays the Picture of the Day from yesterday, or the specified date.",
+        super("apod", "Displays the current Astronomy Picture of the Day, or one from the specified date.",
                 Collections.singletonList(new OptionData(OptionType.STRING, "date", "[yyyy-mm-dd] Date of the APOD to retrieve.").setRequired(false)));
     }
 

@@ -20,7 +20,7 @@ public class GetPostTimeSlashCommand extends NASABotSlashCommand {
         try {
             postChannelId = dbClient.getPostChannelId(Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
         } catch (NullPointerException e) {
-            slashCommandEvent.reply("Unable to retrieve post time, please try again. If this issue persists, please contact the owner of the bot.").queue();
+            slashCommandEvent.reply("Unable to retrieve Post time, please try again. If this issue persists, please contact the owner of the bot.").queue();
         }
 
         if (postChannelId == -1) {

@@ -10,11 +10,11 @@ import org.nasabot.nasabot.NASABot;
 import java.util.Collections;
 import java.util.Objects;
 
-public class SetPostTimeSlashCommand extends NASABotSlashCommand {
+public class SetMoonphaseTimeSlashCommand extends NASABotSlashCommand {
 
-    public SetPostTimeSlashCommand() {
-        super("setposttime", "Sets the Post Time for the server.",
-                Collections.singletonList(new OptionData(OptionType.INTEGER, "post_time", "The Post Time option you want to use.").setRequired(true)
+    public SetMoonphaseTimeSlashCommand() {
+        super("setmoonphasetime", "Sets the Moonphase Time for the server.",
+                Collections.singletonList(new OptionData(OptionType.INTEGER, "moonphase_time", "The Moonphase Time option you want to use.").setRequired(true)
                         .addChoice("16:00 UTC (default)", 0)
                         .addChoice("6:00 UTC", 1)
                         .addChoice("11:00 UTC", 2)
@@ -35,29 +35,29 @@ public class SetPostTimeSlashCommand extends NASABotSlashCommand {
 
         int timeOption = -1;
         try {
-            timeOption = Objects.requireNonNull(slashCommandEvent.getOption("post_time")).getAsInt();
+            timeOption = Objects.requireNonNull(slashCommandEvent.getOption("moonphase_time")).getAsInt();
         } catch (NumberFormatException e) {
-            slashCommandEvent.reply("Missing post_time, please retry.").queue();
+            slashCommandEvent.reply("Missing moonphase_time, please retry.").queue();
             return;
         }
 
-        int postChannelId;
+        int moonphaseChannelId;
 
         try {
-            postChannelId = dbClient.getPostChannelId(Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
+            moonphaseChannelId = dbClient.getMoonphaseChannelId(Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
         } catch (NullPointerException e) {
-            slashCommandEvent.reply("There was a problem setting the server's Post Time.").queue();
+            slashCommandEvent.reply("There was a problem setting the server's Moonphase Time.").queue();
             return;
         }
 
-        if (postChannelId == -1) {
-            slashCommandEvent.reply("This server does not have a Post Channel configured. To set a Post Channel, use the setPostChannel command.").queue();
+        if (moonphaseChannelId == -1) {
+            slashCommandEvent.reply("This server does not have a Moonphase Channel configured. To set a Moonphase Channel, use the setMoonphaseChannel command.").queue();
         } else {
-            boolean result = dbClient.updatePostChannelConfiguration(timeOption, postChannelId);
+            boolean result = dbClient.updateMoonphaseChannelConfiguration(timeOption, moonphaseChannelId);
             if (result) {
-                slashCommandEvent.reply(String.format("Post Time set to %s:00 UTC.", NASABot.postTimes.get(timeOption))).queue();
+                slashCommandEvent.reply(String.format("Moonphase Time set to %s:00 UTC.", NASABot.postTimes.get(timeOption))).queue();
             } else {
-                slashCommandEvent.reply("Unable to set Post Time. Please contact the bot owner or join the NASABot Discord channel to report this error.").queue();
+                slashCommandEvent.reply("Unable to set Moonphase Time. Please contact the bot owner or join the NASABot Discord channel to report this error.").queue();
             }
         }
     }

@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import org.nasabot.nasabot.clients.DBClient;
 import org.nasabot.nasabot.clients.ErrorLoggingClient;
 import org.nasabot.nasabot.clients.NASAClient;
+import org.nasabot.nasabot.managers.EntitlementManager;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public abstract class NASABotSlashCommand {
     protected final DBClient dbClient = DBClient.getInstance();
     protected final ErrorLoggingClient errorLoggingClient = ErrorLoggingClient.getInstance();
     protected final NASAClient nasaClient = NASAClient.getInstance();
+    protected final EntitlementManager entitlementManager = EntitlementManager.getInstance();
     private final String name;
     private final String description;
     private final List<OptionData> optionData;

@@ -11,8 +11,11 @@ import okhttp3.Response;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.nasabot.nasabot.NASABot;
+import org.nasabot.nasabot.objects.APODChannel;
+import org.nasabot.nasabot.objects.MoonphaseChannel;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +67,20 @@ public class DBClient {
             payload.put("method", method);
             payload.put("log", log);
             payload.put("exception", exception);
+        } catch (Exception e) {
+            if (NASABot.loggingEnabled) e.printStackTrace();
+        }
+
+        issuePostRequest("/errors", payload);
+    }
+
+    public void insertErrorLog(String className, String method, String log) {
+        JSONObject payload = new JSONObject();
+        try {
+            payload.put("date", System.currentTimeMillis() / 1000);
+            payload.put("class", className);
+            payload.put("method", method);
+            payload.put("log", log);
         } catch (Exception e) {
             if (NASABot.loggingEnabled) e.printStackTrace();
         }
@@ -231,13 +248,20 @@ public class DBClient {
     }
 
     /**
-     * Gets postChannels for the given timeOption.
+     * Gets APODChannels for the given timeOption.
      *
      * @param timeOption time option to query against.
-     * @return postChannels that match the query.
+     * @return APODChannels that match the query.
      */
-    public JSONArray getPostChannelsForPostTimeOption(int timeOption) {
-        return issueGetRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("timeOption", String.valueOf(timeOption)))));
+    public List<APODChannel> getPostChannelsForPostTimeOption(int timeOption) {
+        List<APODChannel> apodChannels = new ArrayList<>();
+        JSONArray postChannels = issueGetRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("timeOption", String.valueOf(timeOption)))));
+        if (postChannels != null) {
+            for (int i = 0; i < postChannels.length(); i++) {
+                apodChannels.add(new APODChannel(postChannels.getJSONObject(i).getString("server_id"), postChannels.getJSONObject(i).getString("channel_id")));
+            }
+        }
+        return apodChannels;
     }
 
     /**
@@ -269,5 +293,119 @@ public class DBClient {
         payload.put("postChannelId", postChannelId);
 
         return issuePutRequest("/postChannelConfigurations", payload);
+    }
+
+    /**
+     * Creates a new moonphaseChannel for the given serverId and channelId.
+     *
+     * @param serverId  ID of the server.
+     * @param channelId ID of the channel.
+     * @return True if successful, else false.
+     */
+    public boolean createMoonphaseChannel(String serverId, String channelId) {
+        JSONObject payload = new JSONObject();
+        payload.put("dateAdded", System.currentTimeMillis() / 1000);
+        payload.put("serverId", serverId);
+        payload.put("channelId", channelId);
+
+        return issuePostRequest("/moonphaseChannels", payload);
+    }
+
+    /**
+     * Deletes the moonphaseChannels for the given serverId
+     *
+     * @param serverId ID of the server.
+     * @return True if successful, else false.
+     */
+    public boolean deleteMoonphaseChannel(String serverId) {
+        try {
+            return issueDeleteRequest("/moonphaseChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))));
+        } catch (Exception e) {
+            if (NASABot.loggingEnabled) e.printStackTrace();
+            System.out.println(String.format("Failed to delete Moonphase Channel for server: %s", serverId));
+            return false;
+        }
+    }
+
+    public JSONArray getAllMoonphaseChannels() {
+        return issueGetRequest("/moonphaseChannels", null);
+    }
+
+    /**
+     * Gets moonphaseChannels for the given serverId.
+     *
+     * @param serverId ID of the server.
+     * @return ID of moonphaseChannel, or 0 if none.
+     */
+    public String getMoonphaseChannelForServer(String serverId) {
+        try {
+            return Objects.requireNonNull(issueGetRequest("/moonphaseChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))))).getJSONObject(0).getString("channel_id");
+        } catch (Exception e) {
+            if (NASABot.loggingEnabled) e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Gets moonphaseChannels for the given serverId.
+     *
+     * @param serverId ID of the server.
+     * @return ID of moonphaseChannel, or 0 if none.
+     */
+    public int getMoonphaseChannelId(String serverId) {
+        try {
+            return Objects.requireNonNull(issueGetRequest("/moonphaseChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))))).getJSONObject(0).getInt("id");
+        } catch (Exception e) {
+            if (NASABot.loggingEnabled) e.printStackTrace();
+            return -1;
+        }
+    }
+
+    /**
+     * Gets moonphaseChannels for the given timeOption.
+     *
+     * @param timeOption time option to query against.
+     * @return moonphaseChannels that match the query.
+     */
+    public List<MoonphaseChannel> getMoonphaseChannelsForMoonphaseTimeOption(int timeOption) {
+        List<MoonphaseChannel> apodChannels = new ArrayList<>();
+        JSONArray postChannels = issueGetRequest("/moonphaseChannels", new HashMap<>(Map.ofEntries(entry("timeOption", String.valueOf(timeOption)))));
+        if (postChannels != null) {
+            for (int i = 0; i < postChannels.length(); i++) {
+                apodChannels.add(new MoonphaseChannel(postChannels.getJSONObject(i).getString("server_id"), postChannels.getJSONObject(i).getString("channel_id")));
+            }
+        }
+        return apodChannels;
+    }
+
+    /**
+     * Creates a new moonphaseChannelConfiguration for the given moonphaseChannelId.
+     *
+     * @param moonphaseChannelId moonphaseChannelId to create the configuration for.
+     * @return True if successful, else false.
+     */
+    public boolean createMoonphaseChannelConfiguration(int moonphaseChannelId) {
+        JSONObject payload = new JSONObject();
+        payload.put("moonphaseChannelId", moonphaseChannelId);
+
+        return issuePostRequest("/moonphaseChannelConfigurations", payload);
+    }
+
+    public int getMoonphaseTimeForServer(int moonphaseChannelId) {
+        try {
+            return Objects.requireNonNull(issueGetRequest("/moonphaseChannelConfigurations", new HashMap<>(Map.ofEntries(entry("moonphaseChannelId", String.valueOf(moonphaseChannelId)))))).getJSONObject(0).getInt("time_option");
+        } catch (Exception e) {
+            if (NASABot.loggingEnabled) e.printStackTrace();
+            System.out.println(String.format("Failed to get Moonphase Configuration for MoonPhase Channel id: %s.", moonphaseChannelId));
+            return -1;
+        }
+    }
+
+    public boolean updateMoonphaseChannelConfiguration(int timeOption, int moonphaseChannelId) {
+        JSONObject payload = new JSONObject();
+        payload.put("timeOption", timeOption);
+        payload.put("moonphaseChannelId", moonphaseChannelId);
+
+        return issuePutRequest("/moonphaseChannelConfigurations", payload);
     }
 }

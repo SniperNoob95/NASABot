@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.nasabot.nasabot.NASABot;
 import org.nasabot.nasabot.clients.ErrorLoggingClient;
 import org.nasabot.nasabot.managers.ButtonManager;
 import org.nasabot.nasabot.objects.NASAImage;

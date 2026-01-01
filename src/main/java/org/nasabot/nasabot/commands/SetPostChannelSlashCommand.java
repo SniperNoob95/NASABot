@@ -58,7 +58,7 @@ public class SetPostChannelSlashCommand extends NASABotSlashCommand {
                     int postChannelId = dbClient.getPostChannelId(Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
                     if (postChannelId != -1) {
                         if (dbClient.createPostChannelConfiguration(postChannelId)) {
-                            slashCommandEvent.reply(String.format("%s has been set as the Post Channel for this server.", mentionedChannel.getAsMention())).queue();
+                            slashCommandEvent.reply(String.format("%s has been set as the Post Channel for this server. You can configure the Post Time by using the following command: \n```/setposttime```", mentionedChannel.getAsMention())).queue();
                         } else {
                             slashCommandEvent.reply("Unable to set Post Channel Configuration. Please contact the bot owner or join the NASABot Discord channel to report this error.").queue();
                         }
@@ -67,8 +67,8 @@ public class SetPostChannelSlashCommand extends NASABotSlashCommand {
                     }
                 }
             } else {
-                slashCommandEvent.reply(String.format("No channels were mentioned, or the bot does not have permission to view the " +
-                        "mentioned channel. Please check your permission settings or command formatting: %s", this.getArgumentsString())).queue();
+                slashCommandEvent.reply("No channels were mentioned, or the bot does not have permission to view the " +
+                        "mentioned channel. Please check your permission settings.").queue();
             }
         } catch (NullPointerException e) {
             slashCommandEvent.reply("There was a problem setting the server's Post Channel.").queue();

@@ -6,28 +6,29 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.json.JSONArray;
 import org.nasabot.nasabot.NASABot;
 import org.nasabot.nasabot.clients.DBClient;
 import org.nasabot.nasabot.clients.ErrorLoggingClient;
 import org.nasabot.nasabot.clients.NASAClient;
+import org.nasabot.nasabot.managers.EntitlementManager;
+import org.nasabot.nasabot.objects.APODChannel;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TimerTask;
 
-public class APODSchedulePostTimerTask extends TimerTask {
+public class APODScheduleTimerTask extends TimerTask {
     private final DBClient dbClient = DBClient.getInstance();
     private final ErrorLoggingClient errorLoggingClient = ErrorLoggingClient.getInstance();
     private final NASAClient nasaClient = NASAClient.getInstance();
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private final EntitlementManager entitlementManager = EntitlementManager.getInstance();
     private final int timeOption;
 
-    public APODSchedulePostTimerTask(int timeOption) {
+    public APODScheduleTimerTask(int timeOption) {
         this.timeOption = timeOption;
     }
 
@@ -51,20 +52,35 @@ public class APODSchedulePostTimerTask extends TimerTask {
             }
         }
 
-        JSONArray postChannels = dbClient.getPostChannelsForPostTimeOption(timeOption);
+        List<APODChannel> apodChannels = dbClient.getPostChannelsForPostTimeOption(timeOption);
 
         if (NASABot.loggingEnabled) {
             try {
                 NASABot.shardManager.getShards().get(0).openPrivateChannelById("181588597558738954").queue(channel ->
-                        channel.sendMessage("Starting APOD for time option " + timeOption + " for " + postChannels.length() + " servers.").queue());
+                        channel.sendMessage("Starting APOD for time option " + timeOption + " for " + apodChannels.size() + " servers.").queue());
             } catch (NullPointerException e) {
                 errorLoggingClient.handleError("APODSchedulePostTask", "run", "Unable to find bot owner for logging.", e.getClass().getName());
             }
         }
 
-        for (int i = 0; i < postChannels.length(); i++) {
-            sendAPODToChannel(postChannels.getJSONObject(i).getString("server_id"), postChannels.getJSONObject(i).getString("channel_id"), embedBuilder, fileUpload);
-        }
+        FileUpload finalFileUpload = fileUpload;
+        apodChannels.forEach(channel -> sendAPODToChannel(channel, embedBuilder, finalFileUpload));
+
+        /*
+        entitlementManager.getActiveGuildEntitlements(e -> {
+            List<String> entitlements = e.stream().map(Entitlement::getGuildId).collect(Collectors.toList());
+            for (APODChannel channel : apodChannels) {
+                if (entitlements.contains(channel.getServerId())) {
+                    sendAPODToChannel(channel, embedBuilder, finalFileUpload);
+                } else {
+                    notifyEntitlementExpiration(channel);
+                    errorLoggingClient.handleError("APODSchedulePostTask", "run", String.format("Entitlement not found for Guild %s, deleting Post Channel.", channel.getServerId()));
+                    dbClient.deletePostChannel(channel.getServerId());
+                }
+            }
+        });
+
+         */
 
         try {
             if (fileUpload != null) {
@@ -75,29 +91,28 @@ public class APODSchedulePostTimerTask extends TimerTask {
         }
     }
 
-    private void sendAPODToChannel(String serverId, String channelId, EmbedBuilder embedBuilder, FileUpload fileUpload) {
+    private void sendAPODToChannel(APODChannel apodChannel, EmbedBuilder embedBuilder, FileUpload fileUpload) {
         Guild guild;
         TextChannel textChannel;
         try {
-            guild = NASABot.shardManager.getGuildById(serverId);
+            guild = NASABot.shardManager.getGuildById(apodChannel.getServerId());
         } catch (NullPointerException e) {
-            errorLoggingClient.handleError("APODSchedulePostTask", "sendAPODToChannel", String.format("Guild %s no longer visible to bot, deleting Post Channel", serverId), e.getClass().getName());
-            dbClient.deletePostChannel(serverId);
+            errorLoggingClient.handleError("APODSchedulePostTask", "sendAPODToChannel", String.format("Guild %s no longer visible to bot, deleting Post Channel", apodChannel.getServerId()), e.getClass().getName());
+            dbClient.deletePostChannel(apodChannel.getServerId());
             return;
         }
 
         try {
-            textChannel = Objects.requireNonNull(guild).getTextChannelById(channelId);
+            textChannel = Objects.requireNonNull(guild).getTextChannelById(apodChannel.getChannelId());
         } catch (NullPointerException e) {
-            errorLoggingClient.handleError("APODSchedulePostTask", "sendAPODToChannel", String.format("Text channel %s in guild %s no longer visible to bot, deleting Post Channel.", channelId, serverId), e.getClass().getName());
-            dbClient.deletePostChannel(serverId);
+            errorLoggingClient.handleError("APODSchedulePostTask", "sendAPODToChannel", String.format("Text Channel %s in Guild %s no longer visible to bot, deleting Post Channel.", apodChannel.getChannelId(), apodChannel.getServerId()), e.getClass().getName());
+            dbClient.deletePostChannel(apodChannel.getServerId());
             return;
         }
 
         try {
             if (fileUpload != null) {
                 Objects.requireNonNull(textChannel).sendFiles(fileUpload).setEmbeds(embedBuilder.build()).queue();
-
             } else {
                 Objects.requireNonNull(textChannel).sendMessageEmbeds(embedBuilder.build()).queue();
             }
@@ -106,11 +121,14 @@ public class APODSchedulePostTimerTask extends TimerTask {
                 Objects.requireNonNull(textChannel).sendMessage(
                         "NASABot does not have permission to send Files and/or Embeds in this channel! Please verify that all permissions are correctly set up.").queue();
             } catch (InsufficientPermissionException e2) {
-                errorLoggingClient.handleError("APODSchedulePostTask", "sendAPODToChannel", String.format("Guild %s and channel %s inaccessible, deleting Post Channel", serverId, channelId), e2);
-                dbClient.deletePostChannel(serverId);
+                errorLoggingClient.handleError("APODSchedulePostTask", "sendAPODToChannel", String.format("Guild %s and Channel %s inaccessible, deleting Post Channel", apodChannel.getServerId(), apodChannel.getChannelId()), e2);
+                dbClient.deletePostChannel(apodChannel.getServerId());
             }
+        } catch (NullPointerException e) {
+            errorLoggingClient.handleError("APODSchedulePostTask", "sendAPODToChannel", String.format("Unable to find Channel %s in Guild %s. Deleting Post Channel.", apodChannel.getChannelId(), apodChannel.getServerId()), e);
+            dbClient.deletePostChannel(apodChannel.getServerId());
         } catch (Exception e) {
-            errorLoggingClient.handleError("APODSchedulePostTask", "sendAPODToChannel", String.format("Unable to send APOD to text channel %s in guild %s.", channelId, serverId), e);
+            errorLoggingClient.handleError("APODSchedulePostTask", "sendAPODToChannel", String.format("Unexpected error serving Channel %s in Guild %s.", apodChannel.getChannelId(), apodChannel.getServerId()), e);
         }
     }
 }

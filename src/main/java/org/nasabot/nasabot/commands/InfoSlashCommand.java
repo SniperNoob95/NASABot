@@ -35,5 +35,14 @@ public class InfoSlashCommand extends NASABotSlashCommand {
         embedBuilder.setFooter("Created by Sniper Noob", "https://i.imgur.com/6WHhKrR.png");
 
         slashCommandEvent.replyEmbeds(embedBuilder.build()).setEphemeral(false).queue();
+
+        slashCommandEvent.getEntitlements().forEach(entitlement -> {
+            System.out.println(entitlement.getGuildId());
+            System.out.println(entitlement.getUserId());
+            System.out.println(entitlement.getApplicationId());
+            System.out.println(entitlement.getSkuId());
+            System.out.println(entitlement.getType());
+            System.out.println("**********");
+        });
     }
 }

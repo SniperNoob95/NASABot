@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.restaction.TestEntitlementCreateAction;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
@@ -26,7 +27,8 @@ import org.nasabot.nasabot.commands.SetPostTimeSlashCommand;
 import org.nasabot.nasabot.commands.ToggleLoggingSlashCommand;
 import org.nasabot.nasabot.listeners.ButtonHandler;
 import org.nasabot.nasabot.listeners.SlashCommandHandler;
-import org.nasabot.nasabot.timers.APODSchedulePostTimerTask;
+import org.nasabot.nasabot.timers.APODScheduleTimerTask;
+import org.nasabot.nasabot.timers.MoonphaseScheduleTimerTask;
 import org.nasabot.nasabot.timers.TopGGTimerTask;
 
 import java.time.LocalDate;
@@ -55,7 +57,7 @@ public class NASABot extends ListenerAdapter {
     public static List<NASABotSlashCommand> slashCommands;
     public static String ownerId;
     private static boolean commandsUpdated;
-    public static final String VERSION = "10.2.0";
+    public static final String VERSION = "10.3.0";
 
     public static void main(String[] args) {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
@@ -73,6 +75,8 @@ public class NASABot extends ListenerAdapter {
 
         // Slash commands
         slashCommands = List.of(new APODSlashCommand(),
+                //new GetMoonphaseChannelSlashCommand(),
+                //new GetMoonphaseTimeSlashCommand(),
                 new GetPostChannelSlashCommand(),
                 new GetPostTimeSlashCommand(),
                 new HelpSlashCommand(),
@@ -81,6 +85,8 @@ public class NASABot extends ListenerAdapter {
                 new ISSSlashCommand(),
                 new MoonphaseSlashCommand(),
                 new RemovePostChannelSlashCommand(),
+                //new SetMoonphaseChannelSlashCommand(),
+                //new SetMoonphaseTimeSlashCommand(),
                 new SetPostChannelSlashCommand(),
                 new SetPostTimeSlashCommand(),
                 new ToggleLoggingSlashCommand());
@@ -109,10 +115,18 @@ public class NASABot extends ListenerAdapter {
             }
         }
 
+        // When testing locally don't schedule Moonphases
+        if (!Boolean.parseBoolean(System.getenv("testMode"))) {
+            System.out.println("Scheduling Moonphases.");
+            for (HashMap.Entry<Integer, Integer> entry : postTimes.entrySet()) {
+                scheduleMoonphase(entry.getKey());
+            }
+        }
+
         scheduleTopGGTask();
     }
 
-    public static Date getAPODScheduleStartDate(int hours) {
+    public static Date getScheduledPostsStartDate(int hours) {
         LocalTime midnight = LocalTime.MIDNIGHT;
         LocalDate today = LocalDate.now(ZoneId.of("UTC"));
         LocalDateTime todayMidnight = LocalDateTime.of(today, midnight);
@@ -125,10 +139,17 @@ public class NASABot extends ListenerAdapter {
     }
 
     private static void scheduleAPODPostTask(int timeOption) {
-        TimerTask APODSchedulePostTask = new APODSchedulePostTimerTask(timeOption);
+        TimerTask APODSchedulePostTask = new APODScheduleTimerTask(timeOption);
         Timer timer = new Timer();
         // 1 day
-        timer.scheduleAtFixedRate(APODSchedulePostTask, getAPODScheduleStartDate(postTimes.get(timeOption)), 86400000);
+        timer.scheduleAtFixedRate(APODSchedulePostTask, getScheduledPostsStartDate(postTimes.get(timeOption)), 86400000);
+    }
+
+    private static void scheduleMoonphase(int timeOption) {
+        TimerTask moonphaseScheduleTimerTask = new MoonphaseScheduleTimerTask(timeOption);
+        Timer timer = new Timer();
+        // 1 day
+        timer.scheduleAtFixedRate(moonphaseScheduleTimerTask, getScheduledPostsStartDate(postTimes.get(timeOption)), 86400000);
     }
 
     private static void scheduleTopGGTask() {
@@ -140,6 +161,8 @@ public class NASABot extends ListenerAdapter {
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
+        //shardManager.getShards().get(0).createTestEntitlement("999184799365857355", "181588597558738954", TestEntitlementCreateAction.OwnerType.USER_SUBSCRIPTION).queue();
+        //shardManager.getShards().get(0).createTestEntitlement("999184799365857356", "749488213328003194", TestEntitlementCreateAction.OwnerType.GUILD_SUBSCRIPTION).queue();
         if (!commandsUpdated) {
             commandsUpdated = true;
             System.out.println("Loading commands...");

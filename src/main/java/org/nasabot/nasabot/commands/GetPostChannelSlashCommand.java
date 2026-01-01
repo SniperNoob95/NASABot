@@ -33,17 +33,17 @@ public class GetPostChannelSlashCommand extends NASABotSlashCommand {
 
         if (postChannelId != null) {
             try {
-                TextChannel textChannel = Objects.requireNonNull(slashCommandEvent.getGuild()).getTextChannelById(dbClient.getPostChannelForServer(slashCommandEvent.getGuild().getId()));
+                TextChannel textChannel = Objects.requireNonNull(slashCommandEvent.getGuild()).getTextChannelById(postChannelId);
                 slashCommandEvent.reply(String.format("This server is using %s as the Post Channel. You can remove it before setting a new one with the following command:" +
-                        "\n```/removePostChannel```", Objects.requireNonNull(textChannel).getAsMention())).queue();
+                        "\n```/removepostchannel```You can configure the Post Time by using the following command: \n```/setposttime```", Objects.requireNonNull(textChannel).getAsMention())).queue();
             } catch (Exception e) {
-                slashCommandEvent.reply("There is already a Post Channel set for this server, but the bot does not have permission to view it. " +
-                        "Please fix your permission settings or clear the current Post Channel with the following command:\n```/removePostChannel```").queue();
+                slashCommandEvent.reply("There is already a Post Channel set for this server, but it either no longer exists or the bot does not have permission to view it. " +
+                        "Please fix your permission settings or clear the current Post Channel with the following command:\n```/removepostchannel```").queue();
             }
 
         } else {
             slashCommandEvent.reply("No Post Channel has been set for this server. You can set the Post Channel with the following command:" +
-                    "\n```/setPostChannel <#channel>```").queue();
+                    "\n```/setpostchannel <#channel>```").queue();
         }
     }
 }

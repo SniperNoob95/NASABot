@@ -33,4 +33,8 @@ public class ErrorLoggingClient {
     public void handleError(String className, String method, String log, String exceptionClass) {
         dbClient.insertErrorLog(className, method, log, exceptionClass);
     }
+
+    public void handleError(String className, String method, String log) {
+        dbClient.insertErrorLog(className, method, log);
+    }
 }
