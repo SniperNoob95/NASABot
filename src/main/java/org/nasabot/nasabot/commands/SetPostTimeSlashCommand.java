@@ -33,19 +33,14 @@ public class SetPostTimeSlashCommand extends NASABotSlashCommand {
             return;
         }
 
-        int timeOption = -1;
-        try {
-            timeOption = Objects.requireNonNull(slashCommandEvent.getOption("post_time")).getAsInt();
-        } catch (NumberFormatException e) {
-            slashCommandEvent.reply("Missing post_time, please retry.").queue();
-            return;
-        }
+        int timeOption = Objects.requireNonNull(slashCommandEvent.getOption("post_time")).getAsInt();
 
         int postChannelId;
 
         try {
             postChannelId = dbClient.getPostChannelId(Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
         } catch (NullPointerException e) {
+            errorLoggingClient.handleError("SetPostTimeSlashCommand", "execute", "Unable to find Guild.", e.getClass().getName());
             slashCommandEvent.reply("There was a problem setting the server's Post Time.").queue();
             return;
         }

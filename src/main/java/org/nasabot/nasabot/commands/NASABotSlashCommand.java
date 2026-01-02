@@ -23,12 +23,25 @@ public abstract class NASABotSlashCommand {
     private final String description;
     private final List<OptionData> optionData;
     private final boolean isOwnerCommand;
+    private final boolean isPremium;
+    private final boolean isGuildPremiumOnly;
 
     public NASABotSlashCommand(String name, String description, List<OptionData> optionData) {
         this.name = name;
         this.description = description;
         this.optionData = optionData;
         this.isOwnerCommand = false;
+        this.isPremium = false;
+        this.isGuildPremiumOnly = false;
+    }
+
+    public NASABotSlashCommand(String name, String description, List<OptionData> optionData, boolean isPremium, boolean isGuildPremiumOnly) {
+        this.name = name;
+        this.description = description;
+        this.optionData = optionData;
+        this.isOwnerCommand = false;
+        this.isPremium = isPremium;
+        this.isGuildPremiumOnly = isGuildPremiumOnly;
     }
 
     public NASABotSlashCommand(String name, String description, List<OptionData> optionData, boolean isOwnerCommand) {
@@ -36,9 +49,22 @@ public abstract class NASABotSlashCommand {
         this.description = description;
         this.optionData = optionData;
         this.isOwnerCommand = isOwnerCommand;
+        this.isPremium = false;
+        this.isGuildPremiumOnly = false;
     }
 
     public abstract void execute(@NotNull SlashCommandInteractionEvent slashCommandEvent);
+
+    public boolean isAuthorized(@NotNull SlashCommandInteractionEvent slashCommandEvent, boolean guildOnly) {
+        return true;
+        /*
+        if (guildOnly) {
+            return entitlementManager.isGuildEntitled(slashCommandEvent);
+        } else {
+            return entitlementManager.isGuildEntitled(slashCommandEvent) || entitlementManager.isUserEntitled(slashCommandEvent);
+        }
+         */
+    }
 
     public String getArgumentsString() {
         /*
@@ -81,6 +107,14 @@ public abstract class NASABotSlashCommand {
 
     public boolean isOwnerCommand() {
         return isOwnerCommand;
+    }
+
+    public boolean isPremium() {
+        return isPremium;
+    }
+
+    public boolean isGuildPremiumOnly() {
+        return isGuildPremiumOnly;
     }
 
     @Override

@@ -29,9 +29,10 @@ public class ImageSearchSlashCommand extends NASABotSlashCommand {
     private final ButtonManager buttonManager = ButtonManager.getInstance();
 
     public ImageSearchSlashCommand() {
-        super("image", "Displays a random NASA image from the given search.", List.of(
+        super("image", "⭐ Search for images from the NASA Image Archive.", List.of(
                 new OptionData(OptionType.STRING, "search", "Image keywords to search for.").setRequired(true),
-                new OptionData(OptionType.INTEGER, "page", "Results page to search within (default 1).").setRequiredRange(1, 100).setRequired(false)));
+                new OptionData(OptionType.INTEGER, "page", "Results page to search within (default 1).").setRequiredRange(1, 100).setRequired(false)),
+                true, false);
     }
 
     @Override

@@ -6,13 +6,14 @@ import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.requests.restaction.TestEntitlementCreateAction;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.jetbrains.annotations.NotNull;
 import org.nasabot.nasabot.commands.APODSlashCommand;
+import org.nasabot.nasabot.commands.GetMoonphaseChannelSlashCommand;
+import org.nasabot.nasabot.commands.GetMoonphaseTimeSlashCommand;
 import org.nasabot.nasabot.commands.GetPostChannelSlashCommand;
 import org.nasabot.nasabot.commands.GetPostTimeSlashCommand;
 import org.nasabot.nasabot.commands.HelpSlashCommand;
@@ -22,6 +23,8 @@ import org.nasabot.nasabot.commands.InfoSlashCommand;
 import org.nasabot.nasabot.commands.MoonphaseSlashCommand;
 import org.nasabot.nasabot.commands.NASABotSlashCommand;
 import org.nasabot.nasabot.commands.RemovePostChannelSlashCommand;
+import org.nasabot.nasabot.commands.SetMoonphaseChannelSlashCommand;
+import org.nasabot.nasabot.commands.SetMoonphaseTimeSlashCommand;
 import org.nasabot.nasabot.commands.SetPostChannelSlashCommand;
 import org.nasabot.nasabot.commands.SetPostTimeSlashCommand;
 import org.nasabot.nasabot.commands.ToggleLoggingSlashCommand;
@@ -55,6 +58,7 @@ public class NASABot extends ListenerAdapter {
     public static String NASABotServerID;
     public static boolean loggingEnabled;
     public static List<NASABotSlashCommand> slashCommands;
+    public static List<NASABotSlashCommand> localCommands;
     public static String ownerId;
     private static boolean commandsUpdated;
     public static final String VERSION = "10.3.0";
@@ -90,6 +94,12 @@ public class NASABot extends ListenerAdapter {
                 new SetPostChannelSlashCommand(),
                 new SetPostTimeSlashCommand(),
                 new ToggleLoggingSlashCommand());
+
+        localCommands = List.of(
+                new GetMoonphaseChannelSlashCommand(),
+                new GetMoonphaseTimeSlashCommand(),
+                new SetMoonphaseChannelSlashCommand(),
+                new SetMoonphaseTimeSlashCommand());
 
         shardManager = DefaultShardManagerBuilder.createLight(token)
                 .disableIntents(EnumSet.allOf(GatewayIntent.class))
@@ -170,6 +180,11 @@ public class NASABot extends ListenerAdapter {
                     .map(NASABotSlashCommand::getCommandData)
                     .collect(Collectors.toList());
             event.getJDA().updateCommands().addCommands(commandData).queue();
+        } else {
+            List<CommandData> localCommandData = localCommands.stream()
+                    .map(NASABotSlashCommand::getCommandData)
+                    .collect(Collectors.toList());
+            shardManager.getGuildById("749488213328003194").updateCommands().addCommands(localCommandData).queue();
         }
     }
 }

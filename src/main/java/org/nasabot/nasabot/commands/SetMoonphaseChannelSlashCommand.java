@@ -14,8 +14,8 @@ import java.util.Objects;
 public class SetMoonphaseChannelSlashCommand extends NASABotSlashCommand {
 
     public SetMoonphaseChannelSlashCommand() {
-        super("setmoonphasechannel", "Sets the Moonphase Channel for the server.",
-                Collections.singletonList(new OptionData(OptionType.CHANNEL, "channel_mention", "The channel to set as the Moonphase Channel.").setRequired(true)));
+        super("setmoonphasechannel", "⭐ Sets the Daily Moonphase Channel for the server.",
+                Collections.singletonList(new OptionData(OptionType.CHANNEL, "channel_mention", "The channel to set as the Moonphase Channel.").setRequired(true)), true, true);
     }
 
     @Override
