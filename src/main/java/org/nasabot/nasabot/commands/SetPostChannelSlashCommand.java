@@ -14,7 +14,7 @@ import java.util.Objects;
 public class SetPostChannelSlashCommand extends NASABotSlashCommand {
 
     public SetPostChannelSlashCommand() {
-        super("setpostchannel", "Sets the Post Channel for the server.",
+        super("setpostchannel", "Sets the Daily APOD Channel for the server.",
                 Collections.singletonList(new OptionData(OptionType.CHANNEL, "channel_mention", "The channel to set as the Post Channel.").setRequired(true)));
     }
 
@@ -52,26 +52,22 @@ public class SetPostChannelSlashCommand extends NASABotSlashCommand {
         }
 
         try {
-            if (slashCommandEvent.getOption("channel_mention") != null) {
-                GuildChannel mentionedChannel = Objects.requireNonNull(slashCommandEvent.getOption("channel_mention")).getAsChannel();
-                if (dbClient.createPostChannel(Objects.requireNonNull(slashCommandEvent.getGuild()).getId(), mentionedChannel.getId())) {
-                    int postChannelId = dbClient.getPostChannelId(Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
-                    if (postChannelId != -1) {
-                        if (dbClient.createPostChannelConfiguration(postChannelId)) {
-                            slashCommandEvent.reply(String.format("%s has been set as the Post Channel for this server. You can configure the Post Time by using the following command: \n```/setposttime```", mentionedChannel.getAsMention())).queue();
-                        } else {
-                            slashCommandEvent.reply("Unable to set Post Channel Configuration. Please contact the bot owner or join the NASABot Discord channel to report this error.").queue();
-                        }
+            GuildChannel mentionedChannel = Objects.requireNonNull(slashCommandEvent.getOption("channel_mention")).getAsChannel();
+            if (dbClient.createPostChannel(Objects.requireNonNull(slashCommandEvent.getGuild()).getId(), mentionedChannel.getId())) {
+                int postChannelId = dbClient.getPostChannelId(Objects.requireNonNull(slashCommandEvent.getGuild()).getId());
+                if (postChannelId != -1) {
+                    if (dbClient.createPostChannelConfiguration(postChannelId)) {
+                        slashCommandEvent.reply(String.format("%s has been set as the Post Channel for this server. You can configure the Post Time by using the following command: \n```/setposttime```", mentionedChannel.getAsMention())).queue();
                     } else {
-                        slashCommandEvent.reply("Unable to get Post Channel ID. Please contact the bot owner or join the NASABot Discord channel to report this error.").queue();
+                        slashCommandEvent.reply("Unable to set Post Channel Configuration. Please contact the bot owner or join the NASABot Discord channel to report this error.").queue();
                     }
+                } else {
+                    slashCommandEvent.reply("Unable to get Post Channel ID. Please contact the bot owner or join the NASABot Discord channel to report this error.").queue();
                 }
-            } else {
-                slashCommandEvent.reply("No channels were mentioned, or the bot does not have permission to view the " +
-                        "mentioned channel. Please check your permission settings.").queue();
             }
-        } catch (NullPointerException e) {
-            slashCommandEvent.reply("There was a problem setting the server's Post Channel.").queue();
+        } catch (IllegalStateException e) {
+            slashCommandEvent.reply("No channels were mentioned, or the bot does not have permission to view the " +
+                    "mentioned channel. Please check your permission settings.").queue();
         }
     }
 }

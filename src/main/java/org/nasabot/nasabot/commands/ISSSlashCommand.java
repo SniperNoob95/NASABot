@@ -11,7 +11,7 @@ public class ISSSlashCommand extends NASABotSlashCommand {
     private final ISSClient issClient = ISSClient.getInstance();
 
     public ISSSlashCommand() {
-        super("iss", "Displays the current location of the International Space Station.", Collections.emptyList());
+        super("iss", "⭐ Displays the current location of the International Space Station.", Collections.emptyList(), true, false);
     }
 
     @Override

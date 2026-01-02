@@ -13,12 +13,13 @@ import java.util.Objects;
 public class SetMoonphaseTimeSlashCommand extends NASABotSlashCommand {
 
     public SetMoonphaseTimeSlashCommand() {
-        super("setmoonphasetime", "Sets the Moonphase Time for the server.",
+        super("setmoonphasetime", "⭐ Sets the Moonphase Time for the server.",
                 Collections.singletonList(new OptionData(OptionType.INTEGER, "moonphase_time", "The Moonphase Time option you want to use.").setRequired(true)
                         .addChoice("16:00 UTC (default)", 0)
                         .addChoice("6:00 UTC", 1)
                         .addChoice("11:00 UTC", 2)
-                        .addChoice("21:00 UTC", 3)));
+                        .addChoice("21:00 UTC", 3)),
+                true, true);
     }
 
     @Override
