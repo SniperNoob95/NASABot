@@ -44,6 +44,7 @@ public class MoonphaseScheduleTimerTask extends TimerTask {
             }
         }
 
+        /*
         entitlementManager.getActiveGuildEntitlements(e -> {
             Set<String> entitlements = e.stream().map(Entitlement::getGuildId).collect(Collectors.toSet());
             moonphaseChannels.forEach(moonphaseChannel -> {
@@ -52,10 +53,12 @@ public class MoonphaseScheduleTimerTask extends TimerTask {
                 } else {
                     notifyEntitlementExpiration(moonphaseChannel);
                     errorLoggingClient.handleError("APODScheduleTimerTask", "run", String.format("Entitlement not found for Guild %s, deleting Moonphase Channel.", moonphaseChannel.getServerId()));
-                    dbClient.deletePostChannel(moonphaseChannel.getServerId());
+                    dbClient.deleteMoonphaseChannel(moonphaseChannel.getServerId());
                 }
             });
         });
+
+         */
     }
 
     private void notifyEntitlementExpiration(MoonphaseChannel moonphaseChannel) {
