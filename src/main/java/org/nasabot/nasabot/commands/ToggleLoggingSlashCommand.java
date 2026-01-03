@@ -30,11 +30,9 @@ public class ToggleLoggingSlashCommand extends NASABotSlashCommand {
         if (NASABot.loggingEnabled) {
             NASABot.loggingEnabled = false;
             slashCommandEvent.reply("Logging has been disabled.").queue();
-            System.out.println(NASABot.loggingEnabled);
         } else {
             NASABot.loggingEnabled = true;
             slashCommandEvent.reply("Logging has been enabled.").queue();
-            System.out.println(NASABot.loggingEnabled);
         }
     }
 }
