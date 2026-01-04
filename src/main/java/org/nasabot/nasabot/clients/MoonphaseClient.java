@@ -26,39 +26,56 @@ public class MoonphaseClient {
 
     public MessageEmbed getMoonPhase() {
         LocalDateTime localDateTime = LocalDateTime.now();
-        MoonIllumination illumination = MoonIllumination.compute().on(localDateTime).execute();
+        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneOffset.UTC);
+        MoonIllumination illumination = MoonIllumination.compute().on(zonedDateTime).execute();
         double phaseNumber = illumination.getPhase();
+        double fraction = illumination.getFraction() * 100;
 
-        Emoji phaseEmoji = Emoji.fromUnicode("U+2753");
-        String phaseName = "UNKNOWN";
+        Emoji phaseEmoji;
+        String phaseName;
 
-        if (phaseNumber == -180.0d || phaseNumber == 180.0d) {
-            phaseEmoji = Emoji.fromUnicode("U+1F311");
-            phaseName = "New Moon";
-        } else if (phaseNumber < -90.0d) {
-            phaseEmoji = Emoji.fromUnicode("U+1F312");
-            phaseName = "Waxing Crescent";
-        } else if (phaseNumber == -90.0d) {
-            phaseEmoji = Emoji.fromUnicode("U+1F313");
-            phaseName = "First Quarter";
-        } else if (phaseNumber < -0.8d) {
-            phaseEmoji = Emoji.fromUnicode("U+1F314");
-            phaseName = "Waxing Gibbous";
-        } else if (phaseNumber >= -0.8d && phaseNumber <= 0.8d) {
+        /*
+            Phase Number:
+                -180 (new) -> 0 (full) ->  180 (new)
+                Giving 8 margin on each end and the middle to account for instantaneous calculation.
+            Illumination:
+                0 (new) -> 100 (full)
+                Giving 0.8 margin on each end to account for instantaneous calculation.
+                Giving 0.8 margin in the middle (first/last quarters) to account for instantaneous calculation.
+         */
+
+        if (phaseNumber >= 8.0d) {
+            if (fraction > 52.8d) {
+                phaseEmoji = Emoji.fromUnicode("U+1F316");
+                phaseName = "Waning Gibbous";
+            } else if (fraction <= 50.8d && fraction >= 49.2d) {
+                phaseEmoji = Emoji.fromUnicode("U+1F317");
+                phaseName = "Last Quarter";
+            } else if (fraction < 49.2d && fraction > 0.8d) {
+                phaseEmoji = Emoji.fromUnicode("U+1F318");
+                phaseName = "Waning Crescent";
+            } else {
+                phaseEmoji = Emoji.fromUnicode("U+1F311");
+                phaseName = "New Moon";
+            }
+        } else if (phaseNumber <= -8.0d) {
+            if (fraction > 52.8d) {
+                phaseEmoji = Emoji.fromUnicode("U+1F314");
+                phaseName = "Waxing Gibbous";
+            } else if (fraction <= 50.8d && fraction >= 49.2d) {
+                phaseEmoji = Emoji.fromUnicode("U+1F313");
+                phaseName = "First Quarter";
+            } else if (fraction < 49.2d && fraction > 0.8d) {
+                phaseEmoji = Emoji.fromUnicode("U+1F312");
+                phaseName = "Waxing Crescent";
+            } else {
+                phaseEmoji = Emoji.fromUnicode("U+1F311");
+                phaseName = "New Moon";
+            }
+        } else {
             phaseEmoji = Emoji.fromUnicode("U+1F315");
             phaseName = "Full Moon";
-        } else if (phaseNumber > 90.0d) {
-            phaseEmoji = Emoji.fromUnicode("U+1F316");
-            phaseName = "Waning Gibbous";
-        } else if (phaseNumber == 90.0d) {
-            phaseEmoji = Emoji.fromUnicode("U+1F317");
-            phaseName = "Last Quarter";
-        } else if (phaseNumber > 0.8d) {
-            phaseEmoji = Emoji.fromUnicode("U+1F318");
-            phaseName = "Waning Crescent";
         }
-
-        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneOffset.UTC);
 
         MoonPhase.Parameters parametersNew = MoonPhase.compute().on(zonedDateTime)
                 .phase(MoonPhase.Phase.NEW_MOON);
@@ -73,7 +90,7 @@ public class MoonphaseClient {
                 .setTitle("Current Moon Phase")
                 .setDescription(zonedDateTime.format(formatter))
                 .addField("Current Phase", phaseName + " " + phaseEmoji.getFormatted(), false)
-                .addField("Illumination", String.format("%.1f%%", illumination.getFraction() * 100), false)
+                .addField("Illumination", String.format("%.1f%%", fraction), false)
                 .addField("Next New Moon", nextNewMoon.format(formatter) + " - " + ChronoUnit.DAYS.between(zonedDateTime, nextNewMoon.plusDays(1)) + " days", false)
                 .addField("Next Full Moon", nextFullMoon.format(formatter) + " - " + ChronoUnit.DAYS.between(zonedDateTime, nextFullMoon.plusDays(1)) + " days", false)
                 .build();
