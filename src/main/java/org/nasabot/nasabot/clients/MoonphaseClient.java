@@ -36,26 +36,26 @@ public class MoonphaseClient {
             phaseEmoji = Emoji.fromUnicode("U+1F311");
             phaseName = "New Moon";
         } else if (phaseNumber < -90.0d) {
-            phaseEmoji = Emoji.fromUnicode("U+1F314");
-            phaseName = "Waxing Gibbous";
+            phaseEmoji = Emoji.fromUnicode("U+1F312");
+            phaseName = "Waxing Crescent";
         } else if (phaseNumber == -90.0d) {
             phaseEmoji = Emoji.fromUnicode("U+1F313");
             phaseName = "First Quarter";
-        } else if (phaseNumber < 0.0d) {
+        } else if (phaseNumber < -0.8d) {
             phaseEmoji = Emoji.fromUnicode("U+1F314");
             phaseName = "Waxing Gibbous";
-        } else if (phaseNumber == 0.0d) {
+        } else if (phaseNumber >= -0.8d && phaseNumber <= 0.8d) {
             phaseEmoji = Emoji.fromUnicode("U+1F315");
             phaseName = "Full Moon";
         } else if (phaseNumber > 90.0d) {
-            phaseEmoji = Emoji.fromUnicode("U+1F318");
-            phaseName = "Waning Crescent";
+            phaseEmoji = Emoji.fromUnicode("U+1F316");
+            phaseName = "Waning Gibbous";
         } else if (phaseNumber == 90.0d) {
             phaseEmoji = Emoji.fromUnicode("U+1F317");
             phaseName = "Last Quarter";
-        } else if (phaseNumber > 0.0d) {
-            phaseEmoji = Emoji.fromUnicode("U+1F316");
-            phaseName = "Waning Gibbous";
+        } else if (phaseNumber > 0.8d) {
+            phaseEmoji = Emoji.fromUnicode("U+1F318");
+            phaseName = "Waning Crescent";
         }
 
         ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneOffset.UTC);
