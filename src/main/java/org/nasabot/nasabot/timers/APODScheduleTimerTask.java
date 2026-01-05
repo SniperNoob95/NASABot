@@ -1,5 +1,6 @@
 package org.nasabot.nasabot.timers;
 
+import com.google.common.util.concurrent.RateLimiter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -25,6 +26,7 @@ public class APODScheduleTimerTask extends TimerTask {
     private final ErrorLoggingClient errorLoggingClient = ErrorLoggingClient.getInstance();
     private final NASAClient nasaClient = NASAClient.getInstance();
     private final int timeOption;
+    private final RateLimiter rateLimiter = RateLimiter.create(30.0);
 
     public APODScheduleTimerTask(int timeOption) {
         this.timeOption = timeOption;
@@ -62,7 +64,11 @@ public class APODScheduleTimerTask extends TimerTask {
         }
 
         FileUpload finalFileUpload = fileUpload;
-        apodChannels.forEach(channel -> sendAPODToChannel(channel, embedBuilder, finalFileUpload));
+        apodChannels.forEach(apodChannel -> {
+            rateLimiter.acquire();
+            System.out.println("Processing channel " + apodChannel);
+            sendAPODToChannel(apodChannel, embedBuilder, finalFileUpload);
+        });
 
         try {
             if (fileUpload != null) {

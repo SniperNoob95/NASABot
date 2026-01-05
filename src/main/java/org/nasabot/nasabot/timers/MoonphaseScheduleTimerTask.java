@@ -1,5 +1,6 @@
 package org.nasabot.nasabot.timers;
 
+import com.google.common.util.concurrent.RateLimiter;
 import net.dv8tion.jda.api.entities.Entitlement;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -24,6 +25,7 @@ public class MoonphaseScheduleTimerTask extends TimerTask {
     private final MoonphaseClient moonphaseClient = MoonphaseClient.getInstance();
     private final EntitlementManager entitlementManager = EntitlementManager.getInstance();
     private final int timeOption;
+    private final RateLimiter rateLimiter = RateLimiter.create(30.0);
 
     public MoonphaseScheduleTimerTask(int timeOption) {
         this.timeOption = timeOption;
@@ -44,10 +46,10 @@ public class MoonphaseScheduleTimerTask extends TimerTask {
             }
         }
 
-        /*
         entitlementManager.getActiveGuildEntitlements(e -> {
             Set<String> entitlements = e.stream().map(Entitlement::getGuildId).collect(Collectors.toSet());
             moonphaseChannels.forEach(moonphaseChannel -> {
+                rateLimiter.acquire();
                 if (entitlements.contains(moonphaseChannel.getServerId()) || entitlementManager.isWhitelistedGuild(moonphaseChannel.getServerId())) {
                     sendMoonPhaseToChannel(moonphaseChannel, moonphaseEmbed);
                 } else {
@@ -57,8 +59,6 @@ public class MoonphaseScheduleTimerTask extends TimerTask {
                 }
             });
         });
-
-         */
     }
 
     private void notifyEntitlementExpiration(MoonphaseChannel moonphaseChannel) {

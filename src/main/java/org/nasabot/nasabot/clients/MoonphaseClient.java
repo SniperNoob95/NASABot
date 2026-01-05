@@ -93,6 +93,8 @@ public class MoonphaseClient {
                 .addField("Illumination", String.format("%.1f%%", fraction), false)
                 .addField("Next New Moon", nextNewMoon.format(formatter) + " - " + ChronoUnit.DAYS.between(zonedDateTime, nextNewMoon.plusDays(1)) + " days", false)
                 .addField("Next Full Moon", nextFullMoon.format(formatter) + " - " + ChronoUnit.DAYS.between(zonedDateTime, nextFullMoon.plusDays(1)) + " days", false)
+                .addField("Note", "Keep in mind these calculations are performed at the exact moment you send the command. There is some margin of error built in for phases which occur at exact percentages (New/Full/Quarters)," +
+                        " but the phase identified may not match up exactly with what other sources report depending on the moment at which the command is sent.", false)
                 .build();
 
         return embed;
