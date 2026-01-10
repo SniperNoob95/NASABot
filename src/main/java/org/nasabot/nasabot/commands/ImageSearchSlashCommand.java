@@ -107,6 +107,7 @@ public class ImageSearchSlashCommand extends NASABotSlashCommand {
     private MessageEmbed formatImageOptions(List<Pair<Button, NASAImage>> imageOptions) {
         try {
             EmbedBuilder embedBuilder = new EmbedBuilder()
+                    .setColor(new Color(192, 32, 232))
                     .setTitle("Image Results")
                     .setDescription("Select an image from the options below.");
             int i = 1;

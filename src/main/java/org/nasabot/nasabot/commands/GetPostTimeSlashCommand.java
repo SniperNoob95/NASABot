@@ -24,14 +24,16 @@ public class GetPostTimeSlashCommand extends NASABotSlashCommand {
         }
 
         if (postChannelId == -1) {
-            slashCommandEvent.reply("This server does not have a Post Channel configured. To set a Post Channel, use the setPostChannel command.").queue();
+            slashCommandEvent.reply("No Post Channel has been set for this server. You can set the Post Channel with the following command:" +
+                    "\n```/setpostchannel <#channel>```").queue();
             return;
         }
 
         int postTime = dbClient.getPostTimeForServer(postChannelId);
 
         if (postTime == -1) {
-            slashCommandEvent.reply("This server does not have a Post Channel configured. To set a Post Channel, use the setPostChannel command.").queue();
+            slashCommandEvent.reply("No Post Channel has been set for this server. You can set the Post Channel with the following command:" +
+                    "\n```/setpostchannel <#channel>```").queue();
         } else {
             slashCommandEvent.reply(String.format("The Post Time for this server is %s:00 UTC.", NASABot.postTimes.get(postTime))).queue();
         }

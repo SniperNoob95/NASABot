@@ -16,6 +16,8 @@ public class EntitlementManager {
     private final ErrorLoggingClient errorLoggingClient = ErrorLoggingClient.getInstance();
     private List<String> whitelistServers;
     private List<String> whitelistUsers;
+    private final String guildSKU = "";
+    private final String permanentSKU = "";
 
     private EntitlementManager() {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");

@@ -1,18 +1,16 @@
 package org.nasabot.nasabot.commands;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Entitlement;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.nasabot.nasabot.NASABot;
 
+import java.awt.Color;
 import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class InfoSlashCommand extends NASABotSlashCommand {
 
@@ -27,6 +25,7 @@ public class InfoSlashCommand extends NASABotSlashCommand {
         final List<Guild> guilds = NASABot.shardManager.getGuilds();
 
         EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.setColor(new Color(192, 32, 232));
         embedBuilder.setTitle(String.format("NASABot v%s", NASABot.VERSION));
         embedBuilder.setDescription("Information about the bot.");
         embedBuilder.addField("Servers Present", NumberFormat.getNumberInstance(Locale.US).format(guilds.size()), false);
@@ -38,14 +37,5 @@ public class InfoSlashCommand extends NASABotSlashCommand {
         embedBuilder.setFooter("Created by Sniper Noob", "https://i.imgur.com/6WHhKrR.png");
 
         slashCommandEvent.replyEmbeds(embedBuilder.build()).setEphemeral(false).queue();
-
-        slashCommandEvent.getEntitlements().forEach(entitlement -> {
-            System.out.println(entitlement.getGuildId());
-            System.out.println(entitlement.getUserId());
-            System.out.println(entitlement.getApplicationId());
-            System.out.println(entitlement.getSkuId());
-            System.out.println(entitlement.getType());
-            System.out.println("**********");
-        });
     }
 }

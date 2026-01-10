@@ -22,6 +22,7 @@ import org.nasabot.nasabot.commands.ImageSearchSlashCommand;
 import org.nasabot.nasabot.commands.InfoSlashCommand;
 import org.nasabot.nasabot.commands.MoonphaseSlashCommand;
 import org.nasabot.nasabot.commands.NASABotSlashCommand;
+import org.nasabot.nasabot.commands.PremiumSlashCommand;
 import org.nasabot.nasabot.commands.RemovePostChannelSlashCommand;
 import org.nasabot.nasabot.commands.SetMoonphaseChannelSlashCommand;
 import org.nasabot.nasabot.commands.SetMoonphaseTimeSlashCommand;
@@ -99,7 +100,8 @@ public class NASABot extends ListenerAdapter {
                 new GetMoonphaseChannelSlashCommand(),
                 new GetMoonphaseTimeSlashCommand(),
                 new SetMoonphaseChannelSlashCommand(),
-                new SetMoonphaseTimeSlashCommand());
+                new SetMoonphaseTimeSlashCommand(),
+                new PremiumSlashCommand());
 
         shardManager = DefaultShardManagerBuilder.createLight(token)
                 .disableIntents(EnumSet.allOf(GatewayIntent.class))
@@ -171,8 +173,6 @@ public class NASABot extends ListenerAdapter {
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
-        //shardManager.getShards().get(0).createTestEntitlement("999184799365857355", "181588597558738954", TestEntitlementCreateAction.OwnerType.USER_SUBSCRIPTION).queue();
-        //shardManager.getShards().get(0).createTestEntitlement("999184799365857356", "749488213328003194", TestEntitlementCreateAction.OwnerType.GUILD_SUBSCRIPTION).queue();
         if (!commandsUpdated) {
             commandsUpdated = true;
             System.out.println("Loading commands...");
@@ -181,10 +181,12 @@ public class NASABot extends ListenerAdapter {
                     .collect(Collectors.toList());
             event.getJDA().updateCommands().addCommands(commandData).queue();
         } else {
-            List<CommandData> localCommandData = localCommands.stream()
-                    .map(NASABotSlashCommand::getCommandData)
-                    .collect(Collectors.toList());
-            shardManager.getGuildById("749488213328003194").updateCommands().addCommands(localCommandData).queue();
+            if (!localCommands.isEmpty()) {
+                List<CommandData> localCommandData = localCommands.stream()
+                        .map(NASABotSlashCommand::getCommandData)
+                        .collect(Collectors.toList());
+                shardManager.getGuildById("749488213328003194").updateCommands().addCommands(localCommandData).queue();
+            }
         }
     }
 }

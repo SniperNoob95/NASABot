@@ -24,14 +24,16 @@ public class GetMoonphaseTimeSlashCommand extends NASABotSlashCommand {
         }
 
         if (moonphaseChannelId == -1) {
-            slashCommandEvent.reply("This server does not have a Moonphase Channel configured. To set a Moonphase Channel, use the setMoonphaseChannel command.").queue();
+            slashCommandEvent.reply("No Moonphase Channel has been set for this server. You can set the Moonphase Channel with the following command:" +
+                    "\n```/setmoonphasechannel <#channel>```").queue();
             return;
         }
 
         int postTime = dbClient.getMoonphaseTimeForServer(moonphaseChannelId);
 
         if (postTime == -1) {
-            slashCommandEvent.reply("This server does not have a Moonphase Channel configured. To set a Moonphase Channel, use the setMoonphaseChannel command.").queue();
+            slashCommandEvent.reply("No Moonphase Channel has been set for this server. You can set the Moonphase Channel with the following command:" +
+                    "\n```/setmoonphasechannel <#channel>```").queue();
         } else {
             slashCommandEvent.reply(String.format("The Moonphase Time for this server is %s:00 UTC.", NASABot.postTimes.get(postTime))).queue();
         }
