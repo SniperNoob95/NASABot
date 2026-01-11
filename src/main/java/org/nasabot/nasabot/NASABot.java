@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
@@ -62,7 +63,7 @@ public class NASABot extends ListenerAdapter {
     public static List<NASABotSlashCommand> localCommands;
     public static String ownerId;
     private static boolean commandsUpdated;
-    public static final String VERSION = "10.3.0";
+    public static final String VERSION = "11.0.0";
 
     public static void main(String[] args) {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
@@ -80,8 +81,8 @@ public class NASABot extends ListenerAdapter {
 
         // Slash commands
         slashCommands = List.of(new APODSlashCommand(),
-                //new GetMoonphaseChannelSlashCommand(),
-                //new GetMoonphaseTimeSlashCommand(),
+                new GetMoonphaseChannelSlashCommand(),
+                new GetMoonphaseTimeSlashCommand(),
                 new GetPostChannelSlashCommand(),
                 new GetPostTimeSlashCommand(),
                 new HelpSlashCommand(),
@@ -89,19 +90,15 @@ public class NASABot extends ListenerAdapter {
                 new InfoSlashCommand(),
                 new ISSSlashCommand(),
                 new MoonphaseSlashCommand(),
+                new PremiumSlashCommand(),
                 new RemovePostChannelSlashCommand(),
-                //new SetMoonphaseChannelSlashCommand(),
-                //new SetMoonphaseTimeSlashCommand(),
+                new SetMoonphaseChannelSlashCommand(),
+                new SetMoonphaseTimeSlashCommand(),
                 new SetPostChannelSlashCommand(),
                 new SetPostTimeSlashCommand(),
                 new ToggleLoggingSlashCommand());
 
-        localCommands = List.of(
-                new GetMoonphaseChannelSlashCommand(),
-                new GetMoonphaseTimeSlashCommand(),
-                new SetMoonphaseChannelSlashCommand(),
-                new SetMoonphaseTimeSlashCommand(),
-                new PremiumSlashCommand());
+        localCommands = List.of();
 
         shardManager = DefaultShardManagerBuilder.createLight(token)
                 .disableIntents(EnumSet.allOf(GatewayIntent.class))

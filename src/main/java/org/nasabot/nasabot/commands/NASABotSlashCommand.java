@@ -56,14 +56,11 @@ public abstract class NASABotSlashCommand {
     public abstract void execute(@NotNull SlashCommandInteractionEvent slashCommandEvent);
 
     public boolean isAuthorized(@NotNull SlashCommandInteractionEvent slashCommandEvent, boolean guildOnly) {
-        return true;
-        /*
         if (guildOnly) {
             return entitlementManager.isGuildEntitled(slashCommandEvent);
         } else {
             return entitlementManager.isGuildEntitled(slashCommandEvent) || entitlementManager.isUserEntitled(slashCommandEvent);
         }
-         */
     }
 
     public String getArgumentsString() {

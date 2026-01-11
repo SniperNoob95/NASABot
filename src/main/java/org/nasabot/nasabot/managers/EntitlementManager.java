@@ -16,8 +16,9 @@ public class EntitlementManager {
     private final ErrorLoggingClient errorLoggingClient = ErrorLoggingClient.getInstance();
     private List<String> whitelistServers;
     private List<String> whitelistUsers;
-    private final String guildSKU = "";
-    private final String permanentSKU = "";
+    private final String guildSKU = "1459731302348623903";
+    private final String permanentSKU = "1459695726874464500";
+    private final String promoPermanentSKU = "1459728741424042217";
 
     private EntitlementManager() {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
@@ -67,7 +68,7 @@ public class EntitlementManager {
         }
         return slashCommandInteractionEvent.getEntitlements().stream()
                 .filter(e -> e.getApplicationId().equals("748775876077813881"))
-                .anyMatch(e -> e.getGuildId() != null);
+                .anyMatch(e -> e.getSkuId().equals(guildSKU));
     }
 
     public boolean isUserEntitled(SlashCommandInteractionEvent slashCommandInteractionEvent) {
@@ -76,7 +77,7 @@ public class EntitlementManager {
         }
         return slashCommandInteractionEvent.getEntitlements().stream()
                 .filter(e -> e.getApplicationId().equals("748775876077813881"))
-                .anyMatch(e -> e.getGuildId() == null);
+                .anyMatch(e -> e.getSkuId().equals(permanentSKU) || e.getSkuId().equals(promoPermanentSKU));
     }
 
     public boolean isWhitelistedGuild(String guildId) {
