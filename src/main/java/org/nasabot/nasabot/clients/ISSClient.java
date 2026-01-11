@@ -56,11 +56,6 @@ public class ISSClient extends NASABotClient {
                     .setColor(new Color(192, 32, 232))
                     .addField("Latitude", jsonObject.getJSONObject("iss_position").getString("latitude"), true)
                     .addField("Longitude", jsonObject.getJSONObject("iss_position").getString("longitude"), true)
-                    .addField("Google Maps Location",
-                            getGoogleMapsLink(
-                                    Double.parseDouble(jsonObject.getJSONObject("iss_position").getString("latitude")),
-                                    Double.parseDouble(jsonObject.getJSONObject("iss_position").getString("longitude"))),
-                            false)
                     .addField("Currently Over Country",
                             geoNamesClient.getCountryFromLatitudeLongitude(
                                     jsonObject.getJSONObject("iss_position").getString("latitude"),
