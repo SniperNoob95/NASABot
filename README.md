@@ -18,7 +18,7 @@ please refer to the open source code in this repository to check the hosts of th
 #### /setpostchannel
 	/setpostchannel <#channel mention>
     Ex: /setpostchannel #lounge
-Sets the Post Channel for the server to receive automated APOD postings each day, as well as update announcements from the owner.
+Sets the Post Channel for the server to receive automated APOD postings each day.
 
 #### /removepostchannel
 Removes the Post Channel set for the server.
@@ -38,6 +38,30 @@ Sets the Post Time for the server to receive automated APOD postings each day. B
 
 #### /getposttime
 Returns the Post Time set for the server.
+
+#### /setmoonphasechannel
+	/setmoonphasechannel <#channel mention>
+    Ex: /setmoonphasechannel #lounge
+Sets the Moonphase Channel for the server to receive automated Moonphase postings each day.
+
+#### /removemoonphasechannel
+Removes the Moonphase Channel set for the server.
+
+#### /getmoonphasechannel
+Returns the Moonphase Channel set for the server.
+
+#### /setmoonphasetime
+    /setmoonphasetime <option>
+    Ex: /setmoonphasetime 1
+    Options are as follows:
+        0 (default): 16:00 UTC
+        1: 6:00 UTC
+        2: 11:00 UTC
+        3: 21:00 UTC
+Sets the Moonphase Time for the server to receive automated Moonphase postings each day. By default, all servers use option 0 until overridden.
+
+#### /getmoonphasetime
+Returns the Moonphase Time set for the server.
 
 #### /apod
     /apod [date (YYYY-MM-DD)]

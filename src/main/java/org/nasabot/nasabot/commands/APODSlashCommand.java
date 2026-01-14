@@ -30,10 +30,6 @@ public class APODSlashCommand extends NASABotSlashCommand {
     public void execute(@NotNull SlashCommandInteractionEvent slashCommandEvent) {
         this.insertCommand(slashCommandEvent);
 
-        slashCommandEvent.reply("APOD is currently down due to a NASA service outage. Please check https://api.nasa.gov/ for updates. The APOD command will be re-enabled once service is restored.").queue();
-        return;
-
-        /*
         slashCommandEvent.deferReply().queue();
 
         if (slashCommandEvent.getOption("date") == null) {
@@ -84,7 +80,5 @@ public class APODSlashCommand extends NASABotSlashCommand {
                 slashCommandEvent.getHook().sendMessage(String.format("Unable to get APOD, please check your formatting: %s", this.getArgumentsString())).queue();
             }
         }
-
-         */
     }
 }
