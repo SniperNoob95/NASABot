@@ -40,8 +40,7 @@ public class ISSSlashCommand extends NASABotSlashCommand {
 
             try (FileUpload fileUpload = mapBoxClient.getMapImageForLocation(longitude, latitude)) {
                 if (fileUpload != null) {
-                    slashCommandEvent.getHook().sendMessageEmbeds(messageEmbed).queue();
-                    slashCommandEvent.getChannel().sendFiles(fileUpload).queue(s -> mapBoxClient.deleteFile(fileUpload.getName()));
+                    slashCommandEvent.getHook().sendMessageEmbeds(messageEmbed).addFiles(fileUpload).queue(s -> mapBoxClient.deleteFile(fileUpload.getName()));
                 } else {
                     slashCommandEvent.getHook().sendMessage("Unable to retrieve ISS location. This is usually due to a failure in the ISS API. Please try again.").queue();
                 }

@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
@@ -21,6 +20,7 @@ import org.nasabot.nasabot.commands.HelpSlashCommand;
 import org.nasabot.nasabot.commands.ISSSlashCommand;
 import org.nasabot.nasabot.commands.ImageSearchSlashCommand;
 import org.nasabot.nasabot.commands.InfoSlashCommand;
+import org.nasabot.nasabot.commands.MarsWeatherSlashCommand;
 import org.nasabot.nasabot.commands.MoonphaseSlashCommand;
 import org.nasabot.nasabot.commands.NASABotSlashCommand;
 import org.nasabot.nasabot.commands.PremiumSlashCommand;
@@ -63,7 +63,7 @@ public class NASABot extends ListenerAdapter {
     public static List<NASABotSlashCommand> localCommands;
     public static String ownerId;
     private static boolean commandsUpdated;
-    public static final String VERSION = "11.0.0";
+    public static final String VERSION = "11.1.0";
 
     public static void main(String[] args) {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
@@ -89,6 +89,7 @@ public class NASABot extends ListenerAdapter {
                 new ImageSearchSlashCommand(),
                 new InfoSlashCommand(),
                 new ISSSlashCommand(),
+                new MarsWeatherSlashCommand(),
                 new MoonphaseSlashCommand(),
                 new PremiumSlashCommand(),
                 new RemovePostChannelSlashCommand(),
@@ -178,6 +179,11 @@ public class NASABot extends ListenerAdapter {
                     .collect(Collectors.toList());
             event.getJDA().updateCommands().addCommands(commandData).queue();
         } else {
+            shardManager.getGuildById("749488213328003194").retrieveCommands()
+                    .queue(s -> s.forEach(command -> {
+                        System.out.println("Deleting command: " + command.getName());
+                        command.delete().queue();
+                    }));
             if (!localCommands.isEmpty()) {
                 List<CommandData> localCommandData = localCommands.stream()
                         .map(NASABotSlashCommand::getCommandData)

@@ -98,7 +98,7 @@ public class ImageSearchSlashCommand extends NASABotSlashCommand {
         List<Pair<Button, NASAImage>> buttons = new ArrayList<>();
         int i = 1;
         for (NASAImage image : images) {
-            buttons.add(new Pair<>(Button.success(UUID.randomUUID().toString(), "Image " + i), image));
+            buttons.add(new Pair<>(Button.success("IMAGESEARCH:" + UUID.randomUUID(), "Image " + i), image));
             i++;
         }
         return buttons;

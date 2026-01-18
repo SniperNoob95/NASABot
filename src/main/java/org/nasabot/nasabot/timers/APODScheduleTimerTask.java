@@ -66,7 +66,6 @@ public class APODScheduleTimerTask extends TimerTask {
         FileUpload finalFileUpload = fileUpload;
         apodChannels.forEach(apodChannel -> {
             rateLimiter.acquire();
-            System.out.println("Processing channel " + apodChannel);
             sendAPODToChannel(apodChannel, embedBuilder, finalFileUpload);
         });
 

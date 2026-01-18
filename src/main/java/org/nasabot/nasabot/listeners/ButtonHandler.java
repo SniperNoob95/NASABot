@@ -6,15 +6,17 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import org.nasabot.nasabot.NASABot;
 import org.nasabot.nasabot.clients.ErrorLoggingClient;
+import org.nasabot.nasabot.clients.NASAClient;
 import org.nasabot.nasabot.managers.ButtonManager;
 import org.nasabot.nasabot.objects.NASAImage;
+import org.nasabot.nasabot.objects.marsweather.Sol;
 
 import java.awt.Color;
 import java.text.SimpleDateFormat;
 
 public class ButtonHandler extends ListenerAdapter {
+    private final NASAClient nasaClient = NASAClient.getInstance();
     private final ButtonManager buttonManager = ButtonManager.getInstance();
     private final ErrorLoggingClient errorLoggingClient = ErrorLoggingClient.getInstance();
     private static final SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -24,6 +26,17 @@ public class ButtonHandler extends ListenerAdapter {
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         String userId = event.getUser().getId();
         String buttonId = event.getComponentId();
+
+        if (buttonId.startsWith("IMAGESEARCH:")) {
+            handleISSImageButton(event, userId, buttonId);
+        } else if (buttonId.startsWith("MARSWEATHER:")) {
+            handleMarsWeatherButton(event, buttonId.split(":")[1]);
+        } else {
+            event.reply("Unable to handle this button, please contact the owner for support using the `/info` command.").queue();
+        }
+    }
+
+    private void handleISSImageButton(ButtonInteractionEvent event, String userId, String buttonId) {
         Pair<String, NASAImage> buttonImage = buttonManager.getUserImageForButton(buttonId);
         if (buttonImage == null) {
             event.reply("Encountered an error while processing your request. This can happen if the message " +
@@ -55,5 +68,20 @@ public class ButtonHandler extends ListenerAdapter {
             errorLoggingClient.handleError("NASAClient", "formatNASAImage", "Cannot format NASA image.", e);
             return new EmbedBuilder().setTitle("NASA Image").addField("ERROR", "Unable to format the NASA image.", false).setColor(Color.RED).build();
         }
+    }
+
+    private void handleMarsWeatherButton(ButtonInteractionEvent event, String solId) {
+        if (solId.equals("HOME")) {
+            event.editComponents(nasaClient.getMarsWeatherData().renderContainer()).setReplace(true).useComponentsV2().queue();
+            return;
+        }
+
+        Sol sol = nasaClient.getMarsWeatherData().getSols().get(solId);
+        if (sol == null) {
+            event.reply("This Sol data cannot be found, it may have just expired. Please try again.").queue();
+            return;
+        }
+
+        event.editComponents(sol.renderContainer()).setReplace(true).useComponentsV2().queue();
     }
 }

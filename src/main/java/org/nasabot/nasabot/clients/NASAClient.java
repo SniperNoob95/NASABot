@@ -1,5 +1,6 @@
 package org.nasabot.nasabot.clients;
 
+import kotlin.Pair;
 import net.dv8tion.jda.api.EmbedBuilder;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
@@ -8,6 +9,13 @@ import okhttp3.ResponseBody;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.nasabot.nasabot.objects.NASAImage;
+import org.nasabot.nasabot.objects.marsweather.AT;
+import org.nasabot.nasabot.objects.marsweather.HWS;
+import org.nasabot.nasabot.objects.marsweather.MarsWeatherData;
+import org.nasabot.nasabot.objects.marsweather.PRE;
+import org.nasabot.nasabot.objects.marsweather.Sol;
+import org.nasabot.nasabot.objects.marsweather.WD;
+import org.nasabot.nasabot.objects.marsweather.WindDirection;
 
 import java.awt.Color;
 import java.text.SimpleDateFormat;
@@ -18,6 +26,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class NASAClient extends NASABotClient {
     private final String baseUrl = "https://api.nasa.gov";
@@ -25,6 +35,7 @@ public class NASAClient extends NASABotClient {
     private final SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMM dd, yyyy");
     private final SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private String apiKey;
+    private Pair<Long, MarsWeatherData> cachedMarsWeatherData;
 
     private NASAClient() {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
@@ -162,5 +173,103 @@ public class NASAClient extends NASABotClient {
                 data.getString("location"),
                 jsonObject.getJSONArray("links").getJSONObject(0).getString("href").replace(" ", "%20")
         );
+    }
+
+    public MarsWeatherData getMarsWeatherData() {
+        // If no cache or if cache is older than 1 hour
+        if (cachedMarsWeatherData == null || cachedMarsWeatherData.getFirst() < System.currentTimeMillis() / 1000 - 3600) {
+            HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(baseUrl + "/insight_weather/")).newBuilder();
+            builder.addQueryParameter("api_key", apiKey).addQueryParameter("feedtype", "json").addQueryParameter("ver", "1.0");
+            Request request = new Request.Builder().url(builder.build().toString()).build();
+            try (Response response = httpClient.newCall(request).execute()) {
+                ResponseBody responseBody = response.body();
+                String responseString = responseBody.string();
+                MarsWeatherData weatherData = formatMarsWeatherData(responseString);
+                cachedMarsWeatherData = new Pair<>(System.currentTimeMillis() / 1000, weatherData);
+                return weatherData;
+            } catch (Exception e) {
+                errorLoggingClient.handleError("NASAClient", "getMarsWeatherData", "Cannot get Mars weather data.", e);
+                return null;
+            }
+        } else {
+            return cachedMarsWeatherData.getSecond();
+        }
+    }
+
+    private MarsWeatherData formatMarsWeatherData(String responseString) {
+        try {
+            JSONObject jsonObject = new JSONObject(responseString);
+            List<Sol> sols = new ArrayList<>();
+            JSONArray solKeys = jsonObject.getJSONArray("sol_keys");
+            for (int i = 0; i < solKeys.length(); i++) {
+                JSONObject sol = jsonObject.getJSONObject(solKeys.getString(i));
+                String name = solKeys.getString(i);
+                String season = sol.optString("Season", "UNKNOWN");
+                String firstUTC = sol.optString("First_UTC", "UNKNOWN");
+                String lastUTC = sol.optString("Last_UTC", "UNKNOWN");
+
+                // WD
+                WindDirection mostCommon = null;
+                List<WindDirection> windDirectionList = new ArrayList<>();
+                JSONObject windDirections = sol.getJSONObject("WD");
+                for (String key : windDirections.keySet()) {
+                    JSONObject wd = windDirections.getJSONObject(key);
+                    if (key.equals("most_common")) {
+                        mostCommon = new WindDirection(
+                                wd.getDouble("compass_degrees"),
+                                wd.getDouble("compass_right"),
+                                wd.getDouble("compass_up"),
+                                wd.getString("compass_point"),
+                                wd.getInt("ct"));
+                    } else {
+                        windDirectionList.add(new WindDirection(
+                                wd.getDouble("compass_degrees"),
+                                wd.getDouble("compass_right"),
+                                wd.getDouble("compass_up"),
+                                wd.getString("compass_point"),
+                                wd.getInt("ct")));
+                    }
+                }
+
+                WD wd = new WD(windDirectionList, mostCommon);
+
+                // PRE
+                JSONObject preObject = sol.getJSONObject("PRE");
+                PRE pre = new PRE(
+                        "Pa",
+                        preObject.getDouble("av"),
+                        preObject.getInt("ct"),
+                        preObject.getDouble("mx"),
+                        preObject.getDouble("mn")
+                );
+
+                // AT
+                JSONObject atObject = sol.getJSONObject("AT");
+                AT at = new AT(
+                        "° C",
+                        atObject.getDouble("av"),
+                        atObject.getInt("ct"),
+                        atObject.getDouble("mx"),
+                        atObject.getDouble("mn")
+                );
+
+                // HWS
+                JSONObject hwsObject = sol.getJSONObject("PRE");
+                HWS hws = new HWS(
+                        "m/s",
+                        hwsObject.getDouble("av"),
+                        hwsObject.getInt("ct"),
+                        hwsObject.getDouble("mx"),
+                        hwsObject.getDouble("mn")
+                );
+
+                sols.add(new Sol(name, at, hws, pre, wd, season, firstUTC, lastUTC));
+            }
+
+            return new MarsWeatherData(sols.stream().collect(Collectors.toMap(Sol::getName, Function.identity())));
+        } catch (Exception e) {
+            errorLoggingClient.handleError("NASAClient", "formatMarsWeatherData", "Cannot format Mars weather data.", e);
+            return null;
+        }
     }
 }

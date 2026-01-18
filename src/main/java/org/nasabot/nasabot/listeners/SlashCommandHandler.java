@@ -46,7 +46,6 @@ public class SlashCommandHandler extends ListenerAdapter {
 
     private void loadCommands() {
         NASABot.slashCommands.forEach(command -> commands.put(command.getName(), command));
-        // TODO remove
         NASABot.localCommands.forEach(command -> commands.put(command.getName(), command));
     }
 }
