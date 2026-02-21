@@ -71,10 +71,12 @@ public class NASAClient extends NASABotClient {
 
     public EmbedBuilder getLatestPictureOfTheDay() {
         LocalDate now = LocalDate.now().plusDays(2);
+        System.out.println(now.toString());
         while (true) {
             HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(baseUrl + "/planetary/apod")).newBuilder();
             builder.addQueryParameter("api_key", apiKey).addQueryParameter("date", inputDateFormat.format(Date.from(now.atStartOfDay(ZoneOffset.UTC).toInstant())));
             Request request = new Request.Builder().url(builder.build().toString()).build();
+            System.out.println(request.url());
             try (Response response = httpClient.newCall(request).execute()) {
                 ResponseBody responseBody = response.body();
                 String responseString = responseBody.string();
@@ -82,6 +84,7 @@ public class NASAClient extends NASABotClient {
                     now = now.minusDays(1);
                     continue;
                 }
+                System.out.println(responseString);
                 return formatPictureOfTheDay(responseString);
             } catch (Exception e) {
                 errorLoggingClient.handleError("NASAClient", "getPictureOfTheDay", "Cannot get picture of the day.", e);

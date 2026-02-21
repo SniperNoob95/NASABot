@@ -26,7 +26,7 @@ public class APODScheduleTimerTask extends TimerTask {
     private final ErrorLoggingClient errorLoggingClient = ErrorLoggingClient.getInstance();
     private final NASAClient nasaClient = NASAClient.getInstance();
     private final int timeOption;
-    private final RateLimiter rateLimiter = RateLimiter.create(30.0);
+    private final RateLimiter rateLimiter = RateLimiter.create(20.0);
 
     public APODScheduleTimerTask(int timeOption) {
         this.timeOption = timeOption;

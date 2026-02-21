@@ -1,5 +1,7 @@
 package org.nasabot.nasabot.clients;
 
+import org.nasabot.nasabot.NASABot;
+
 public class ErrorLoggingClient {
     private final DBClient dbClient = DBClient.getInstance();
 
@@ -15,6 +17,9 @@ public class ErrorLoggingClient {
     }
 
     public void handleError(String className, String method, String log, Exception e) {
+        if (NASABot.loggingEnabled) {
+            e.printStackTrace();
+        }
         StringBuilder stringBuilder = new StringBuilder();
         StackTraceElement[] stackTraceElements = e.getStackTrace();
         if (stackTraceElements.length < 3) {
@@ -22,7 +27,7 @@ public class ErrorLoggingClient {
                 stringBuilder.append(String.format("%s;", element));
             }
         } else {
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 5; i++) {
                 stringBuilder.append(String.format("%s;", stackTraceElements[i]));
             }
         }
