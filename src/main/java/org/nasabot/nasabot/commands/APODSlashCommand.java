@@ -34,6 +34,14 @@ public class APODSlashCommand extends NASABotSlashCommand {
 
         if (slashCommandEvent.getOption("date") == null) {
             EmbedBuilder embedBuilder = nasaClient.getLatestPictureOfTheDay();
+            if (embedBuilder == null) {
+                slashCommandEvent.getHook().sendMessageEmbeds(new EmbedBuilder().setTitle("Picture of the Day")
+                                .addField("ERROR", "Unable to obtain Picture of the Day from NASA. Please try again soon.", false)
+                                .setColor(Color.RED)
+                                .build())
+                        .queue();
+                return;
+            }
             InputStream file;
             Optional<MessageEmbed.Field> imageUrl = embedBuilder.getFields().stream()
                     .filter(field -> field.getName() != null)
@@ -55,6 +63,14 @@ public class APODSlashCommand extends NASABotSlashCommand {
             try {
                 if (simpleDateFormat.parse(Objects.requireNonNull(slashCommandEvent.getOption("date")).getAsString()) != null) {
                     EmbedBuilder embedBuilder = nasaClient.getPictureOfTheDay(Objects.requireNonNull(slashCommandEvent.getOption("date")).getAsString());
+                    if (embedBuilder == null) {
+                        slashCommandEvent.getHook().sendMessageEmbeds(new EmbedBuilder().setTitle("Picture of the Day")
+                                        .addField("ERROR", "Unable to obtain Picture of the Day from NASA. Please try again soon.", false)
+                                        .setColor(Color.RED)
+                                        .build())
+                                .queue();
+                        return;
+                    }
                     InputStream file;
                     Optional<MessageEmbed.Field> imageUrl = embedBuilder.getFields().stream()
                             .filter(field -> field.getName() != null)

@@ -63,7 +63,7 @@ public class NASABot extends ListenerAdapter {
     public static List<NASABotSlashCommand> localCommands;
     public static String ownerId;
     private static boolean commandsUpdated;
-    public static final String VERSION = "11.1.0";
+    public static final String VERSION = "11.1.1";
 
     public static void main(String[] args) {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
