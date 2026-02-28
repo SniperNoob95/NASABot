@@ -31,6 +31,8 @@ public class ButtonHandler extends ListenerAdapter {
             handleISSImageButton(event, userId, buttonId);
         } else if (buttonId.startsWith("MARSWEATHER:")) {
             handleMarsWeatherButton(event, buttonId.split(":")[1]);
+        } else if (buttonId.startsWith("EONET:")) {
+            handleEONETButton(event, buttonId.split(":")[1]);
         } else {
             event.reply("Unable to handle this button, please contact the owner for support using the `/info` command.").queue();
         }
@@ -83,5 +85,31 @@ public class ButtonHandler extends ListenerAdapter {
         }
 
         event.editComponents(sol.renderContainer()).setReplace(true).useComponentsV2().queue();
+    }
+
+    private void handleEONETButton(ButtonInteractionEvent event, String eventId) {
+        if (eventId.equals("HOME")) {
+            var data = nasaClient.getEONETEventsData();
+            if (data == null) {
+                event.reply("Unable to refresh EONET events. Please try again soon.").setEphemeral(true).queue();
+                return;
+            }
+            event.editComponents(data.renderContainer()).setReplace(true).useComponentsV2().queue();
+            return;
+        }
+
+        var data = nasaClient.getEONETEventsData();
+        if (data == null || data.getEvents().isEmpty()) {
+            event.reply("EONET events are not available right now. Please try again soon.").setEphemeral(true).queue();
+            return;
+        }
+
+        var eonetEvent = data.getEvents().get(eventId);
+        if (eonetEvent == null) {
+            event.reply("This EONET event cannot be found, it may have just expired. Please try again.").setEphemeral(true).queue();
+            return;
+        }
+
+        event.editComponents(eonetEvent.renderContainer()).setReplace(true).useComponentsV2().queue();
     }
 }

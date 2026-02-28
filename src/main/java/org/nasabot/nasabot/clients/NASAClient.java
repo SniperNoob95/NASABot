@@ -9,6 +9,8 @@ import okhttp3.ResponseBody;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.nasabot.nasabot.objects.NASAImage;
+import org.nasabot.nasabot.objects.eonet.EONETEvent;
+import org.nasabot.nasabot.objects.eonet.EONETEventsData;
 import org.nasabot.nasabot.objects.marsweather.AT;
 import org.nasabot.nasabot.objects.marsweather.HWS;
 import org.nasabot.nasabot.objects.marsweather.MarsWeatherData;
@@ -23,7 +25,9 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.function.Function;
@@ -36,6 +40,7 @@ public class NASAClient extends NASABotClient {
     private final SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private String apiKey;
     private Pair<Long, MarsWeatherData> cachedMarsWeatherData;
+    private Pair<Long, EONETEventsData> cachedEONETEvents;
     private Pair<Long, EmbedBuilder> cachedAPOD;
 
     private NASAClient() {
@@ -126,6 +131,72 @@ public class NASAClient extends NASABotClient {
         } catch (Exception e) {
             errorLoggingClient.handleError("NASAClient", "formatPictureOfTheDay", "Cannot format picture of the day.", e);
             return new EmbedBuilder().setTitle("Picture of the Day").addField("ERROR", "Unable to obtain Picture of the Day.", false).setColor(Color.RED);
+        }
+    }
+
+    public EONETEventsData getEONETEventsData() {
+        // Cache for 10 minutes
+        if (cachedEONETEvents != null && cachedEONETEvents.getFirst() >= (System.currentTimeMillis() / 1000 - 600)) {
+            return cachedEONETEvents.getSecond();
+        }
+
+        HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse("https://eonet.gsfc.nasa.gov/api/v3/events")).newBuilder();
+        builder.addQueryParameter("limit", "10");
+        builder.addQueryParameter("status", "open");
+        Request request = new Request.Builder().url(builder.build().toString()).build();
+        try (Response response = httpClient.newCall(request).execute()) {
+            String responseString = Objects.requireNonNull(response.body()).string();
+            EONETEventsData data = parseEONETEvents(responseString);
+            if (data != null) {
+                cachedEONETEvents = new Pair<>(System.currentTimeMillis() / 1000, data);
+            }
+            return data;
+        } catch (Exception e) {
+            errorLoggingClient.handleError("NASAClient", "getEONETEventsData", "Cannot get recent EONET events.", e);
+            return cachedEONETEvents != null ? cachedEONETEvents.getSecond() : null;
+        }
+    }
+
+    private EONETEventsData parseEONETEvents(String responseString) {
+        try {
+            JSONObject jsonObject = new JSONObject(responseString);
+            JSONArray events = jsonObject.optJSONArray("events");
+            Map<String, EONETEvent> map = new HashMap<>();
+            if (events != null) {
+                for (int i = 0; i < events.length(); i++) {
+                    JSONObject event = events.getJSONObject(i);
+                    String id = event.getString("id");
+                    String title = event.getString("title");
+
+                    // Categories
+                    List<String> categories = new ArrayList<>();
+                    JSONArray categoriesArr = event.optJSONArray("categories");
+                    if (categoriesArr != null && !categoriesArr.isEmpty()) {
+                        for (int c = 0; c < categoriesArr.length(); c++) {
+                            JSONObject cat = categoriesArr.getJSONObject(c);
+                            categories.add(cat.optString("title", "Unknown"));
+                        }
+                    }
+
+                    // Most recent geometry date or closed
+                    String dateStr;
+                    JSONArray geometry = event.optJSONArray("geometry");
+                    if (geometry != null && !geometry.isEmpty()) {
+                        JSONObject geomLatest = geometry.getJSONObject(geometry.length() - 1);
+                        dateStr = geomLatest.optString("date", null);
+                    } else {
+                        dateStr = event.optString("closed", null);
+                    }
+
+                    EONETEvent ev = new EONETEvent(id, title, dateStr, categories);
+                    map.put(id, ev);
+                }
+            }
+
+            return new EONETEventsData(map);
+        } catch (Exception e) {
+            errorLoggingClient.handleError("NASAClient", "parseEONETEvents", "Cannot parse EONET events.", e);
+            return null;
         }
     }
 

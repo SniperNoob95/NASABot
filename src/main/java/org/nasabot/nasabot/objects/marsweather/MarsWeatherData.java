@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.components.section.Section;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.nasabot.nasabot.clients.ErrorLoggingClient;
 
 import java.awt.Color;
 import java.io.File;
@@ -19,7 +18,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MarsWeatherData {
-    private final ErrorLoggingClient errorLoggingClient = ErrorLoggingClient.getInstance();
     private static final Emoji sunEmoji = Emoji.fromUnicode("U+1F506");
 
     private final Map<String, Sol> sols;
