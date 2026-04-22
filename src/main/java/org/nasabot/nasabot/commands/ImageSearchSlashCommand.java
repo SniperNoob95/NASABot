@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 public class ImageSearchSlashCommand extends NASABotSlashCommand {
     private final ButtonManager buttonManager = ButtonManager.getInstance();
+    private static final int NUMBER_OF_IMAGES = 5;
 
     public ImageSearchSlashCommand() {
         super("image", "⭐ Search for images from the NASA Image Archive.", List.of(
@@ -91,7 +92,7 @@ public class ImageSearchSlashCommand extends NASABotSlashCommand {
             return Collections.emptyList();
         }
         Collections.shuffle(images);
-        return images.subList(0, Math.min(3, images.size()));
+        return images.subList(0, Math.min(NUMBER_OF_IMAGES, images.size()));
     }
 
     private List<Pair<Button, NASAImage>> getButtonsForOptions(List<NASAImage> images) {

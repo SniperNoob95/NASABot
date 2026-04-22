@@ -64,7 +64,7 @@ public class NASABot extends ListenerAdapter {
     public static List<NASABotSlashCommand> localCommands;
     public static String ownerId;
     private static boolean commandsUpdated;
-    public static final String VERSION = "12.0.0";
+    public static final String VERSION = "13.0.0";
 
     public static void main(String[] args) {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
@@ -91,7 +91,8 @@ public class NASABot extends ListenerAdapter {
                 new ImageSearchSlashCommand(),
                 new InfoSlashCommand(),
                 new ISSSlashCommand(),
-                new MarsWeatherSlashCommand(),
+                // Deprecated
+                // new MarsWeatherSlashCommand(),
                 new MoonphaseSlashCommand(),
                 new PremiumSlashCommand(),
                 new RemovePostChannelSlashCommand(),

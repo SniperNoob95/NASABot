@@ -19,7 +19,7 @@ public class RemovePostChannelSlashCommand extends NASABotSlashCommand {
 
         try {
             if (!Objects.requireNonNull(slashCommandEvent.getMember()).hasPermission(Permission.ADMINISTRATOR) && !Objects.requireNonNull(slashCommandEvent.getMember()).isOwner()) {
-                slashCommandEvent.reply("Only server administrators or the server owner may use this command.").queue();
+                slashCommandEvent.reply("Only server administrators or the server owner may use this command!").setEphemeral(true).queue();
                 return;
             }
         } catch (NullPointerException e) {

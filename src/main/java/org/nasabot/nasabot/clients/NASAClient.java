@@ -78,8 +78,7 @@ public class NASAClient extends NASABotClient {
     public EmbedBuilder getLatestPictureOfTheDay() {
         // If no cache or if cache is older than 1 hour
         if (cachedAPOD == null || cachedAPOD.getFirst() < System.currentTimeMillis() / 1000 - 3600) {
-            LocalDate now = LocalDate.now().plusDays(2);
-            System.out.println(now.toString());
+            LocalDate now = LocalDate.now().plusDays(1);
             while (true) {
                 HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(baseUrl + "/planetary/apod")).newBuilder();
                 builder.addQueryParameter("api_key", apiKey).addQueryParameter("date", inputDateFormat.format(Date.from(now.atStartOfDay(ZoneOffset.UTC).toInstant())));
@@ -130,7 +129,9 @@ public class NASAClient extends NASABotClient {
             return embedBuilder;
         } catch (Exception e) {
             errorLoggingClient.handleError("NASAClient", "formatPictureOfTheDay", "Cannot format picture of the day.", e);
-            return new EmbedBuilder().setTitle("Picture of the Day").addField("ERROR", "Unable to obtain Picture of the Day.", false).setColor(Color.RED);
+            return cachedAPOD != null
+                    ? cachedAPOD.getSecond()
+                    : new EmbedBuilder().setTitle("Picture of the Day").addField("ERROR", "Unable to obtain Picture of the Day.", false).setColor(Color.RED);
         }
     }
 

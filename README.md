@@ -1,7 +1,9 @@
-# NASABot v12.0.0
+# NASABot v13.0.0
 A Discord bot that implements NASA and other space-related APIs to provide fun, interesting, and informative artifacts.
 This includes daily APOD postings, daily Moonphase postings, ISS location, NASA image database search, and more! New features are always 
 being explored and added!
+
+![Discord Bots](https://top.gg/api/widget/748775876077813881.svg)
 
 ## Credit/Attribution
 **All data presented is owned by NASA and/or its affiliates which provide this data. For more information,
@@ -70,6 +72,9 @@ Returns the Astronomy Picture of the Day for the previous day, or the given date
 
 #### /marsweather
 Explore Mars weather from the InSight Mars Lander!
+
+#### /eonet
+Explore Earth Observatory Natural Event Tracker data!
 
 #### /moonphase
 Returns the current moon phase and time until next new moon.

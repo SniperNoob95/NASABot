@@ -49,10 +49,11 @@ public class APODSlashCommand extends NASABotSlashCommand {
                     .findFirst();
             if (imageUrl.isPresent()) {
                 try {
+                    // TODO Need to determine if file size is over the limit
                     file = new URL(Objects.requireNonNull(imageUrl.get().getValue())).openStream();
                     embedBuilder.setImage("attachment://image.png");
                     slashCommandEvent.getHook().sendFiles(FileUpload.fromData(file, "image.png")).setEmbeds(embedBuilder.build()).queue();
-                } catch (NullPointerException | IOException e) {
+                } catch (Exception e) {
                     errorLoggingClient.handleError("APODSlashCommand", "execute", "Unable to format embed.", e);
                     slashCommandEvent.getHook().sendMessageEmbeds(new EmbedBuilder().setTitle("Picture of the Day").addField("ERROR", "Unable to obtain Picture of the Day.", false).setColor(Color.RED).build()).queue();
                 }
@@ -78,6 +79,7 @@ public class APODSlashCommand extends NASABotSlashCommand {
                             .findFirst();
                     if (imageUrl.isPresent()) {
                         try {
+                            // TODO Need to determine if file size is over the limit
                             file = new URL(Objects.requireNonNull(imageUrl.get().getValue())).openStream();
                             embedBuilder.setImage("attachment://image.png");
                             slashCommandEvent.getHook().sendFiles(FileUpload.fromData(file, "image.png")).setEmbeds(embedBuilder.build()).queue();

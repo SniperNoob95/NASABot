@@ -25,7 +25,7 @@ public class SetPostTimeSlashCommand extends NASABotSlashCommand {
     public void execute(@NotNull SlashCommandInteractionEvent slashCommandEvent) {
         try {
             if (!Objects.requireNonNull(slashCommandEvent.getMember()).hasPermission(Permission.ADMINISTRATOR) && !Objects.equals(Objects.requireNonNull(slashCommandEvent.getGuild()).getOwner(), slashCommandEvent.getMember())) {
-                slashCommandEvent.reply("Only server administrators or the server owner may use this command.").queue();
+                slashCommandEvent.reply("Only server administrators or the server owner may use this command!").setEphemeral(true).queue();
                 return;
             }
         } catch (NullPointerException e) {
