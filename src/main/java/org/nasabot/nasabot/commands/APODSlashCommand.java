@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Color;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -19,6 +20,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class APODSlashCommand extends NASABotSlashCommand {
+    private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public APODSlashCommand() {
@@ -49,10 +51,15 @@ public class APODSlashCommand extends NASABotSlashCommand {
                     .findFirst();
             if (imageUrl.isPresent()) {
                 try {
-                    // TODO Need to determine if file size is over the limit
-                    file = new URL(Objects.requireNonNull(imageUrl.get().getValue())).openStream();
-                    embedBuilder.setImage("attachment://image.png");
-                    slashCommandEvent.getHook().sendFiles(FileUpload.fromData(file, "image.png")).setEmbeds(embedBuilder.build()).queue();
+                    byte[] imageBytes = new URL(Objects.requireNonNull(imageUrl.get().getValue())).openStream().readAllBytes();
+                    if (imageBytes.length <= MAX_FILE_SIZE) {
+                        file = new ByteArrayInputStream(imageBytes);
+                        embedBuilder.setImage("attachment://image.png");
+                        slashCommandEvent.getHook().sendFiles(FileUpload.fromData(file, "image.png")).setEmbeds(embedBuilder.build()).queue();
+                    } else {
+                        embedBuilder.addField("Image", "Image is too large to display.", false);
+                        slashCommandEvent.getHook().sendMessageEmbeds(embedBuilder.build()).queue();
+                    }
                 } catch (Exception e) {
                     errorLoggingClient.handleError("APODSlashCommand", "execute", "Unable to format embed.", e);
                     slashCommandEvent.getHook().sendMessageEmbeds(new EmbedBuilder().setTitle("Picture of the Day").addField("ERROR", "Unable to obtain Picture of the Day.", false).setColor(Color.RED).build()).queue();
@@ -79,10 +86,14 @@ public class APODSlashCommand extends NASABotSlashCommand {
                             .findFirst();
                     if (imageUrl.isPresent()) {
                         try {
-                            // TODO Need to determine if file size is over the limit
-                            file = new URL(Objects.requireNonNull(imageUrl.get().getValue())).openStream();
-                            embedBuilder.setImage("attachment://image.png");
-                            slashCommandEvent.getHook().sendFiles(FileUpload.fromData(file, "image.png")).setEmbeds(embedBuilder.build()).queue();
+                            byte[] imageBytes = new URL(Objects.requireNonNull(imageUrl.get().getValue())).openStream().readAllBytes();
+                            if (imageBytes.length <= MAX_FILE_SIZE) {
+                                file = new ByteArrayInputStream(imageBytes);
+                                embedBuilder.setImage("attachment://image.png");
+                                slashCommandEvent.getHook().sendFiles(FileUpload.fromData(file, "image.png")).setEmbeds(embedBuilder.build()).queue();
+                            } else {
+                                slashCommandEvent.getHook().sendMessageEmbeds(embedBuilder.build()).queue();
+                            }
                         } catch (NullPointerException | IOException e) {
                             errorLoggingClient.handleError("APODSlashCommand", "execute", "Unable to format embed.", e);
                             slashCommandEvent.getHook().sendMessageEmbeds(new EmbedBuilder().setTitle("Picture of the Day").addField("ERROR", "Unable to obtain Picture of the Day.", false).setColor(Color.RED).build()).queue();

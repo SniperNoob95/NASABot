@@ -13,6 +13,7 @@ import org.nasabot.nasabot.clients.ErrorLoggingClient;
 import org.nasabot.nasabot.clients.NASAClient;
 import org.nasabot.nasabot.objects.APODChannel;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -22,6 +23,7 @@ import java.util.Optional;
 import java.util.TimerTask;
 
 public class APODScheduleTimerTask extends TimerTask {
+    private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
     private final DBClient dbClient = DBClient.getInstance();
     private final ErrorLoggingClient errorLoggingClient = ErrorLoggingClient.getInstance();
     private final NASAClient nasaClient = NASAClient.getInstance();
@@ -43,9 +45,14 @@ public class APODScheduleTimerTask extends TimerTask {
 
         if (imageField.isPresent()) {
             try {
-                InputStream file = new URL(Objects.requireNonNull(imageField.get().getValue())).openStream();
-                fileUpload = FileUpload.fromData(file, "image.png");
-                embedBuilder.setImage("attachment://image.png");
+                byte[] imageBytes = new URL(Objects.requireNonNull(imageField.get().getValue())).openStream().readAllBytes();
+                if (imageBytes.length <= MAX_FILE_SIZE) {
+                    InputStream file = new ByteArrayInputStream(imageBytes);
+                    fileUpload = FileUpload.fromData(file, "image.png");
+                    embedBuilder.setImage("attachment://image.png");
+                } else {
+                    embedBuilder.addField("Image", "Image is too large to display.", false);
+                }
             } catch (IOException e) {
                 errorLoggingClient.handleError("APODScheduleTimerTask", "run", "Error creating fileUpload.", e);
                 return;
