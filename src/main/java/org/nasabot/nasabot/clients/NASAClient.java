@@ -75,7 +75,32 @@ public class NASAClient extends NASABotClient {
         return null;
     }
 
-    public EmbedBuilder getLatestPictureOfTheDay() {
+    public EmbedBuilder getLatestPictureOfTheDay(boolean forceRefresh) {
+        if (forceRefresh) {
+            LocalDate now = LocalDate.now().plusDays(1);
+            while (true) {
+                HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(baseUrl + "/planetary/apod")).newBuilder();
+                builder.addQueryParameter("api_key", apiKey).addQueryParameter("date", inputDateFormat.format(Date.from(now.atStartOfDay(ZoneOffset.UTC).toInstant())));
+                Request request = new Request.Builder().url(builder.build().toString()).build();
+                System.out.println(request.url());
+                try (Response response = httpClient.newCall(request).execute()) {
+                    ResponseBody responseBody = response.body();
+                    String responseString = responseBody.string();
+                    if (responseString.contains("No data available") || responseString.contains("Date must be between")) {
+                        now = now.minusDays(1);
+                        continue;
+                    }
+                    System.out.println(responseString);
+                    EmbedBuilder embedBuilder = formatPictureOfTheDay(responseString);
+                    cachedAPOD = new Pair<>(System.currentTimeMillis() / 1000, embedBuilder);
+                    return embedBuilder;
+                } catch (Exception e) {
+                    errorLoggingClient.handleError("NASAClient", "getPictureOfTheDay", "Cannot get picture of the day.", e);
+                    // If we get an error, just return the cached APOD if present.
+                    return cachedAPOD != null ? cachedAPOD.getSecond() : null;
+                }
+            }
+        }
         // If no cache or if cache is older than 1 hour
         if (cachedAPOD == null || cachedAPOD.getFirst() < System.currentTimeMillis() / 1000 - 3600) {
             LocalDate now = LocalDate.now().plusDays(1);
@@ -97,7 +122,7 @@ public class NASAClient extends NASABotClient {
                     return embedBuilder;
                 } catch (Exception e) {
                     errorLoggingClient.handleError("NASAClient", "getPictureOfTheDay", "Cannot get picture of the day.", e);
-                    // If we get an error just return the cached APOD if present.
+                    // If we get an error, just return the cached APOD if present.
                     return cachedAPOD != null ? cachedAPOD.getSecond() : null;
                 }
             }

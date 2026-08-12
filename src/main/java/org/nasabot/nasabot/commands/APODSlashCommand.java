@@ -35,7 +35,7 @@ public class APODSlashCommand extends NASABotSlashCommand {
         slashCommandEvent.deferReply().queue();
 
         if (slashCommandEvent.getOption("date") == null) {
-            EmbedBuilder embedBuilder = nasaClient.getLatestPictureOfTheDay();
+            EmbedBuilder embedBuilder = nasaClient.getLatestPictureOfTheDay(false);
             if (embedBuilder == null) {
                 slashCommandEvent.getHook().sendMessageEmbeds(new EmbedBuilder().setTitle("Picture of the Day")
                                 .addField("ERROR", "Unable to obtain Picture of the Day from NASA. Please try again soon.", false)

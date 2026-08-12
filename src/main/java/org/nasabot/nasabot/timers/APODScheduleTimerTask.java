@@ -36,7 +36,7 @@ public class APODScheduleTimerTask extends TimerTask {
 
     @Override
     public void run() {
-        EmbedBuilder embedBuilder = nasaClient.getLatestPictureOfTheDay();
+        EmbedBuilder embedBuilder = nasaClient.getLatestPictureOfTheDay(true);
         FileUpload fileUpload = null;
         Optional<MessageEmbed.Field> imageField = embedBuilder.getFields().stream()
                 .filter(field -> field.getName() != null)
