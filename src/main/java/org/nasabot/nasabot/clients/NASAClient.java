@@ -147,7 +147,7 @@ public class NASAClient extends NASABotClient {
                 embedBuilder.addField("HD Image Link", jsonObject.getString("hdurl"), false);
             }
             if (jsonObject.has("url")) {
-                if (jsonObject.getString("url").contains("youtube.com") || jsonObject.getString("url").contains("video")) {
+                if (jsonObject.getString("url").contains("youtube.com") || jsonObject.getString("url").contains("video") || jsonObject.getString("url").contains(".mp4")) {
                     embedBuilder.addField("Video Link", jsonObject.getString("url"), false);
                 }
             }
