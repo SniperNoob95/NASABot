@@ -44,8 +44,8 @@ public class APODScheduleTimerTask extends TimerTask {
                 .findFirst();
 
         if (imageField.isPresent()) {
-            try {
-                byte[] imageBytes = new URL(Objects.requireNonNull(imageField.get().getValue())).openStream().readAllBytes();
+            try (InputStream urlStream = new URL(Objects.requireNonNull(imageField.get().getValue())).openStream()) {
+                byte[] imageBytes = urlStream.readAllBytes();
                 if (imageBytes.length <= MAX_FILE_SIZE) {
                     InputStream file = new ByteArrayInputStream(imageBytes);
                     fileUpload = FileUpload.fromData(file, "image.png");

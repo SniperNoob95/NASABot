@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -74,8 +73,9 @@ public class ImageSearchSlashCommand extends NASABotSlashCommand {
 
                         // Schedule task to delete message in 5 minutes
                         try {
-                            TimerTask timerTask = new NASAImageTimerTask(Objects.requireNonNull(slashCommandEvent.getGuild()).getId(), slashCommandEvent.getChannelId(), messageId);
+                            NASAImageTimerTask timerTask = new NASAImageTimerTask(Objects.requireNonNull(slashCommandEvent.getGuild()).getId(), slashCommandEvent.getChannelId(), messageId);
                             Timer timer = new Timer(true);
+                            timerTask.setOwnerTimer(timer);
                             timer.schedule(timerTask, Date.from(Instant.now().plusSeconds(300)));
                         } catch (NullPointerException e) {
                             errorLoggingClient.handleError("ImageSearchSlashCommand", "execute", "Unable to find Guild ID for deletion Timer Task.", e);

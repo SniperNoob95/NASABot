@@ -8,6 +8,7 @@ import org.nasabot.nasabot.managers.ButtonManager;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
 import java.util.TimerTask;
 
 public class NASAImageTimerTask extends TimerTask {
@@ -16,11 +17,16 @@ public class NASAImageTimerTask extends TimerTask {
     private final String messageId;
     private final ErrorLoggingClient errorLoggingClient = ErrorLoggingClient.getInstance();
     private final ButtonManager buttonManager = ButtonManager.getInstance();
+    private Timer ownerTimer;
 
     public NASAImageTimerTask(String guildId, String channelId, String messageId) {
         this.guildId = guildId;
         this.channelId = channelId;
         this.messageId = messageId;
+    }
+
+    public void setOwnerTimer(Timer ownerTimer) {
+        this.ownerTimer = ownerTimer;
     }
 
     @Override
@@ -40,9 +46,15 @@ public class NASAImageTimerTask extends TimerTask {
                 });
             } catch (NullPointerException e) {
                 errorLoggingClient.handleError("NASAImageTimerTask", "run", "Unable to find Channel for expired image.", e.getClass().getName());
+                buttonManager.removeButtonsFromMap(messageId);
             }
         } catch (NullPointerException e) {
             errorLoggingClient.handleError("NASAImageTimerTask", "run", "Unable to find Guild for expired image.", e.getClass().getName());
+            buttonManager.removeButtonsFromMap(messageId);
+        } finally {
+            if (ownerTimer != null) {
+                ownerTimer.cancel();
+            }
         }
     }
 }

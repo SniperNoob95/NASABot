@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -24,9 +23,8 @@ import java.util.ResourceBundle;
 
 import static java.util.Map.entry;
 
-public class DBClient {
+public class DBClient extends NASABotClient {
     private String url;
-    private final OkHttpClient httpClient = new OkHttpClient().newBuilder().build();
 
     private DBClient() {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
