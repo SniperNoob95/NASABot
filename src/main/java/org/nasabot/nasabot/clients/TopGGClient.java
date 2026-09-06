@@ -1,6 +1,5 @@
 package org.nasabot.nasabot.clients;
 
-import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -19,7 +18,7 @@ public class TopGGClient extends NASABotClient {
         try {
             token = resourceBundle.getString("TopGGKey");
         } catch (Exception e) {
-            errorLoggingClient.handleError("TopGGClient", "TopGGClient", "Cannot contact TopGG API.", e);
+            getErrorLoggingClient().handleError("TopGGClient", "TopGGClient", "Cannot contact TopGG API.", e);
             System.exit(1);
         }
     }
@@ -36,13 +35,13 @@ public class TopGGClient extends NASABotClient {
         int serverCount = NASABot.shardManager.getGuilds().size();
         try {
             RequestBody requestBody = RequestBody.create(new JSONObject().put("server_count", serverCount).toString(),
-                    MediaType.parse("application/json"));
+                    JSON_MEDIA_TYPE);
             Request request = new Request.Builder().url(url + "/stats").method("POST", requestBody)
                     .addHeader("Authorization", "Bearer " + token).build();
             try (Response response = httpClient.newCall(request).execute()) {
             }
         } catch (Exception e) {
-            errorLoggingClient.handleError("TopGGClient", "setStats", "Cannot set stats.", e);
+            getErrorLoggingClient().handleError("TopGGClient", "setStats", "Cannot set stats.", e);
         }
     }
 }

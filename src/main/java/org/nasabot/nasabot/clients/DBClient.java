@@ -3,7 +3,6 @@ package org.nasabot.nasabot.clients;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import okhttp3.HttpUrl;
-import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -15,13 +14,10 @@ import org.nasabot.nasabot.objects.MoonphaseChannel;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
-
-import static java.util.Map.entry;
 
 public class DBClient extends NASABotClient {
     private String url;
@@ -35,7 +31,7 @@ public class DBClient extends NASABotClient {
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Error loading DBClient config.");
-            System.exit(0);
+            System.exit(1);
         }
     }
 
@@ -113,7 +109,7 @@ public class DBClient extends NASABotClient {
     }
 
     public boolean issuePostRequest(String path, JSONObject payload) {
-        RequestBody requestBody = RequestBody.create(payload.toString(), MediaType.parse("application/json"));
+        RequestBody requestBody = RequestBody.create(payload.toString(), JSON_MEDIA_TYPE);
         Request request = new Request.Builder().url(url + path).post(requestBody).build();
         try (Response response = httpClient.newCall(request).execute()) {
             return response.code() == 201;
@@ -124,7 +120,7 @@ public class DBClient extends NASABotClient {
     }
 
     public boolean issuePutRequest(String path, JSONObject payload) {
-        RequestBody requestBody = RequestBody.create(payload.toString(), MediaType.parse("application/json"));
+        RequestBody requestBody = RequestBody.create(payload.toString(), JSON_MEDIA_TYPE);
         Request request = new Request.Builder().url(url + path).put(requestBody).build();
         try (Response response = httpClient.newCall(request).execute()) {
             return response.code() == 201;
@@ -203,7 +199,7 @@ public class DBClient extends NASABotClient {
      */
     public boolean deletePostChannel(String serverId) {
         try {
-            return issueDeleteRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))));
+            return issueDeleteRequest("/postChannels", Map.of("serverId", serverId));
         } catch (Exception e) {
             if (NASABot.loggingEnabled) e.printStackTrace();
             System.out.println(String.format("Failed to delete Post Channel for server: %s", serverId));
@@ -223,7 +219,7 @@ public class DBClient extends NASABotClient {
      */
     public String getPostChannelForServer(String serverId) {
         try {
-            return Objects.requireNonNull(issueGetRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))))).getJSONObject(0).getString("channel_id");
+            return Objects.requireNonNull(issueGetRequest("/postChannels", Map.of("serverId", serverId))).getJSONObject(0).getString("channel_id");
         } catch (Exception e) {
             if (NASABot.loggingEnabled) e.printStackTrace();
             return null;
@@ -238,7 +234,7 @@ public class DBClient extends NASABotClient {
      */
     public int getPostChannelId(String serverId) {
         try {
-            return Objects.requireNonNull(issueGetRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))))).getJSONObject(0).getInt("id");
+            return Objects.requireNonNull(issueGetRequest("/postChannels", Map.of("serverId", serverId))).getJSONObject(0).getInt("id");
         } catch (Exception e) {
             if (NASABot.loggingEnabled) e.printStackTrace();
             return -1;
@@ -253,7 +249,7 @@ public class DBClient extends NASABotClient {
      */
     public List<APODChannel> getPostChannelsForPostTimeOption(int timeOption) {
         List<APODChannel> apodChannels = new ArrayList<>();
-        JSONArray postChannels = issueGetRequest("/postChannels", new HashMap<>(Map.ofEntries(entry("timeOption", String.valueOf(timeOption)))));
+        JSONArray postChannels = issueGetRequest("/postChannels", Map.of("timeOption", String.valueOf(timeOption)));
         if (postChannels != null) {
             for (int i = 0; i < postChannels.length(); i++) {
                 apodChannels.add(new APODChannel(postChannels.getJSONObject(i).getString("server_id"), postChannels.getJSONObject(i).getString("channel_id")));
@@ -277,7 +273,7 @@ public class DBClient extends NASABotClient {
 
     public int getPostTimeForServer(int postChannelId) {
         try {
-            return Objects.requireNonNull(issueGetRequest("/postChannelConfigurations", new HashMap<>(Map.ofEntries(entry("postChannelId", String.valueOf(postChannelId)))))).getJSONObject(0).getInt("time_option");
+            return Objects.requireNonNull(issueGetRequest("/postChannelConfigurations", Map.of("postChannelId", String.valueOf(postChannelId)))).getJSONObject(0).getInt("time_option");
         } catch (Exception e) {
             if (NASABot.loggingEnabled) e.printStackTrace();
             System.out.println(String.format("Failed to get Post Configuration for Post Channel id: %s.", postChannelId));
@@ -317,7 +313,7 @@ public class DBClient extends NASABotClient {
      */
     public boolean deleteMoonphaseChannel(String serverId) {
         try {
-            return issueDeleteRequest("/moonphaseChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))));
+            return issueDeleteRequest("/moonphaseChannels", Map.of("serverId", serverId));
         } catch (Exception e) {
             if (NASABot.loggingEnabled) e.printStackTrace();
             System.out.println(String.format("Failed to delete Moonphase Channel for server: %s", serverId));
@@ -337,7 +333,7 @@ public class DBClient extends NASABotClient {
      */
     public String getMoonphaseChannelForServer(String serverId) {
         try {
-            return Objects.requireNonNull(issueGetRequest("/moonphaseChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))))).getJSONObject(0).getString("channel_id");
+            return Objects.requireNonNull(issueGetRequest("/moonphaseChannels", Map.of("serverId", serverId))).getJSONObject(0).getString("channel_id");
         } catch (Exception e) {
             if (NASABot.loggingEnabled) e.printStackTrace();
             return null;
@@ -352,7 +348,7 @@ public class DBClient extends NASABotClient {
      */
     public int getMoonphaseChannelId(String serverId) {
         try {
-            return Objects.requireNonNull(issueGetRequest("/moonphaseChannels", new HashMap<>(Map.ofEntries(entry("serverId", serverId))))).getJSONObject(0).getInt("id");
+            return Objects.requireNonNull(issueGetRequest("/moonphaseChannels", Map.of("serverId", serverId))).getJSONObject(0).getInt("id");
         } catch (Exception e) {
             if (NASABot.loggingEnabled) e.printStackTrace();
             return -1;
@@ -366,14 +362,14 @@ public class DBClient extends NASABotClient {
      * @return moonphaseChannels that match the query.
      */
     public List<MoonphaseChannel> getMoonphaseChannelsForMoonphaseTimeOption(int timeOption) {
-        List<MoonphaseChannel> apodChannels = new ArrayList<>();
-        JSONArray postChannels = issueGetRequest("/moonphaseChannels", new HashMap<>(Map.ofEntries(entry("timeOption", String.valueOf(timeOption)))));
+        List<MoonphaseChannel> moonphaseChannels = new ArrayList<>();
+        JSONArray postChannels = issueGetRequest("/moonphaseChannels", Map.of("timeOption", String.valueOf(timeOption)));
         if (postChannels != null) {
             for (int i = 0; i < postChannels.length(); i++) {
-                apodChannels.add(new MoonphaseChannel(postChannels.getJSONObject(i).getString("server_id"), postChannels.getJSONObject(i).getString("channel_id")));
+                moonphaseChannels.add(new MoonphaseChannel(postChannels.getJSONObject(i).getString("server_id"), postChannels.getJSONObject(i).getString("channel_id")));
             }
         }
-        return apodChannels;
+        return moonphaseChannels;
     }
 
     /**
@@ -391,7 +387,7 @@ public class DBClient extends NASABotClient {
 
     public int getMoonphaseTimeForServer(int moonphaseChannelId) {
         try {
-            return Objects.requireNonNull(issueGetRequest("/moonphaseChannelConfigurations", new HashMap<>(Map.ofEntries(entry("moonphaseChannelId", String.valueOf(moonphaseChannelId)))))).getJSONObject(0).getInt("time_option");
+            return Objects.requireNonNull(issueGetRequest("/moonphaseChannelConfigurations", Map.of("moonphaseChannelId", String.valueOf(moonphaseChannelId)))).getJSONObject(0).getInt("time_option");
         } catch (Exception e) {
             if (NASABot.loggingEnabled) e.printStackTrace();
             System.out.println(String.format("Failed to get Moonphase Configuration for MoonPhase Channel id: %s.", moonphaseChannelId));

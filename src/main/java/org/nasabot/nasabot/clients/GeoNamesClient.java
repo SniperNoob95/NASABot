@@ -18,7 +18,7 @@ public class GeoNamesClient extends NASABotClient {
         try {
             username = resourceBundle.getString("geoNamesUsername");
         } catch (Exception e) {
-            errorLoggingClient.handleError("GeoNamesClient", "GeoNamesClient", "Cannot create GeoNamesClient.", e);
+            getErrorLoggingClient().handleError("GeoNamesClient", "GeoNamesClient", "Cannot create GeoNamesClient.", e);
             System.exit(1);
         }
     }
@@ -45,7 +45,7 @@ public class GeoNamesClient extends NASABotClient {
                         "Generally this means the ISS is currently in international territory or over an ocean.");
             }
         } catch (Exception e) {
-            errorLoggingClient.handleError("GeoNamesClient", "getCountryFromLatitudeLongitude", "Unable to get ISS location.", e);
+            getErrorLoggingClient().handleError("GeoNamesClient", "getCountryFromLatitudeLongitude", "Unable to get ISS location.", e);
         }
 
         return null;

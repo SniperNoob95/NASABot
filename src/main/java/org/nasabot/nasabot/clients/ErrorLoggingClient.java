@@ -3,7 +3,14 @@ package org.nasabot.nasabot.clients;
 import org.nasabot.nasabot.NASABot;
 
 public class ErrorLoggingClient {
-    private final DBClient dbClient = DBClient.getInstance();
+    private DBClient dbClient;
+
+    private DBClient getDbClient() {
+        if (dbClient == null) {
+            dbClient = DBClient.getInstance();
+        }
+        return dbClient;
+    }
 
     private ErrorLoggingClient() {
     }
@@ -27,19 +34,19 @@ public class ErrorLoggingClient {
                 stringBuilder.append(String.format("%s;", element));
             }
         } else {
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < Math.min(5, stackTraceElements.length); i++) {
                 stringBuilder.append(String.format("%s;", stackTraceElements[i]));
             }
         }
 
-        dbClient.insertErrorLog(className, method, log, stringBuilder.toString());
+        getDbClient().insertErrorLog(className, method, log, stringBuilder.toString());
     }
 
     public void handleError(String className, String method, String log, String exceptionClass) {
-        dbClient.insertErrorLog(className, method, log, exceptionClass);
+        getDbClient().insertErrorLog(className, method, log, exceptionClass);
     }
 
     public void handleError(String className, String method, String log) {
-        dbClient.insertErrorLog(className, method, log);
+        getDbClient().insertErrorLog(className, method, log);
     }
 }

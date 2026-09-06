@@ -105,7 +105,7 @@ public class APODSlashCommand extends NASABotSlashCommand {
                     slashCommandEvent.getHook().sendMessage(String.format("Unable to get APOD, please check your formatting: %s", this.getArgumentsString())).queue();
                 }
             } catch (ParseException e) {
-                errorLoggingClient.handleError("APODSlashCommand", "execute", String.format("Unable to parse date: %s", slashCommandEvent.getOption("date")), e);
+                errorLoggingClient.handleError("APODSlashCommand", "execute", String.format("Unable to parse date: %s", slashCommandEvent.getOption("date").getAsString()), e);
                 slashCommandEvent.getHook().sendMessage(String.format("Unable to get APOD, please check your formatting: %s", this.getArgumentsString())).queue();
             }
         }

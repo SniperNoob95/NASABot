@@ -24,8 +24,8 @@ public class MapBoxClient extends NASABotClient {
         try {
             token = resourceBundle.getString("mapboxToken");
         } catch (Exception e) {
-            errorLoggingClient.handleError("MapBoxClient", "MapBoxClient", "Cannot load MapBox token.", e);
-            System.exit(0);
+            getErrorLoggingClient().handleError("MapBoxClient", "MapBoxClient", "Cannot load MapBox token.", e);
+            System.exit(1);
         }
     }
 
@@ -68,7 +68,7 @@ public class MapBoxClient extends NASABotClient {
                 return fileUpload;
             }
         } catch (Exception e) {
-            errorLoggingClient.handleError("MapBoxClient", "getMapImageForLocation", "Unable to process MapBox image.", e);
+            getErrorLoggingClient().handleError("MapBoxClient", "getMapImageForLocation", "Unable to process MapBox image.", e);
             return null;
         }
     }
@@ -77,7 +77,7 @@ public class MapBoxClient extends NASABotClient {
         try {
             Files.delete(Paths.get("./" + fileName));
         } catch (IOException e) {
-            errorLoggingClient.handleError("MapBoxClient", "deleteFile", "Unable to delete ISS file.", e);
+            getErrorLoggingClient().handleError("MapBoxClient", "deleteFile", "Unable to delete ISS file.", e);
         }
     }
 }

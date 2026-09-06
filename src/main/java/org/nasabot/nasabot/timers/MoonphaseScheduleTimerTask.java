@@ -33,32 +33,36 @@ public class MoonphaseScheduleTimerTask extends TimerTask {
 
     @Override
     public void run() {
-        MessageEmbed moonphaseEmbed = moonphaseClient.getMoonPhase();
+        try {
+            MessageEmbed moonphaseEmbed = moonphaseClient.getMoonPhase();
 
-        List<MoonphaseChannel> moonphaseChannels = dbClient.getMoonphaseChannelsForMoonphaseTimeOption(timeOption);
+            List<MoonphaseChannel> moonphaseChannels = dbClient.getMoonphaseChannelsForMoonphaseTimeOption(timeOption);
 
-        if (NASABot.loggingEnabled) {
-            try {
-                NASABot.shardManager.getShards().get(0).openPrivateChannelById("181588597558738954").queue(channel ->
-                        channel.sendMessage("Starting Moonphase for time option " + timeOption + " for " + moonphaseChannels.size() + " servers.").queue());
-            } catch (NullPointerException e) {
-                errorLoggingClient.handleError("MoonphaseScheduleTimerTask", "run", "Unable to find bot owner for logging.", e.getClass().getName());
-            }
-        }
-
-        entitlementManager.getActiveGuildEntitlements(e -> {
-            Set<String> entitlements = e.stream().map(Entitlement::getGuildId).collect(Collectors.toSet());
-            moonphaseChannels.forEach(moonphaseChannel -> {
-                rateLimiter.acquire();
-                if (entitlements.contains(moonphaseChannel.getServerId()) || entitlementManager.isWhitelistedGuild(moonphaseChannel.getServerId())) {
-                    sendMoonPhaseToChannel(moonphaseChannel, moonphaseEmbed);
-                } else {
-                    notifyEntitlementExpiration(moonphaseChannel);
-                    errorLoggingClient.handleError("APODScheduleTimerTask", "run", String.format("Entitlement not found for Guild %s, deleting Moonphase Channel.", moonphaseChannel.getServerId()));
-                    dbClient.deleteMoonphaseChannel(moonphaseChannel.getServerId());
+            if (NASABot.loggingEnabled) {
+                try {
+                    NASABot.shardManager.getShards().get(0).openPrivateChannelById("181588597558738954").queue(channel ->
+                            channel.sendMessage("Starting Moonphase for time option " + timeOption + " for " + moonphaseChannels.size() + " servers.").queue());
+                } catch (NullPointerException e) {
+                    errorLoggingClient.handleError("MoonphaseScheduleTimerTask", "run", "Unable to find bot owner for logging.", e.getClass().getName());
                 }
+            }
+
+            entitlementManager.getActiveGuildEntitlements(e -> {
+                Set<String> entitlements = e.stream().map(Entitlement::getGuildId).collect(Collectors.toSet());
+                moonphaseChannels.forEach(moonphaseChannel -> {
+                    rateLimiter.acquire();
+                    if (entitlements.contains(moonphaseChannel.getServerId()) || entitlementManager.isWhitelistedGuild(moonphaseChannel.getServerId())) {
+                        sendMoonPhaseToChannel(moonphaseChannel, moonphaseEmbed);
+                    } else {
+                        notifyEntitlementExpiration(moonphaseChannel);
+                        errorLoggingClient.handleError("MoonphaseScheduleTimerTask", "run", String.format("Entitlement not found for Guild %s, deleting Moonphase Channel.", moonphaseChannel.getServerId()));
+                        dbClient.deleteMoonphaseChannel(moonphaseChannel.getServerId());
+                    }
+                });
             });
-        });
+        } catch (Exception e) {
+            errorLoggingClient.handleError("MoonphaseScheduleTimerTask", "run", "Unexpected error in Moonphase scheduled task.", e);
+        }
     }
 
     private void notifyEntitlementExpiration(MoonphaseChannel moonphaseChannel) {

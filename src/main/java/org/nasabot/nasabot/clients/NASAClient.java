@@ -49,8 +49,8 @@ public class NASAClient extends NASABotClient {
         try {
             apiKey = resourceBundle.getString("NASAKey");
         } catch (Exception e) {
-            errorLoggingClient.handleError("NASAClient", "NASAClient", "Cannot contact NASA API.", e);
-            System.exit(0);
+            getErrorLoggingClient().handleError("NASAClient", "NASAClient", "Cannot contact NASA API.", e);
+            System.exit(1);
         }
     }
 
@@ -69,7 +69,7 @@ public class NASAClient extends NASABotClient {
         try (Response response = httpClient.newCall(request).execute()) {
             return formatPictureOfTheDay(Objects.requireNonNull(response.body()).string());
         } catch (Exception e) {
-            errorLoggingClient.handleError("NASAClient", "getPictureOfTheDay", "Cannot get picture of the day.", e);
+            getErrorLoggingClient().handleError("NASAClient", "getPictureOfTheDay", "Cannot get picture of the day.", e);
         }
 
         return null;
@@ -77,58 +77,38 @@ public class NASAClient extends NASABotClient {
 
     public EmbedBuilder getLatestPictureOfTheDay(boolean forceRefresh) {
         if (forceRefresh) {
-            LocalDate now = LocalDate.now().plusDays(1);
-            while (true) {
-                HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(baseUrl + "/planetary/apod")).newBuilder();
-                builder.addQueryParameter("api_key", apiKey).addQueryParameter("date", inputDateFormat.format(Date.from(now.atStartOfDay(ZoneOffset.UTC).toInstant())));
-                Request request = new Request.Builder().url(builder.build().toString()).build();
-                System.out.println(request.url());
-                try (Response response = httpClient.newCall(request).execute()) {
-                    ResponseBody responseBody = response.body();
-                    String responseString = responseBody.string();
-                    if (responseString.contains("No data available") || responseString.contains("Date must be between")) {
-                        now = now.minusDays(1);
-                        continue;
-                    }
-                    System.out.println(responseString);
-                    EmbedBuilder embedBuilder = formatPictureOfTheDay(responseString);
-                    cachedAPOD = new Pair<>(System.currentTimeMillis() / 1000, embedBuilder);
-                    return embedBuilder;
-                } catch (Exception e) {
-                    errorLoggingClient.handleError("NASAClient", "getPictureOfTheDay", "Cannot get picture of the day.", e);
-                    // If we get an error, just return the cached APOD if present.
-                    return cachedAPOD != null ? cachedAPOD.getSecond() : null;
-                }
-            }
+            return fetchAndCacheAPOD();
         }
         // If no cache or if cache is older than 1 hour
         if (cachedAPOD == null || cachedAPOD.getFirst() < System.currentTimeMillis() / 1000 - 3600) {
-            LocalDate now = LocalDate.now().plusDays(1);
-            while (true) {
-                HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(baseUrl + "/planetary/apod")).newBuilder();
-                builder.addQueryParameter("api_key", apiKey).addQueryParameter("date", inputDateFormat.format(Date.from(now.atStartOfDay(ZoneOffset.UTC).toInstant())));
-                Request request = new Request.Builder().url(builder.build().toString()).build();
-                System.out.println(request.url());
-                try (Response response = httpClient.newCall(request).execute()) {
-                    ResponseBody responseBody = response.body();
-                    String responseString = responseBody.string();
-                    if (responseString.contains("No data available") || responseString.contains("Date must be between")) {
-                        now = now.minusDays(1);
-                        continue;
-                    }
-                    System.out.println(responseString);
-                    EmbedBuilder embedBuilder = formatPictureOfTheDay(responseString);
-                    cachedAPOD = new Pair<>(System.currentTimeMillis() / 1000, embedBuilder);
-                    return embedBuilder;
-                } catch (Exception e) {
-                    errorLoggingClient.handleError("NASAClient", "getPictureOfTheDay", "Cannot get picture of the day.", e);
-                    // If we get an error, just return the cached APOD if present.
-                    return cachedAPOD != null ? cachedAPOD.getSecond() : null;
-                }
-            }
+            return fetchAndCacheAPOD();
         } else {
-            System.out.println("Cached APOD.");
+            System.out.println(true);
             return cachedAPOD.getSecond();
+        }
+    }
+
+    private EmbedBuilder fetchAndCacheAPOD() {
+        LocalDate now = LocalDate.now().plusDays(1);
+        while (true) {
+            HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(baseUrl + "/planetary/apod")).newBuilder();
+            builder.addQueryParameter("api_key", apiKey).addQueryParameter("date", inputDateFormat.format(Date.from(now.atStartOfDay(ZoneOffset.UTC).toInstant())));
+            Request request = new Request.Builder().url(builder.build().toString()).build();
+            try (Response response = httpClient.newCall(request).execute()) {
+                ResponseBody responseBody = response.body();
+                String responseString = responseBody.string();
+                if (responseString.contains("No data available") || responseString.contains("Date must be between")) {
+                    now = now.minusDays(1);
+                    continue;
+                }
+                EmbedBuilder embedBuilder = formatPictureOfTheDay(responseString);
+                cachedAPOD = new Pair<>(System.currentTimeMillis() / 1000, embedBuilder);
+                return embedBuilder;
+            } catch (Exception e) {
+                getErrorLoggingClient().handleError("NASAClient", "fetchAndCacheAPOD", "Cannot get picture of the day.", e);
+                // If we get an error, just return the cached APOD if present.
+                return cachedAPOD != null ? cachedAPOD.getSecond() : null;
+            }
         }
     }
 
@@ -140,9 +120,9 @@ public class NASAClient extends NASABotClient {
             EmbedBuilder embedBuilder = new EmbedBuilder();
             embedBuilder
                     .setTitle(jsonObject.getString("title"), String.format("https://apod.nasa.gov/apod/ap%s.html", jsonObject.getString("date").replaceAll("-", "").substring(2)))
-                    .setDescription(String.format("%s", outputDateFormat.format(inputDateFormat.parse(jsonObject.getString("date")))))
+                    .setDescription(outputDateFormat.format(inputDateFormat.parse(jsonObject.getString("date"))))
                     .setColor(new Color(192, 32, 232))
-                    .addField("Description", jsonObject.getString("explanation").length() > 1024 ? String.format("%s", jsonObject.getString("explanation")).substring(0, 1020) + "..." : String.format("%s", jsonObject.getString("explanation")), false);
+                    .addField("Description", jsonObject.getString("explanation").length() > 1024 ? jsonObject.getString("explanation").substring(0, 1020) + "..." : jsonObject.getString("explanation"), false);
             if (jsonObject.has("hdurl")) {
                 embedBuilder.addField("HD Image Link", jsonObject.getString("hdurl"), false);
             }
@@ -153,7 +133,7 @@ public class NASAClient extends NASABotClient {
             }
             return embedBuilder;
         } catch (Exception e) {
-            errorLoggingClient.handleError("NASAClient", "formatPictureOfTheDay", "Cannot format picture of the day.", e);
+            getErrorLoggingClient().handleError("NASAClient", "formatPictureOfTheDay", "Cannot format picture of the day.", e);
             return cachedAPOD != null
                     ? cachedAPOD.getSecond()
                     : new EmbedBuilder().setTitle("Picture of the Day").addField("ERROR", "Unable to obtain Picture of the Day.", false).setColor(Color.RED);
@@ -178,7 +158,7 @@ public class NASAClient extends NASABotClient {
             }
             return data;
         } catch (Exception e) {
-            errorLoggingClient.handleError("NASAClient", "getEONETEventsData", "Cannot get recent EONET events.", e);
+            getErrorLoggingClient().handleError("NASAClient", "getEONETEventsData", "Cannot get recent EONET events.", e);
             return cachedEONETEvents != null ? cachedEONETEvents.getSecond() : null;
         }
     }
@@ -221,7 +201,7 @@ public class NASAClient extends NASABotClient {
 
             return new EONETEventsData(map);
         } catch (Exception e) {
-            errorLoggingClient.handleError("NASAClient", "parseEONETEvents", "Cannot parse EONET events.", e);
+            getErrorLoggingClient().handleError("NASAClient", "parseEONETEvents", "Cannot parse EONET events.", e);
             return null;
         }
     }
@@ -235,7 +215,7 @@ public class NASAClient extends NASABotClient {
             JSONArray responseArray = responseBody.has("reason") ? new JSONArray() : responseBody.getJSONObject("collection").getJSONArray("items");
             return filterSuitableImages(responseArray);
         } catch (Exception e) {
-            errorLoggingClient.handleError("NASAClient", "getNASAImage", "Cannot get NASA images.", e);
+            getErrorLoggingClient().handleError("NASAClient", "getNASAImage", "Cannot get NASA images.", e);
         }
 
         return null;
@@ -243,10 +223,10 @@ public class NASAClient extends NASABotClient {
 
     private List<NASAImage> filterSuitableImages(JSONArray imageResponseArray) {
         List<NASAImage> images = new ArrayList<>();
+        List<String> requiredDataFields = List.of("title", "nasa_id", "description", "date_created", "location");
 
         for (int i = 0; i < imageResponseArray.length(); i++) {
             JSONObject selection = imageResponseArray.getJSONObject(i);
-            List<String> requiredDataFields = List.of("title", "nasa_id", "description", "date_created", "location");
             try {
                 boolean valid = true;
                 JSONObject data = selection.getJSONArray("data").getJSONObject(0);
@@ -266,7 +246,7 @@ public class NASAClient extends NASABotClient {
                     images.add(formatImageFromJSON(selection));
                 }
             } catch (Exception e) {
-                errorLoggingClient.handleError("NASAClient", "filterSuitableImages", "Uncaught exception when filtering images.", e);
+                getErrorLoggingClient().handleError("NASAClient", "filterSuitableImages", "Uncaught exception when filtering images.", e);
             }
         }
 
@@ -298,7 +278,7 @@ public class NASAClient extends NASABotClient {
                 cachedMarsWeatherData = new Pair<>(System.currentTimeMillis() / 1000, weatherData);
                 return weatherData;
             } catch (Exception e) {
-                errorLoggingClient.handleError("NASAClient", "getMarsWeatherData", "Cannot get Mars weather data.", e);
+                getErrorLoggingClient().handleError("NASAClient", "getMarsWeatherData", "Cannot get Mars weather data.", e);
                 return null;
             }
         } else {
@@ -364,7 +344,7 @@ public class NASAClient extends NASABotClient {
                 );
 
                 // HWS
-                JSONObject hwsObject = sol.getJSONObject("PRE");
+                JSONObject hwsObject = sol.getJSONObject("HWS");
                 HWS hws = new HWS(
                         "m/s",
                         hwsObject.getDouble("av"),
@@ -378,7 +358,7 @@ public class NASAClient extends NASABotClient {
 
             return new MarsWeatherData(sols.stream().collect(Collectors.toMap(Sol::getName, Function.identity())));
         } catch (Exception e) {
-            errorLoggingClient.handleError("NASAClient", "formatMarsWeatherData", "Cannot format Mars weather data.", e);
+            getErrorLoggingClient().handleError("NASAClient", "formatMarsWeatherData", "Cannot format Mars weather data.", e);
             return null;
         }
     }

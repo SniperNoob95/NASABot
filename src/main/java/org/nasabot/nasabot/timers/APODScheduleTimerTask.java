@@ -36,52 +36,56 @@ public class APODScheduleTimerTask extends TimerTask {
 
     @Override
     public void run() {
-        EmbedBuilder embedBuilder = nasaClient.getLatestPictureOfTheDay(true);
-        FileUpload fileUpload = null;
-        Optional<MessageEmbed.Field> imageField = embedBuilder.getFields().stream()
-                .filter(field -> field.getName() != null)
-                .filter(field -> field.getName().equals("HD Image Link"))
-                .findFirst();
+        try {
+            EmbedBuilder embedBuilder = nasaClient.getLatestPictureOfTheDay(true);
+            FileUpload fileUpload = null;
+            Optional<MessageEmbed.Field> imageField = embedBuilder.getFields().stream()
+                    .filter(field -> field.getName() != null)
+                    .filter(field -> field.getName().equals("HD Image Link"))
+                    .findFirst();
 
-        if (imageField.isPresent()) {
-            try (InputStream urlStream = new URL(Objects.requireNonNull(imageField.get().getValue())).openStream()) {
-                byte[] imageBytes = urlStream.readAllBytes();
-                if (imageBytes.length <= MAX_FILE_SIZE) {
-                    InputStream file = new ByteArrayInputStream(imageBytes);
-                    fileUpload = FileUpload.fromData(file, "image.png");
-                    embedBuilder.setImage("attachment://image.png");
-                } else {
-                    embedBuilder.addField("Image", "Image is too large to display.", false);
+            if (imageField.isPresent()) {
+                try (InputStream urlStream = new URL(Objects.requireNonNull(imageField.get().getValue())).openStream()) {
+                    byte[] imageBytes = urlStream.readAllBytes();
+                    if (imageBytes.length <= MAX_FILE_SIZE) {
+                        InputStream file = new ByteArrayInputStream(imageBytes);
+                        fileUpload = FileUpload.fromData(file, "image.png");
+                        embedBuilder.setImage("attachment://image.png");
+                    } else {
+                        embedBuilder.addField("Image", "Image is too large to display.", false);
+                    }
+                } catch (IOException e) {
+                    errorLoggingClient.handleError("APODScheduleTimerTask", "run", "Error creating fileUpload.", e);
+                    return;
+                }
+            }
+
+            List<APODChannel> apodChannels = dbClient.getPostChannelsForPostTimeOption(timeOption);
+
+            if (NASABot.loggingEnabled) {
+                try {
+                    NASABot.shardManager.getShards().get(0).openPrivateChannelById("181588597558738954").queue(channel ->
+                            channel.sendMessage("Starting APOD for time option " + timeOption + " for " + apodChannels.size() + " servers.").queue());
+                } catch (NullPointerException e) {
+                    errorLoggingClient.handleError("APODScheduleTimerTask", "run", "Unable to find bot owner for logging.", e.getClass().getName());
+                }
+            }
+
+            FileUpload finalFileUpload = fileUpload;
+            apodChannels.forEach(apodChannel -> {
+                rateLimiter.acquire();
+                sendAPODToChannel(apodChannel, embedBuilder, finalFileUpload);
+            });
+
+            try {
+                if (fileUpload != null) {
+                    fileUpload.close();
                 }
             } catch (IOException e) {
-                errorLoggingClient.handleError("APODScheduleTimerTask", "run", "Error creating fileUpload.", e);
-                return;
+                errorLoggingClient.handleError("APODScheduleTimerTask", "run", "Error closing fileUpload.", e);
             }
-        }
-
-        List<APODChannel> apodChannels = dbClient.getPostChannelsForPostTimeOption(timeOption);
-
-        if (NASABot.loggingEnabled) {
-            try {
-                NASABot.shardManager.getShards().get(0).openPrivateChannelById("181588597558738954").queue(channel ->
-                        channel.sendMessage("Starting APOD for time option " + timeOption + " for " + apodChannels.size() + " servers.").queue());
-            } catch (NullPointerException e) {
-                errorLoggingClient.handleError("APODScheduleTimerTask", "run", "Unable to find bot owner for logging.", e.getClass().getName());
-            }
-        }
-
-        FileUpload finalFileUpload = fileUpload;
-        apodChannels.forEach(apodChannel -> {
-            rateLimiter.acquire();
-            sendAPODToChannel(apodChannel, embedBuilder, finalFileUpload);
-        });
-
-        try {
-            if (fileUpload != null) {
-                fileUpload.close();
-            }
-        } catch (IOException e) {
-            errorLoggingClient.handleError("APODScheduleTimerTask", "run", "Error closing fileUpload.", e);
+        } catch (Exception e) {
+            errorLoggingClient.handleError("APODScheduleTimerTask", "run", "Unexpected error in APOD scheduled task.", e);
         }
     }
 

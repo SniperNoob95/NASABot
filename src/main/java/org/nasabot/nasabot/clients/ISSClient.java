@@ -37,7 +37,7 @@ public class ISSClient extends NASABotClient {
                 return formatISSLocation(Objects.requireNonNull(response.body()).string());
             }
         } catch (Exception e) {
-            errorLoggingClient.handleError("ISSClient", "getISSLocation", "Cannot get ISS location.", e);
+            getErrorLoggingClient().handleError("ISSClient", "getISSLocation", "Cannot get ISS location.", e);
         }
 
         return null;
@@ -64,7 +64,7 @@ public class ISSClient extends NASABotClient {
                     .setThumbnail("https://i.imgur.com/xm3XSgc.jpg");
             return embedBuilder.build();
         } catch (Exception e) {
-            errorLoggingClient.handleError("ISSClient", "formatISSLocation", "Cannot format ISS location.", e);
+            getErrorLoggingClient().handleError("ISSClient", "formatISSLocation", "Cannot format ISS location.", e);
             return new EmbedBuilder().setTitle("ISS Current Location")
                     .addField("ERROR", "Unable to obtain ISS location.", false).setColor(Color.RED).build();
         }
