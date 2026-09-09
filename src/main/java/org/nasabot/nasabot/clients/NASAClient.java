@@ -11,6 +11,8 @@ import org.json.JSONObject;
 import org.nasabot.nasabot.objects.NASAImage;
 import org.nasabot.nasabot.objects.eonet.EONETEvent;
 import org.nasabot.nasabot.objects.eonet.EONETEventsData;
+import org.nasabot.nasabot.objects.epic.EPICData;
+import org.nasabot.nasabot.objects.epic.EPICImage;
 import org.nasabot.nasabot.objects.marsweather.AT;
 import org.nasabot.nasabot.objects.marsweather.HWS;
 import org.nasabot.nasabot.objects.marsweather.MarsWeatherData;
@@ -36,12 +38,14 @@ import java.util.stream.Collectors;
 public class NASAClient extends NASABotClient {
     private final String baseUrl = "https://api.nasa.gov";
     private final String imageUrl = "https://images-api.nasa.gov";
+    private final String epicBaseUrl = "https://epic.gsfc.nasa.gov";
     private final SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMM dd, yyyy");
     private final SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private String apiKey;
     private Pair<Long, MarsWeatherData> cachedMarsWeatherData;
     private Pair<Long, EONETEventsData> cachedEONETEvents;
     private Pair<Long, EmbedBuilder> cachedAPOD;
+    private Pair<Long, EPICData> cachedEPICData;
 
     private NASAClient() {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
@@ -263,6 +267,70 @@ public class NASAClient extends NASABotClient {
                 data.getString("location"),
                 jsonObject.getJSONArray("links").getJSONObject(0).getString("href").replace(" ", "%20")
         );
+    }
+
+    public EPICData getEPICData(String collection, String date) {
+        String url;
+        if (date != null && !date.isEmpty()) {
+            url = epicBaseUrl + "/api/" + collection + "/date/" + date;
+        } else {
+            url = epicBaseUrl + "/api/" + collection;
+        }
+
+        Request request = new Request.Builder().url(url).build();
+        try (Response response = httpClient.newCall(request).execute()) {
+            String responseString = Objects.requireNonNull(response.body()).string();
+            return parseEPICData(responseString, collection, date);
+        } catch (Exception e) {
+            getErrorLoggingClient().handleError("NASAClient", "getEPICData", "Cannot get EPIC data.", e);
+            return null;
+        }
+    }
+
+    private EPICData parseEPICData(String responseString, String collection, String date) {
+        try {
+            JSONArray jsonArray = new JSONArray(responseString);
+            Map<String, EPICImage> map = new java.util.LinkedHashMap<>();
+
+            int limit = Math.min(jsonArray.length(), 8);
+            for (int i = 0; i < limit; i++) {
+                JSONObject obj = jsonArray.getJSONObject(i);
+                String identifier = obj.getString("identifier");
+                String caption = obj.optString("caption", "No caption available");
+                String imageName = obj.getString("image");
+                String imageDate = obj.optString("date", null);
+
+                double centroidLat = 0;
+                double centroidLon = 0;
+                JSONObject centroid = obj.optJSONObject("centroid_coordinates");
+                if (centroid != null) {
+                    centroidLat = centroid.optDouble("lat", 0);
+                    centroidLon = centroid.optDouble("lon", 0);
+                }
+
+                // Build image URL: https://epic.gsfc.nasa.gov/archive/{collection}/{year}/{month}/{day}/jpg/{imageName}.jpg
+                String imageUrl = buildEPICImageUrl(collection, imageDate, imageName);
+
+                map.put(identifier, new EPICImage(identifier, caption, imageName, imageDate,
+                        centroidLat, centroidLon, imageUrl));
+            }
+
+            return new EPICData(map, collection, date);
+        } catch (Exception e) {
+            getErrorLoggingClient().handleError("NASAClient", "parseEPICData", "Cannot parse EPIC data.", e);
+            return null;
+        }
+    }
+
+    private String buildEPICImageUrl(String collection, String date, String imageName) {
+        // Date format from API: "2026-09-06 00:59:48"
+        String datePart = date != null ? date.split(" ")[0] : "";
+        String[] parts = datePart.split("-");
+        if (parts.length == 3) {
+            return String.format("https://epic.gsfc.nasa.gov/archive/%s/%s/%s/%s/jpg/%s.jpg",
+                    collection, parts[0], parts[1], parts[2], imageName);
+        }
+        return String.format("https://epic.gsfc.nasa.gov/archive/%s/jpg/%s.jpg", collection, imageName);
     }
 
     public MarsWeatherData getMarsWeatherData() {

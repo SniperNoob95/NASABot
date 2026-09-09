@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.jetbrains.annotations.NotNull;
 import org.nasabot.nasabot.commands.APODSlashCommand;
 import org.nasabot.nasabot.commands.EONETSlashCommand;
+import org.nasabot.nasabot.commands.EPICSlashCommand;
 import org.nasabot.nasabot.commands.GetMoonphaseChannelSlashCommand;
 import org.nasabot.nasabot.commands.GetMoonphaseTimeSlashCommand;
 import org.nasabot.nasabot.commands.GetPostChannelSlashCommand;
@@ -64,7 +65,7 @@ public class NASABot extends ListenerAdapter {
     public static List<NASABotSlashCommand> localCommands;
     public static String ownerId;
     private static boolean commandsUpdated;
-    public static final String VERSION = "13.2.1";
+    public static final String VERSION = "14.0.0";
 
     public static void main(String[] args) {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
@@ -83,6 +84,7 @@ public class NASABot extends ListenerAdapter {
         // Slash commands
         slashCommands = List.of(new APODSlashCommand(),
                 new EONETSlashCommand(),
+                new EPICSlashCommand(),
                 new GetMoonphaseChannelSlashCommand(),
                 new GetMoonphaseTimeSlashCommand(),
                 new GetPostChannelSlashCommand(),

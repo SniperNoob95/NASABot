@@ -10,6 +10,7 @@ import org.nasabot.nasabot.clients.ErrorLoggingClient;
 import org.nasabot.nasabot.clients.NASAClient;
 import org.nasabot.nasabot.managers.ButtonManager;
 import org.nasabot.nasabot.objects.NASAImage;
+import org.nasabot.nasabot.objects.epic.EPICData;
 import org.nasabot.nasabot.objects.marsweather.Sol;
 
 import java.awt.Color;
@@ -33,6 +34,8 @@ public class ButtonHandler extends ListenerAdapter {
             handleMarsWeatherButton(event, buttonId.split(":")[1]);
         } else if (buttonId.startsWith("EONET:")) {
             handleEONETButton(event, buttonId.split(":")[1]);
+        } else if (buttonId.startsWith("EPIC:")) {
+            handleEPICButton(event, buttonId);
         } else {
             event.reply("Unable to handle this button, please contact the owner for support using the `/info` command.").queue();
         }
@@ -85,6 +88,43 @@ public class ButtonHandler extends ListenerAdapter {
         }
 
         event.editComponents(sol.renderContainer()).setReplace(true).useComponentsV2().queue();
+    }
+
+    private void handleEPICButton(ButtonInteractionEvent event, String buttonId) {
+        // Button IDs: "EPIC:<collection>:<date>:<identifier>" for image view, "EPIC:HOME:<collection>:<date>" for back
+        String[] parts = buttonId.split(":");
+        if (parts.length < 4) {
+            event.reply("Invalid EPIC button.").setEphemeral(true).queue();
+            return;
+        }
+
+        String action = parts[1];
+
+        if (action.equals("HOME")) {
+            String collection = parts[2];
+            String date = parts[3];
+            EPICData data = nasaClient.getEPICData(collection, date);
+            if (data == null || data.getImages().isEmpty()) {
+                event.reply("Unable to refresh EPIC images. Please try again soon.").setEphemeral(true).queue();
+                return;
+            }
+            event.editComponents(data.renderContainer()).setReplace(true).useComponentsV2().queue();
+            return;
+        }
+
+        String collection = action;
+        String date = parts[2];
+        String identifier = parts[3];
+        EPICData data = nasaClient.getEPICData(collection, date);
+
+        var image = data != null ? data.getImages().get(identifier) : null;
+
+        if (image == null) {
+            event.reply("This EPIC image cannot be found. It may no longer be available. Please try again.").setEphemeral(true).queue();
+            return;
+        }
+
+        event.editComponents(image.renderContainer(collection, date)).setReplace(true).useComponentsV2().queue();
     }
 
     private void handleEONETButton(ButtonInteractionEvent event, String eventId) {
