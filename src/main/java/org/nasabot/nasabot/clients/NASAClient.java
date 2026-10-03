@@ -8,6 +8,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
 import org.nasabot.nasabot.objects.NASAImage;
 import org.nasabot.nasabot.objects.eonet.EONETEvent;
 import org.nasabot.nasabot.objects.eonet.EONETEventsData;
@@ -23,10 +24,7 @@ import org.nasabot.nasabot.objects.marsweather.WindDirection;
 
 import java.awt.Color;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +35,7 @@ import java.util.stream.Collectors;
 
 public class NASAClient extends NASABotClient {
     private final String baseUrl = "https://api.nasa.gov";
+    private final String apodBaseUrl = "https://science.nasa.gov/wp-json/wp/v2/apod-basic";
     private final String imageUrl = "https://images-api.nasa.gov";
     private final String epicBaseUrl = "https://epic.gsfc.nasa.gov";
     private final SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMM dd, yyyy");
@@ -67,11 +66,13 @@ public class NASAClient extends NASABotClient {
     }
 
     public EmbedBuilder getPictureOfTheDay(String date) {
-        HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(baseUrl + "/planetary/apod")).newBuilder();
-        builder.addQueryParameter("api_key", apiKey).addQueryParameter("date", date);
+        HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(apodBaseUrl)).newBuilder();
+        builder.addQueryParameter("date", date);
         Request request = new Request.Builder().url(builder.build().toString()).build();
         try (Response response = httpClient.newCall(request).execute()) {
-            return formatPictureOfTheDay(Objects.requireNonNull(response.body()).string());
+            String responseString = Objects.requireNonNull(response.body()).string();
+            JSONObject jsonObject = new JSONObject(responseString);
+            return formatPictureOfTheDay(jsonObject);
         } catch (Exception e) {
             getErrorLoggingClient().handleError("NASAClient", "getPictureOfTheDay", "Cannot get picture of the day.", e);
         }
@@ -93,47 +94,39 @@ public class NASAClient extends NASABotClient {
     }
 
     private EmbedBuilder fetchAndCacheAPOD() {
-        LocalDate now = LocalDate.now().plusDays(1);
-        while (true) {
-            HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(baseUrl + "/planetary/apod")).newBuilder();
-            builder.addQueryParameter("api_key", apiKey).addQueryParameter("date", inputDateFormat.format(Date.from(now.atStartOfDay(ZoneOffset.UTC).toInstant())));
-            Request request = new Request.Builder().url(builder.build().toString()).build();
-            try (Response response = httpClient.newCall(request).execute()) {
-                ResponseBody responseBody = response.body();
-                String responseString = responseBody.string();
-                if (responseString.contains("No data available") || responseString.contains("Date must be between")) {
-                    now = now.minusDays(1);
-                    continue;
-                }
-                EmbedBuilder embedBuilder = formatPictureOfTheDay(responseString);
+        Request request = new Request.Builder().url(apodBaseUrl).build();
+        try (Response response = httpClient.newCall(request).execute()) {
+            String responseString = Objects.requireNonNull(response.body()).string();
+            JSONArray jsonArray = new JSONArray(responseString);
+            if (!jsonArray.isEmpty()) {
+                EmbedBuilder embedBuilder = formatPictureOfTheDay(jsonArray.getJSONObject(0));
                 cachedAPOD = new Pair<>(System.currentTimeMillis() / 1000, embedBuilder);
                 return embedBuilder;
-            } catch (Exception e) {
-                getErrorLoggingClient().handleError("NASAClient", "fetchAndCacheAPOD", "Cannot get picture of the day.", e);
-                // If we get an error, just return the cached APOD if present.
-                return cachedAPOD != null ? cachedAPOD.getSecond() : null;
             }
+        } catch (Exception e) {
+            getErrorLoggingClient().handleError("NASAClient", "fetchAndCacheAPOD", "Cannot get picture of the day.", e);
         }
+        // If we get an error or no results, just return the cached APOD if present.
+        return cachedAPOD != null ? cachedAPOD.getSecond() : null;
     }
 
-    private EmbedBuilder formatPictureOfTheDay(String POTDResponse) {
+    private EmbedBuilder formatPictureOfTheDay(JSONObject jsonObject) {
         SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         try {
-            JSONObject jsonObject = new JSONObject(POTDResponse);
             EmbedBuilder embedBuilder = new EmbedBuilder();
+            String explanation = Jsoup.parse(jsonObject.getString("explanation")).text();
+            String titleUrl = jsonObject.optString("url", String.format("https://apod.nasa.gov/apod/ap%s.html", jsonObject.getString("date").replace("-", "").substring(2)));
             embedBuilder
-                    .setTitle(jsonObject.getString("title"), String.format("https://apod.nasa.gov/apod/ap%s.html", jsonObject.getString("date").replaceAll("-", "").substring(2)))
+                    .setTitle(jsonObject.getString("title"), titleUrl)
                     .setDescription(outputDateFormat.format(inputDateFormat.parse(jsonObject.getString("date"))))
                     .setColor(new Color(192, 32, 232))
-                    .addField("Description", jsonObject.getString("explanation").length() > 1024 ? jsonObject.getString("explanation").substring(0, 1020) + "..." : jsonObject.getString("explanation"), false);
+                    .addField("Description", explanation.length() > 1024 ? explanation.substring(0, 1020) + "..." : explanation, false);
             if (jsonObject.has("hdurl")) {
                 embedBuilder.addField("HD Image Link", jsonObject.getString("hdurl"), false);
             }
-            if (jsonObject.has("url")) {
-                if (jsonObject.getString("url").contains("youtube.com") || jsonObject.getString("url").contains("video") || jsonObject.getString("url").contains(".mp4")) {
-                    embedBuilder.addField("Video Link", jsonObject.getString("url"), false);
-                }
+            if (jsonObject.has("media_type") && jsonObject.getString("media_type").equals("video")) {
+                embedBuilder.addField("Video Link", jsonObject.optString("url", ""), false);
             }
             return embedBuilder;
         } catch (Exception e) {

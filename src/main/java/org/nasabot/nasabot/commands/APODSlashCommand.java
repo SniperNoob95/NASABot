@@ -70,6 +70,14 @@ public class APODSlashCommand extends NASABotSlashCommand {
         } else {
             try {
                 if (simpleDateFormat.parse(Objects.requireNonNull(slashCommandEvent.getOption("date")).getAsString()) != null) {
+                    EmbedBuilder tempResponse = new EmbedBuilder();
+                    tempResponse.setTitle("APOD");
+                    tempResponse.setColor(Color.RED);
+                    tempResponse.addField("ERROR", "The new APOD API is currently broken, and does not accept date parameters." +
+                            "\nSee https://github.com/nasa/apod-api/issues/181 for more information.", false);
+                    slashCommandEvent.getHook().sendMessageEmbeds(tempResponse.build()).queue();
+                    return;
+                    /*
                     EmbedBuilder embedBuilder = nasaClient.getPictureOfTheDay(Objects.requireNonNull(slashCommandEvent.getOption("date")).getAsString());
                     if (embedBuilder == null) {
                         slashCommandEvent.getHook().sendMessageEmbeds(new EmbedBuilder().setTitle("Picture of the Day")
@@ -103,6 +111,8 @@ public class APODSlashCommand extends NASABotSlashCommand {
                     }
                 } else {
                     slashCommandEvent.getHook().sendMessage(String.format("Unable to get APOD, please check your formatting: %s", this.getArgumentsString())).queue();
+
+                     */
                 }
             } catch (ParseException e) {
                 errorLoggingClient.handleError("APODSlashCommand", "execute", String.format("Unable to parse date: %s", slashCommandEvent.getOption("date").getAsString()), e);
