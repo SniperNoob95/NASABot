@@ -12,6 +12,8 @@ import org.nasabot.nasabot.managers.ButtonManager;
 import org.nasabot.nasabot.objects.NASAImage;
 import org.nasabot.nasabot.objects.epic.EPICData;
 import org.nasabot.nasabot.objects.marsweather.Sol;
+import org.nasabot.nasabot.objects.neo.NEO;
+import org.nasabot.nasabot.objects.neo.NEOData;
 
 import java.awt.Color;
 import java.text.SimpleDateFormat;
@@ -36,6 +38,8 @@ public class ButtonHandler extends ListenerAdapter {
             handleEONETButton(event, buttonId.split(":")[1]);
         } else if (buttonId.startsWith("EPIC:")) {
             handleEPICButton(event, buttonId);
+        } else if (buttonId.startsWith("NEO:")) {
+            handleNEOButton(event, buttonId);
         } else {
             event.reply("Unable to handle this button, please contact the owner for support using the `/info` command.").queue();
         }
@@ -151,5 +155,79 @@ public class ButtonHandler extends ListenerAdapter {
         }
 
         event.editComponents(eonetEvent.renderContainer()).setReplace(true).useComponentsV2().queue();
+    }
+
+    private void handleNEOButton(ButtonInteractionEvent event, String buttonId) {
+        // Button IDs:
+        // "NEO:PAGE:<page>" for pagination
+        // "NEO:VIEW:<page>:<neoId>" for viewing details of an NEO
+        // "NEO:ORBIT:<page>:<neoId>" for viewing orbital data of an NEO
+        // "NEO:HOME:<page>" for returning to the page list
+        String[] parts = buttonId.split(":");
+        if (parts.length < 3) {
+            event.reply("Invalid NEO button.").setEphemeral(true).queue();
+            return;
+        }
+
+        String action = parts[1];
+        int page;
+        try {
+            page = Integer.parseInt(parts[2]);
+        } catch (NumberFormatException e) {
+            page = 0;
+        }
+
+        if (action.equals("PAGE") || action.equals("HOME")) {
+            NEOData data = nasaClient.getNEOData(page);
+            if (data == null || data.getNeos().isEmpty()) {
+                event.reply("Unable to refresh NEO list. Please try again soon.").setEphemeral(true).queue();
+                return;
+            }
+            event.editComponents(data.renderContainer()).setReplace(true).useComponentsV2().queue();
+            return;
+        }
+
+        if (action.equals("VIEW")) {
+            if (parts.length < 4) {
+                event.reply("Invalid NEO selection.").setEphemeral(true).queue();
+                return;
+            }
+            String neoId = parts[3];
+            NEOData data = nasaClient.getNEOData(page);
+            NEO neo = data != null ? data.getNeos().get(neoId) : null;
+
+            if (neo == null) {
+                event.reply("This Near Earth Object cannot be found. It may no longer be available. Please try again.").setEphemeral(true).queue();
+                return;
+            }
+
+            event.editComponents(neo.renderContainer(page)).setReplace(true).useComponentsV2().queue();
+            return;
+        }
+
+        if (action.equals("ORBIT")) {
+            if (parts.length < 4) {
+                event.reply("Invalid NEO selection.").setEphemeral(true).queue();
+                return;
+            }
+            String neoId = parts[3];
+            NEOData data = nasaClient.getNEOData(page);
+            NEO neo = data != null ? data.getNeos().get(neoId) : null;
+
+            if (neo == null) {
+                event.reply("This Near Earth Object cannot be found. It may no longer be available. Please try again.").setEphemeral(true).queue();
+                return;
+            }
+
+            if (neo.getOrbitalData() == null) {
+                event.reply("Orbital data is not available for this Near Earth Object.").setEphemeral(true).queue();
+                return;
+            }
+
+            event.editComponents(neo.getOrbitalData().renderContainer(page, neo.getId(), neo.getName())).setReplace(true).useComponentsV2().queue();
+            return;
+        }
+
+        event.reply("Unknown action for NEO button.").setEphemeral(true).queue();
     }
 }

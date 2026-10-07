@@ -25,6 +25,7 @@ import org.nasabot.nasabot.commands.InfoSlashCommand;
 import org.nasabot.nasabot.commands.MarsWeatherSlashCommand;
 import org.nasabot.nasabot.commands.MoonphaseSlashCommand;
 import org.nasabot.nasabot.commands.NASABotSlashCommand;
+import org.nasabot.nasabot.commands.NEOSlashCommand;
 import org.nasabot.nasabot.commands.PremiumSlashCommand;
 import org.nasabot.nasabot.commands.RemovePostChannelSlashCommand;
 import org.nasabot.nasabot.commands.SetMoonphaseChannelSlashCommand;
@@ -65,7 +66,7 @@ public class NASABot extends ListenerAdapter {
     public static List<NASABotSlashCommand> localCommands;
     public static String ownerId;
     private static boolean commandsUpdated;
-    public static final String VERSION = "15.0.0";
+    public static final String VERSION = "16.0.0";
 
     public static void main(String[] args) {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
@@ -96,6 +97,7 @@ public class NASABot extends ListenerAdapter {
                 // Deprecated
                 // new MarsWeatherSlashCommand(),
                 new MoonphaseSlashCommand(),
+                new NEOSlashCommand(),
                 new PremiumSlashCommand(),
                 new RemovePostChannelSlashCommand(),
                 new SetMoonphaseChannelSlashCommand(),

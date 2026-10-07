@@ -21,15 +21,20 @@ import org.nasabot.nasabot.objects.marsweather.PRE;
 import org.nasabot.nasabot.objects.marsweather.Sol;
 import org.nasabot.nasabot.objects.marsweather.WD;
 import org.nasabot.nasabot.objects.marsweather.WindDirection;
+import org.nasabot.nasabot.objects.neo.NEO;
+import org.nasabot.nasabot.objects.neo.NEOData;
+import org.nasabot.nasabot.objects.neo.OrbitalData;
 
 import java.awt.Color;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -45,6 +50,7 @@ public class NASAClient extends NASABotClient {
     private Pair<Long, EONETEventsData> cachedEONETEvents;
     private Pair<Long, EmbedBuilder> cachedAPOD;
     private Pair<Long, EPICData> cachedEPICData;
+    private final Map<Integer, Pair<Long, NEOData>> cachedNEOData = new ConcurrentHashMap<>();
 
     private NASAClient() {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("config");
@@ -66,9 +72,9 @@ public class NASAClient extends NASABotClient {
     }
 
     public EmbedBuilder getPictureOfTheDay(String date) {
-        HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(apodBaseUrl)).newBuilder();
-        builder.addQueryParameter("date", date);
-        Request request = new Request.Builder().url(builder.build().toString()).build();
+        // New date format is YYMMDD instead of YYYY-MM-DD
+        String formattedDate = date.replace("-", "").replaceFirst("20", "");
+        Request request = new Request.Builder().url(apodBaseUrl + "/" + formattedDate).build();
         try (Response response = httpClient.newCall(request).execute()) {
             String responseString = Objects.requireNonNull(response.body()).string();
             JSONObject jsonObject = new JSONObject(responseString);
@@ -420,6 +426,126 @@ public class NASAClient extends NASABotClient {
             return new MarsWeatherData(sols.stream().collect(Collectors.toMap(Sol::getName, Function.identity())));
         } catch (Exception e) {
             getErrorLoggingClient().handleError("NASAClient", "formatMarsWeatherData", "Cannot format Mars weather data.", e);
+            return null;
+        }
+    }
+
+    public NEOData getNEOData(int page) {
+        if (page < 0) {
+            page = 0;
+        }
+        Pair<Long, NEOData> cached = cachedNEOData.get(page);
+        if (cached != null && cached.getFirst() >= (System.currentTimeMillis() / 1000 - 600)) {
+            return cached.getSecond();
+        }
+
+        HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(baseUrl + "/neo/rest/v1/neo/browse")).newBuilder();
+        builder.addQueryParameter("page", String.valueOf(page));
+        builder.addQueryParameter("size", "10");
+        builder.addQueryParameter("api_key", apiKey);
+
+        Request request = new Request.Builder().url(builder.build().toString()).build();
+        try (Response response = httpClient.newCall(request).execute()) {
+            String responseString = Objects.requireNonNull(response.body()).string();
+            NEOData data = parseNEOData(responseString);
+            if (data != null) {
+                cachedNEOData.put(page, new Pair<>(System.currentTimeMillis() / 1000, data));
+            }
+            return data;
+        } catch (Exception e) {
+            getErrorLoggingClient().handleError("NASAClient", "getNEOData", "Cannot get NEO data for page " + page, e);
+            return cached != null ? cached.getSecond() : null;
+        }
+    }
+
+    private NEOData parseNEOData(String responseString) {
+        try {
+            JSONObject jsonObject = new JSONObject(responseString);
+            JSONObject pageObj = jsonObject.optJSONObject("page");
+            int pageNumber = pageObj != null ? pageObj.optInt("number", 0) : 0;
+            int pageSize = pageObj != null ? pageObj.optInt("size", 10) : 10;
+            int totalPages = pageObj != null ? pageObj.optInt("total_pages", 1) : 1;
+            long totalElements = pageObj != null ? pageObj.optLong("total_elements", 0) : 0;
+
+            JSONArray neosArray = jsonObject.optJSONArray("near_earth_objects");
+            Map<String, NEO> map = new LinkedHashMap<>();
+            if (neosArray != null) {
+                for (int i = 0; i < neosArray.length(); i++) {
+                    JSONObject neoObj = neosArray.getJSONObject(i);
+                    String id = neoObj.optString("id", String.valueOf(i));
+                    String name = neoObj.optString("name", "Unknown NEO");
+                    String nasaJplUrl = neoObj.optString("nasa_jpl_url", "");
+                    double absoluteMagnitude = neoObj.optDouble("absolute_magnitude_h", 0.0);
+                    boolean isHazardous = neoObj.optBoolean("is_potentially_hazardous_asteroid", false);
+
+                    double minDiameter = 0.0;
+                    double maxDiameter = 0.0;
+                    JSONObject estDiam = neoObj.optJSONObject("estimated_diameter");
+                    if (estDiam != null) {
+                        JSONObject meters = estDiam.optJSONObject("meters");
+                        if (meters != null) {
+                            minDiameter = meters.optDouble("estimated_diameter_min", 0.0);
+                            maxDiameter = meters.optDouble("estimated_diameter_max", 0.0);
+                        }
+                    }
+
+                    List<String> approachDates = new ArrayList<>();
+                    JSONArray closeApproachData = neoObj.optJSONArray("close_approach_data");
+                    if (closeApproachData != null) {
+                        for (int j = 0; j < closeApproachData.length(); j++) {
+                            JSONObject approachObj = closeApproachData.getJSONObject(j);
+                            String date = approachObj.optString("close_approach_date", null);
+                            if (date != null && !date.isEmpty()) {
+                                approachDates.add(date);
+                            }
+                        }
+                    }
+
+                    OrbitalData orbitalData = null;
+                    JSONObject orbitalDataObj = neoObj.optJSONObject("orbital_data");
+                    if (orbitalDataObj != null) {
+                        JSONObject orbitClass = orbitalDataObj.optJSONObject("orbit_class");
+                        String orbitClassType = orbitClass != null ? orbitClass.optString("orbit_class_type", "N/A") : "N/A";
+                        String orbitClassDescription = orbitClass != null ? orbitClass.optString("orbit_class_description", "N/A") : "N/A";
+                        String orbitClassRange = orbitClass != null ? orbitClass.optString("orbit_class_range", "N/A") : "N/A";
+
+                        orbitalData = new OrbitalData(
+                                orbitalDataObj.optString("orbit_id", "N/A"),
+                                orbitalDataObj.optString("orbit_determination_date", "N/A"),
+                                orbitalDataObj.optString("first_observation_date", "N/A"),
+                                orbitalDataObj.optString("last_observation_date", "N/A"),
+                                orbitalDataObj.optString("data_arc_in_days", "N/A"),
+                                orbitalDataObj.optString("observations_used", "N/A"),
+                                orbitalDataObj.optString("orbit_uncertainty", "N/A"),
+                                orbitalDataObj.optString("minimum_orbit_intersection", "N/A"),
+                                orbitalDataObj.optString("jupiter_tisserand_invariant", "N/A"),
+                                orbitalDataObj.optString("epoch_osculation", "N/A"),
+                                orbitalDataObj.optString("eccentricity", "N/A"),
+                                orbitalDataObj.optString("semi_major_axis", "N/A"),
+                                orbitalDataObj.optString("inclination", "N/A"),
+                                orbitalDataObj.optString("ascending_node_longitude", "N/A"),
+                                orbitalDataObj.optString("orbital_period", "N/A"),
+                                orbitalDataObj.optString("perihelion_distance", "N/A"),
+                                orbitalDataObj.optString("perihelion_argument", "N/A"),
+                                orbitalDataObj.optString("aphelion_distance", "N/A"),
+                                orbitalDataObj.optString("perihelion_time", "N/A"),
+                                orbitalDataObj.optString("mean_anomaly", "N/A"),
+                                orbitalDataObj.optString("mean_motion", "N/A"),
+                                orbitalDataObj.optString("equinox", "N/A"),
+                                orbitClassType,
+                                orbitClassDescription,
+                                orbitClassRange
+                        );
+                    }
+
+                    NEO neo = new NEO(id, name, nasaJplUrl, absoluteMagnitude, minDiameter, maxDiameter, isHazardous, approachDates, orbitalData);
+                    map.put(id, neo);
+                }
+            }
+
+            return new NEOData(map, pageNumber, pageSize, totalPages, totalElements);
+        } catch (Exception e) {
+            getErrorLoggingClient().handleError("NASAClient", "parseNEOData", "Cannot parse NEO data.", e);
             return null;
         }
     }

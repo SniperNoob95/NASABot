@@ -45,7 +45,7 @@ public class EPICData {
 
         for (EPICImage image : imagesById.values()) {
             children.add(Section.of(
-                    Button.primary(makeImageButtonID(image.getIdentifier()), "View"),
+                    Button.primary(makeEPICButtonID(image.getIdentifier()), "View"),
                     TextDisplay.of(String.format("**%s**\n%s", trim(image.getImageName()), image.getPrettyDate()))
             ));
         }
@@ -57,7 +57,7 @@ public class EPICData {
         return s.length() > 80 ? s.substring(0, 80 - 3) + "..." : s;
     }
 
-    private String makeImageButtonID(String id) {
+    private String makeEPICButtonID(String id) {
         return "EPIC:" + collection + ":" + date + ":" + id;
     }
 }

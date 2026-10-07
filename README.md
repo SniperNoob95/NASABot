@@ -1,4 +1,4 @@
-# NASABot v15.0.0
+# NASABot v16.0.0
 A Discord bot that implements NASA and other space-related APIs to provide fun, interesting, and informative artifacts.
 This includes daily APOD postings, daily Moonphase postings, ISS location, NASA image database search, and more! New features are always 
 being explored and added!
@@ -91,6 +91,11 @@ Returns images from the NASA image database that match the given search term.
     /epic <date (YYYY-MM-DD)> [lighting]
     Ex: /epic 2020-09-05 enhanced
 Returns images from the NASA's EPIC image database.
+
+#### /neos
+    /neos [page]
+    Ex: /neos 2
+Browse NASA's Near Earth Object Web Service (NeoWs) database.
 
 #### /info
 Returns information about the bot.
