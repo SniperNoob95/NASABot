@@ -18,7 +18,7 @@ public class ToggleLoggingSlashCommand extends NASABotSlashCommand {
         this.insertCommand(slashCommandEvent);
 
         try {
-            if (!Objects.requireNonNull(slashCommandEvent.getMember()).isOwner()) {
+            if (!Objects.requireNonNull(slashCommandEvent.getMember()).getId().equals(NASABot.ownerId)) {
                 slashCommandEvent.reply("Only the bot owner may use this command.").queue();
                 return;
             }

@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -29,7 +30,7 @@ public class ImageSearchSlashCommand extends NASABotSlashCommand {
     private static final int NUMBER_OF_IMAGES = 5;
 
     public ImageSearchSlashCommand() {
-        super("image", "⭐ Search for images from the NASA Image Archive.", List.of(
+        super("image", Emoji.fromUnicode("U+2B50").getFormatted() + " Search for images from the NASA Image Archive.", List.of(
                 new OptionData(OptionType.STRING, "search", "Image keywords to search for.").setRequired(true),
                 new OptionData(OptionType.INTEGER, "page", "Results page to search within (default 1).").setRequiredRange(1, 100).setRequired(false)),
                 true, false);

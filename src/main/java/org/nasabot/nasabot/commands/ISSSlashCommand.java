@@ -1,6 +1,7 @@
 package org.nasabot.nasabot.commands;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +17,7 @@ public class ISSSlashCommand extends NASABotSlashCommand {
     private final MapBoxClient mapBoxClient = MapBoxClient.getInstance();
 
     public ISSSlashCommand() {
-        super("iss", "⭐ Displays the current location of the International Space Station.", Collections.emptyList(), true, false);
+        super("iss", Emoji.fromUnicode("U+2B50").getFormatted() + " Displays the current location of the International Space Station.", Collections.emptyList(), true, false);
     }
 
     @Override

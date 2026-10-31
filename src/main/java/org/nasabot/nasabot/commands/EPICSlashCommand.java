@@ -1,5 +1,6 @@
 package org.nasabot.nasabot.commands;
 
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -15,7 +16,7 @@ public class EPICSlashCommand extends NASABotSlashCommand {
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public EPICSlashCommand() {
-        super("epic", "⭐ Browse NASA's EPIC Earth imagery.",
+        super("epic", Emoji.fromUnicode("U+2B50").getFormatted() + " Browse NASA's EPIC Earth imagery.",
                 List.of(
                         new OptionData(OptionType.STRING, "date", "[yyyy-mm-dd] Date of the imagery to retrieve.")
                                 .setRequired(true),

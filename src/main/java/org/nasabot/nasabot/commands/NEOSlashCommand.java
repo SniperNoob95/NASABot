@@ -1,5 +1,6 @@
 package org.nasabot.nasabot.commands;
 
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public class NEOSlashCommand extends NASABotSlashCommand {
     public NEOSlashCommand() {
-        super("neos", "⭐ Browse NASA's Near Earth Object Web Service (NeoWs) database.",
+        super("neos", Emoji.fromUnicode("U+2B50").getFormatted() + " Browse NASA's Near Earth Object Web Service (NeoWs) database.",
                 List.of(
                         new OptionData(OptionType.INTEGER, "page", "Page number of NEOs to browse (starts at 1).")
                                 .setRequired(false)

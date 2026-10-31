@@ -1,5 +1,6 @@
 package org.nasabot.nasabot.commands;
 
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jspecify.annotations.NonNull;
 import org.nasabot.nasabot.objects.marsweather.MarsWeatherData;
@@ -8,7 +9,7 @@ import java.util.Collections;
 
 public class MarsWeatherSlashCommand extends NASABotSlashCommand {
     public MarsWeatherSlashCommand() {
-        super("marsweather", "⭐ Explore Mars weather data!", Collections.emptyList(), true, false);
+        super("marsweather", Emoji.fromUnicode("U+2B50").getFormatted() + " Explore Mars weather data!", Collections.emptyList(), true, false);
     }
 
     @Override

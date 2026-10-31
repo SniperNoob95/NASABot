@@ -3,6 +3,7 @@ package org.nasabot.nasabot.commands;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -14,7 +15,7 @@ import java.util.Objects;
 public class SetMoonphaseChannelSlashCommand extends NASABotSlashCommand {
 
     public SetMoonphaseChannelSlashCommand() {
-        super("setmoonphasechannel", "⭐ Sets the Daily Moonphase Channel for the server.",
+        super("setmoonphasechannel", Emoji.fromUnicode("U+2B50").getFormatted() + " Sets the Daily Moonphase Channel for the server.",
                 Collections.singletonList(new OptionData(OptionType.CHANNEL, "channel_mention", "The channel to set as the Moonphase Channel.").setRequired(true)), true, true);
     }
 

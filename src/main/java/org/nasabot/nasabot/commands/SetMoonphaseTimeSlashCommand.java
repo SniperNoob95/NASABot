@@ -1,6 +1,7 @@
 package org.nasabot.nasabot.commands;
 
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -13,7 +14,7 @@ import java.util.Objects;
 public class SetMoonphaseTimeSlashCommand extends NASABotSlashCommand {
 
     public SetMoonphaseTimeSlashCommand() {
-        super("setmoonphasetime", "⭐ Sets the Moonphase Time for the server.",
+        super("setmoonphasetime", Emoji.fromUnicode("U+2B50").getFormatted() + " Sets the Moonphase Time for the server.",
                 Collections.singletonList(new OptionData(OptionType.INTEGER, "moonphase_time", "The Moonphase Time option you want to use.").setRequired(true)
                         .addChoice("16:00 UTC (default)", 0)
                         .addChoice("6:00 UTC", 1)
